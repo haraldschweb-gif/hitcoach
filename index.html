@@ -1104,6 +1104,27 @@ function importAllData(){
   if(!raw){showToast('Kein JSON eingefügt');return}
   let dump;
   try{dump=JSON.parse(raw)}catch{showToast('Ungültiges JSON');return}
+
+  // FDDB-Format aus Apple-Health-Kurzbefehl: {"fddb":[{"date":"2026-06-12","kcal":1980,"p":158,"c":205,"f":62}]}
+  if(Array.isArray(dump.fddb)){
+    let fddbMerged=0;
+    dump.fddb.forEach(d=>{
+      if(!d.date)return;
+      const key='meals_'+d.date;
+      const meals=loadData(key,[]);
+      // Vorherigen FDDB-Import desselben Tages ersetzen, manuelle Einträge behalten
+      const filtered=meals.filter(m=>m.name!=='FDDB Tagesimport');
+      filtered.push({name:'FDDB Tagesimport',kcal:Math.round(d.kcal||0),p:Math.round(d.p||0),c:Math.round(d.c||0),f:Math.round(d.f||0)});
+      saveData(key,filtered);
+      fddbMerged++;
+    });
+    document.getElementById('import-json').value='';
+    document.getElementById('import-area').style.display='none';
+    renderNutritionHistory();updateNutritionTotals();updateDashboard();
+    showToast(fddbMerged+' FDDB-Tage importiert ✓');
+    return;
+  }
+
   const data=dump.data||dump;
   let merged=0;
   Object.keys(data).forEach(k=>{
