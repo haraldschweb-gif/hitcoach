@@ -111,6 +111,74 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
 .info-box strong{color:var(--accent)}
 .workout-done{margin:0 16px 12px;background:var(--bg2);border:1px solid var(--accent);border-radius:var(--radius);padding:20px;text-align:center;display:none}
 .workout-done.show{display:block}
+
+/* KADENZ TIMER */
+.kadenz-btn{display:inline-flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:3px 8px;cursor:pointer;margin-top:6px;transition:all 0.15s;}
+.kadenz-btn:active{opacity:0.7;}
+.kadenz-btn.running{background:rgba(0,229,160,0.12);border-color:var(--accent);color:var(--accent);}
+.kadenz-display{display:none;align-items:center;gap:8px;margin-top:6px;
+  background:var(--bg0);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+.kadenz-display.active{display:flex;}
+.kadenz-phase{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:80px;}
+.kadenz-phase.up{color:var(--accent);}
+.kadenz-phase.hold{color:var(--amber);}
+.kadenz-phase.down{color:var(--blue);}
+.kadenz-count{font-size:28px;font-weight:800;font-family:'DM Mono',monospace;
+  color:var(--text1);min-width:36px;text-align:center;line-height:1;}
+.kadenz-bar-wrap{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.kadenz-bar-fill{height:100%;border-radius:2px;transition:width 0.1s linear;}
+.kadenz-stop{font-size:14px;cursor:pointer;color:var(--text3);padding:2px 4px;}
+
+/* SUPERSATZ COUNTDOWN */
+.superset-countdown{display:none;align-items:center;gap:8px;
+  background:rgba(0,229,160,0.07);border:1px solid rgba(0,229,160,0.25);
+  border-radius:8px;padding:10px 14px;margin-top:8px;}
+.superset-countdown.active{display:flex;}
+.superset-count-num{font-size:32px;font-weight:800;font-family:'DM Mono',monospace;
+  color:var(--accent);min-width:40px;line-height:1;}
+.superset-count-label{font-size:12px;font-weight:700;color:var(--accent);line-height:1.4;}
+.superset-count-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+/* TRAINING STATE */
+.exercise-item.active-ex{
+  background:rgba(0,229,160,0.05);
+  border-left:3px solid var(--accent);
+  padding-left:13px;
+}
+.training-action-bar{
+  position:sticky;bottom:0;
+  padding:12px 16px calc(12px + var(--safe-bottom));
+  background:linear-gradient(transparent,var(--bg0) 30%);
+  display:flex;gap:8px;
+}
+.btn-start-training{
+  flex:1;background:var(--accent);color:var(--bg0);border:none;
+  border-radius:var(--radius-sm);font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:800;padding:14px 16px;cursor:pointer;
+  letter-spacing:-0.3px;
+}
+.btn-finish-training{
+  flex:1;background:var(--bg2);color:var(--accent);
+  border:1px solid var(--accent);border-radius:var(--radius-sm);
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  padding:14px 16px;cursor:pointer;
+}
+.btn-abort-training{
+  background:var(--bg2);color:var(--text3);border:1px solid var(--border);
+  border-radius:var(--radius-sm);font-family:'Syne',sans-serif;
+  font-size:12px;font-weight:600;padding:14px 12px;cursor:pointer;
+  white-space:nowrap;
+}
+  padding:12px 14px;display:flex;align-items:center;gap:12px;border:1px solid var(--border);}
+.rest-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rest-text{font-size:12px;font-weight:600;flex:1;}
+.rest-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;}
+
+/* DASHBOARD SHORTCUTS */
+.home-shortcut{cursor:pointer;transition:opacity 0.15s;}
+.home-shortcut:active{opacity:0.7;}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -157,6 +225,42 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
 /* inline edit input */
 .ww-inp{width:70px;text-align:center;font-size:16px;font-weight:800;font-family:'DM Mono',monospace;color:var(--accent);background:var(--bg3);border:1px solid var(--accent);border-radius:6px;padding:3px 4px;-moz-appearance:textfield;outline:none}
 .ww-inp::-webkit-outer-spin-button,.ww-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+/* SWAP BUTTON */
+.ex-swap-btn{display:inline-flex;align-items:center;gap:3px;font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;padding:2px 6px;cursor:pointer;margin-left:6px;vertical-align:middle;
+  transition:all 0.15s;flex-shrink:0;white-space:nowrap;}
+.ex-swap-btn:active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.ex-swap-btn.swapped{background:rgba(255,179,71,0.12);border-color:rgba(255,179,71,0.3);color:var(--amber);}
+/* ALTERNATIVES MODAL */
+.alt-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;
+  display:none;align-items:flex-end;justify-content:center;}
+.alt-modal-overlay.open{display:flex;}
+.alt-modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0;
+  width:100%;max-width:430px;padding:20px;padding-bottom:calc(20px + var(--safe-bottom));}
+.alt-modal-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:4px;
+  font-family:'DM Mono',monospace;letter-spacing:0.5px;text-transform:uppercase;}
+.alt-modal-orig{font-size:16px;font-weight:800;margin-bottom:16px;}
+.alt-option{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+.alt-option:active{border-color:var(--accent);background:var(--accent-dim);}
+.alt-option:last-child{margin-bottom:0;}
+.alt-option-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.alt-option-detail{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:3px;}
+.alt-option-note{font-size:11px;color:var(--text3);font-style:italic;}
+.alt-reset{width:100%;margin-top:12px;padding:10px;background:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text3);font-family:'Syne',sans-serif;
+  font-size:13px;cursor:pointer;}
+/* REPS + SUGGESTION ROW */
+.ww-reps-row{display:flex;align-items:center;gap:8px;margin-top:6px;padding:0 2px}
+.ww-reps-label{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap}
+.ww-reps-inp{width:52px;text-align:center;font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text1);background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 6px;-moz-appearance:textfield;outline:none}
+.ww-reps-inp:focus{border-color:var(--accent)}
+.ww-reps-inp::-webkit-outer-spin-button,.ww-reps-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.ww-suggestion{font-size:10px;font-family:'DM Mono',monospace;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.ww-suggestion.increase{background:rgba(0,229,160,0.12);color:var(--accent);border:1px solid rgba(0,229,160,0.3)}
+.ww-suggestion.hold{background:rgba(144,144,168,0.1);color:var(--text3);border:1px solid var(--border)}
+.ww-suggestion.decrease{background:rgba(255,77,109,0.12);color:var(--red);border:1px solid rgba(255,77,109,0.3)}
 </style>
 </head>
 <body>
@@ -203,7 +307,7 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
     </div>
   </div>
   <div class="section-label">Heutiges Training</div>
-  <div class="card">
+  <div class="card home-shortcut" onclick="showScreen('training',document.querySelectorAll('.nav-btn')[1])" id="home-training-card">
     <div class="card-body" id="home-training-body" style="color:var(--text2);font-size:13px">Lade...</div>
   </div>
   <div class="section-label">Letzte Mahlzeiten</div>
@@ -225,7 +329,9 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
       <div class="page-title">Training</div>
       <div class="page-sub" id="training-day-sub">HIT Upper / Lower</div>
     </div>
+    <button class="btn-secondary" onclick="showKadenzSettings()" style="font-size:10px;padding:5px 10px;">⚙ 2/1/4</button>
   </div>
+  <div id="rest-indicator" class="rest-indicator"></div>
   <div class="day-tabs" id="day-tabs"></div>
   <div id="workout-done-box" class="workout-done">
     <div style="font-size:32px;margin-bottom:8px">✓</div>
@@ -233,10 +339,7 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
     <div style="font-size:12px;color:var(--text2);margin-top:4px">Mindestens 4 Ruhetage gönnen.</div>
   </div>
   <div class="card" id="exercise-list"></div>
-  <div style="padding:0 16px 16px;display:flex;gap:8px;">
-    <button class="btn-primary" onclick="finishWorkout()" style="flex:1">Training abschließen ✓</button>
-    <button class="btn-secondary" onclick="resetWorkout()">Reset</button>
-  </div>
+  <div class="training-action-bar" id="training-action-bar"></div>
 </div>
 
 <!-- NUTRITION -->
@@ -508,6 +611,16 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
 
 <div class="toast" id="toast"></div>
 
+<!-- ALTERNATIVES MODAL -->
+<div class="alt-modal-overlay" id="alt-modal-overlay" onclick="if(event.target===this)closeAltModal()">
+  <div class="alt-modal">
+    <div class="alt-modal-title">Gerät belegt? Alternative wählen</div>
+    <div class="alt-modal-orig" id="alt-modal-orig"></div>
+    <div id="alt-modal-options"></div>
+    <button class="alt-reset" id="alt-reset-btn" onclick="resetSwap()">↺ Zurück zur Original-Übung</button>
+  </div>
+</div>
+
 <script>
 const USER={weight:98.3,fat:33.1,muscle:63.5,age:44,kcalTarget:2000,protTarget:155,carbTarget:220,fatTarget:67};
 const DAYS=['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -620,8 +733,79 @@ const QUICK_MEALS=[
   {name:'Hanfsamen 30g',kcal:170,p:10,c:4,f:14}
 ];
 
-// ===== WEIGHT LOGGER =====
-const WL_KEY='hit_weights_v1';
+// ===== ÜBUNGSALTERNATIVEN =====
+// Pro exKey: 1–2 Alternativen, die dieselbe Muskelgruppe ansprechen
+// Eigener exKey → eigene Gewichtshistorie, getrennt vom Original
+const ALTERNATIVES={
+  bankdruecken:[
+    {exKey:'brustpresse_maschine', name:'Brustpresse Maschine', detail:'1 Satz × 8–10 WH bis PmM · Gelenkschonender als Freihantel', note:'Alternative wenn Bank besetzt oder Schulter empfindlich'},
+    {exKey:'kabelziehen_brust', name:'Kabelziehen Brust (Fliegende)', detail:'1 Satz × 10–12 WH bis PmM · Konstante Spannung', note:'Freie Bewegungsbahn, gut für Brust-Isolation'}
+  ],
+  butterfly:[
+    {exKey:'kabel_butterfly', name:'Kabel-Crossover / Fliegende', detail:'1 Satz × 10–12 WH bis PmM · Konstante Spannung über vollen ROM', note:'Wenn Butterfly-Maschine besetzt'},
+    {exKey:'pec_deck', name:'Pec Deck Maschine', detail:'1 Satz × 10–12 WH bis PmM · Geführte Bewegung', note:'Gute Alternative zur Butterfly-Maschine'}
+  ],
+  latziehen:[
+    {exKey:'latzug_breiter_griff', name:'Latziehen (breiter Übergriff)', detail:'1 Satz × 8–10 WH bis PmM · Breiterer Griff = stärkere Außenrotation', note:'Gleiche Maschine, anderer Griff → anderer Reiz'},
+    {exKey:'kabel_rudern_eng', name:'Kabelrudern enger Griff', detail:'1 Satz × 8–10 WH bis PmM · Mehr Rhomboidei-Beteiligung', note:'Am Kabelturm mit V-Griff'}
+  ],
+  klimmzuege:[
+    {exKey:'latziehen_ersatz', name:'Latziehen (Untergriff)', detail:'1 Satz × 8–10 WH bis PmM · Gleiche Muskelgruppe, geführt', note:'Wenn Klimmzugstange besetzt oder zu schwer für PmM'},
+    {exKey:'assisted_klimmzug', name:'Klimmzug Maschine (assistiert)', detail:'1 Satz × 8–10 WH bis PmM · Negativgewicht hilft', note:'Geführte Alternative'}
+  ],
+  rudern:[
+    {exKey:'kabelrudern_breit', name:'Kabelrudern breiter Griff', detail:'1 Satz × 10–12 WH bis PmM · Mehr Trapez-Beteiligung', note:'Am Kabelturm mit breitem Griff'},
+    {exKey:'latzug_rudern', name:'Schrägbankrudern Maschine', detail:'1 Satz × 10–12 WH bis PmM · Stabiler Oberkörper', note:'Wenn Rudermaschine besetzt'}
+  ],
+  beinpresse:[
+    {exKey:'hackenschmidt', name:'Hackenschmidt / Hack-Squat', detail:'1 Satz × 8–12 WH bis PmM · Mehr Quad-Betonung', note:'Wenn Beinpresse besetzt'},
+    {exKey:'beinpresse_schmal', name:'Beinpresse (enger Fußstand)', detail:'1 Satz × 8–12 WH bis PmM · Mehr Quads, weniger Gesäß', note:'Gleiche Maschine, anderer Reiz'}
+  ],
+  beinstrecken:[
+    {exKey:'beinstrecken_einbeinig', name:'Beinstrecken einbeinig', detail:'1 Satz je Bein × 10–12 WH bis PmM · Beseitigt Seitenungleichgewichte', note:'An derselben Maschine'},
+    {exKey:'leg_extension_kabel', name:'Beinstrecker Kabel', detail:'1 Satz × 10–12 WH bis PmM · Stehend am Kabelturm', note:'Wenn Beinstreckermaschine besetzt'}
+  ],
+  nackendruecken:[
+    {exKey:'schulterdruecken_maschine', name:'Schulterdrücken Maschine', detail:'1 Satz × 8–10 WH bis PmM · Geführt, gelenkschonender', note:'Wenn Nackendrücken Schulterprobleme macht'},
+    {exKey:'arnoldpress', name:'Arnold Press (KH)', detail:'1 Satz × 8–10 WH bis PmM · Volle Schulterrotation', note:'Freier Bewegungsradius'}
+  ],
+  seitheben:[
+    {exKey:'seitheben_kabel', name:'Seitheben Kabel (einarmig)', detail:'1 Satz × 10–12 WH bis PmM · Konstante Spannung, kein toter Punkt', note:'Am Kabelturm – bessere Spannung als KH'},
+    {exKey:'seitheben_maschine', name:'Seitheben Maschine', detail:'1 Satz × 10–12 WH bis PmM · Geführt, ideal für Isolation', note:'Wenn vorhanden besser als KH'}
+  ],
+  bizepcurlslh:[
+    {exKey:'bizepcurls_kabel', name:'Bizep-Curls Kabel (Untergriff)', detail:'1 Satz × 8–10 WH bis PmM · Konstante Spannung über vollen ROM', note:'Am Kabelturm – kein toter Punkt oben'},
+    {exKey:'bizep_maschine', name:'Bizeps-Maschine', detail:'1 Satz × 8–10 WH bis PmM · Geführt, kein Schwung möglich', note:'Wenn LH besetzt'}
+  ],
+  bizepcurlskh:[
+    {exKey:'hammer_curls', name:'Hammer Curls (KH)', detail:'1 Satz × 10–12 WH bis PmM · Neutralgriff = mehr Brachialis', note:'Neutralgriff statt Supination – anderer Reiz'},
+    {exKey:'konzentrationscurls', name:'Konzentrations-Curls', detail:'1 Satz × 10–12 WH bis PmM · Maximale Isolation, kein Schwung', note:'Einarmig sitzend – Ellbogen an Oberschenkel'}
+  ],
+  trizepskabel:[
+    {exKey:'trizeps_dips', name:'Dips (enger Griff)', detail:'1 Satz × 8–10 WH bis PmM · Schwere Grundübung Trizeps', note:'An Dip-Station, Körper aufrecht'},
+    {exKey:'trizeps_maschine', name:'Trizeps-Drückmaschine', detail:'1 Satz × 10–12 WH bis PmM · Geführt, kein Balancebedarf', note:'Wenn Kabelturm besetzt'}
+  ],
+  ueberzuege:[
+    {exKey:'pullover_kabel', name:'Pullover Kabel', detail:'1 Satz × 10–12 WH bis PmM · Konstante Spannung, stehend', note:'Am Kabelturm von oben – wenn Bank besetzt'},
+    {exKey:'straight_arm_pulldown', name:'Straight-Arm Pulldown', detail:'1 Satz × 12–15 WH bis PmM · Lat-Isolation stehend', note:'Gerades Seil am Kabelturm von oben'}
+  ],
+  kreuzheben:[
+    {exKey:'beinbeuger_maschine', name:'Beinbeuger liegend (Maschine)', detail:'1 Satz × 10–12 WH bis PmM · Isolation Ischiocrurale, kein Rückenrisiko', note:'Sicherer wenn Kreuzheben-Technik noch nicht sauber'},
+    {exKey:'stiff_leg_maschine', name:'Beinbeuger sitzend', detail:'1 Satz × 10–12 WH bis PmM · Sitzend = mehr Dehnung', note:'Andere Maschinen-Variante'}
+  ],
+  wadenheben:[
+    {exKey:'wadenheben_stehend', name:'Wadenheben stehend (Maschine)', detail:'1 Satz × 12–15 WH bis PmM · Gastrocnemius stärker betont', note:'Wenn Beinpresse für Waden belegt'},
+    {exKey:'wadenheben_sitzend', name:'Wadenheben sitzend (Maschine)', detail:'1 Satz × 12–15 WH bis PmM · Soleus stärker betont', note:'Andere Muskelbetonung als stehend'}
+  ],
+  schulterheben:[
+    {exKey:'schulterheben_kabel', name:'Schulterheben Kabel', detail:'1 Satz × 12–15 WH bis PmM · Konstante Spannung', note:'Am Kabelturm mit kurzem Seil'},
+    {exKey:'schulterheben_maschine', name:'Schulterheben Maschine', detail:'1 Satz × 12–15 WH bis PmM · Geführt', note:'Wenn vorhanden'}
+  ]
+};
+
+// activeSwaps: sessionStorage-backed, bleibt bei Seiten-Reload erhalten (z.B. Anruf)
+let activeSwaps=(()=>{try{return JSON.parse(sessionStorage.getItem('hit_active_swaps')||'{}')}catch{return{}}})();
+function saveSwaps(){try{sessionStorage.setItem('hit_active_swaps',JSON.stringify(activeSwaps))}catch(e){console.warn('saveSwaps:',e);}}
 
 // Default starting weights per exKey
 const WEIGHT_DEFAULTS={
@@ -633,8 +817,49 @@ const WEIGHT_DEFAULTS={
 const WEIGHT_STEPS={wadenheben:5,beinpresse:5,klimmzuege:2.5};
 function getStep(k){return WEIGHT_STEPS[k]||2.5}
 
-function wlLoad(){try{return JSON.parse(localStorage.getItem(WL_KEY)||'{}')}catch{return{}}}
-function wlSave(d){try{localStorage.setItem(WL_KEY,JSON.stringify(d))}catch{}}
+function wlLoad(){try{return JSON.parse(localStorage.getItem(WL_KEY)||'{}')}catch(e){console.error('wlLoad:',e);return{}}}
+function wlSave(d){try{localStorage.setItem(WL_KEY,JSON.stringify(d))}catch(e){showToast('⚠ Speicherfehler – Daten nicht gespeichert');}}
+
+// ===== WIEDERHOLUNGEN & VORSCHLAG =====
+const REPS_KEY='hit_reps_v1';
+const REPS_MIN=8;  // Gießing-Korridor: 8–12 Wdh.
+const REPS_MAX=12;
+
+function getReps(key){
+  try{const d=JSON.parse(localStorage.getItem(REPS_KEY)||'{}');return d[key]||null}catch{return null}
+}
+
+function saveReps(key,val){
+  try{
+    const d=JSON.parse(localStorage.getItem(REPS_KEY)||'{}');
+    const n=parseInt(val);
+    if(!isNaN(n)&&n>0)d[key]=n; else delete d[key];
+    localStorage.setItem(REPS_KEY,JSON.stringify(d));
+  }catch(e){console.error('saveReps:',e);}
+}
+
+function buildSuggestion(key,weightKg,reps){
+  if(!reps)return'<span class="ww-suggestion hold">Wdh. eintragen</span>';
+  const r=parseInt(reps);
+  const step=getStep(key);
+  if(r>REPS_MAX){
+    return`<span class="ww-suggestion increase">↑ ${weightKg+step} kg (${r} Wdh. → steigern)</span>`;
+  } else if(r<REPS_MIN){
+    return`<span class="ww-suggestion decrease">↓ ${Math.max(0,weightKg-step)} kg (${r} Wdh. → reduzieren)</span>`;
+  } else {
+    return`<span class="ww-suggestion hold">✓ Gewicht halten (${r} Wdh. im Korridor)</span>`;
+  }
+}
+
+function refreshSuggestion(key){
+  const el=document.getElementById('ww-sug-'+key);
+  if(!el)return;
+  const repsEl=document.getElementById('ww-reps-'+key);
+  const reps=repsEl?parseInt(repsEl.value)||null:null;
+  if(reps)saveReps(key,reps);
+  const cur=getCurrentW(key);
+  el.innerHTML=buildSuggestion(key,cur,reps);
+}
 
 function getCurrentW(key){
   const d=wlLoad();
@@ -685,12 +910,30 @@ function buildWeightWidget(key){
     return `<div class="ww-hist-dot" style="opacity:${opacity};background:var(--accent)"></div>`;
   }).join('');
   const prHtml=isPR(key,cur)?`<span class="ww-pr">PR</span>`:'';
+  const reps=getReps(key);
+  const suggHtml=buildSuggestion(key,cur,reps);
   return `<div class="weight-widget" id="ww-${key}">
     <button class="ww-btn" onclick="wwChange('${key}',-${step});event.stopPropagation()">−</button>
     <div class="ww-val" id="ww-val-${key}" onclick="wwStartEdit('${key}');event.stopPropagation()">${cur}<span class="ww-unit"> kg</span></div>
     <button class="ww-btn" onclick="wwChange('${key}',+${step});event.stopPropagation()">+</button>
     <div class="ww-hist">${dotsHtml}</div>
     ${deltaHtml}${prHtml}
+  </div>
+  <div class="ww-reps-row" id="ww-reps-row-${key}">
+    <span class="ww-reps-label">Wdh. PmM:</span>
+    <input class="ww-reps-inp" id="ww-reps-${key}" type="number" min="1" max="30" placeholder="—"
+      value="${reps||''}"
+      onclick="event.stopPropagation()"
+      oninput="saveReps('${key}',this.value);refreshSuggestion('${key}')"
+      onblur="refreshSuggestion('${key}')">
+    <span id="ww-sug-${key}">${suggHtml}</span>
+  </div>
+  <button class="kadenz-btn" id="kbtn-${key}" onclick="startKadenz('${key}');event.stopPropagation()">▶ Kadenz ${kadenzSettings.up}/${kadenzSettings.hold}/${kadenzSettings.down}</button>
+  <div class="kadenz-display" id="kdisplay-${key}">
+    <div class="kadenz-phase" id="kphase-${key}">—</div>
+    <div class="kadenz-count" id="kcount-${key}">—</div>
+    <div class="kadenz-bar-wrap"><div class="kadenz-bar-fill" id="kbar-${key}" style="width:0%"></div></div>
+    <span class="kadenz-stop" onclick="stopKadenz('${key}');event.stopPropagation()">✕</span>
   </div>`;
 }
 
@@ -701,6 +944,7 @@ function wwChange(key,delta){
   if(next<0)next=0;
   saveW(key,next);
   wwRefresh(key,next);
+  refreshSuggestion(key);
   showToast(next+' kg gespeichert ✓');
 }
 
@@ -709,7 +953,7 @@ function wwStartEdit(key){
   const valEl=document.getElementById('ww-val-'+key);
   if(!valEl)return;
   valEl.innerHTML=`<input class="ww-inp" id="ww-inp-${key}" type="number" value="${cur}" step="${getStep(key)}" min="0"
-    onblur="wwCommit('${key}')" onkeydown="if(event.key==='Enter'){wwCommit('${key}');event.preventDefault()}"
+    onblur="wwCommit('${key}')" onkeydown="if(event.key==='Enter'){event.preventDefault();event.target.blur();}"
     onclick="event.stopPropagation()">`;
   const inp=document.getElementById('ww-inp-'+key);
   if(inp){inp.focus();inp.select();}
@@ -722,6 +966,7 @@ function wwCommit(key){
   if(!isNaN(val)&&val>=0){
     saveW(key,val);
     wwRefresh(key,val);
+    refreshSuggestion(key);
     showToast(val+' kg gespeichert ✓');
   } else {
     wwRefresh(key,getCurrentW(key));
@@ -771,19 +1016,25 @@ function wwRefresh(key,w){
 
 function getCoachAnswer(text){const t=text.toLowerCase();let best=0,ans=null;for(const e of COACH_KNOWLEDGE){const s=e.keys.filter(k=>t.includes(k)).length;if(s>best){best=s;ans=e.answer}}return best===0?'Dazu habe ich keine direkte Antwort. Frag mich zu: Training (PmM, Kadenz, Übungen, Ruhetage), Ernährung (Protein, Kalorien, vegane Quellen) oder HIT-Prinzipien (Nachermüdung, Supersatz, Regeneration).':ans}
 
-function getDateKey(d){return d.toISOString().split('T')[0]}
+function getDateKey(d){
+  // Lokales Datum in Europe/Berlin – verhindert UTC-Verschiebung nach 23:30 Uhr
+  return d.toLocaleDateString('sv-SE',{timeZone:'Europe/Berlin'});
+}
 function today(){return getDateKey(new Date())}
-function loadData(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
-function saveData(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function loadData(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){console.error('loadData',k,e);return d}}
+function saveData(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){showToast('⚠ Speicherfehler – Daten nicht gespeichert');}}
 
 function showScreen(name,btn){
+  // Alle laufenden Kadenz-Timer stoppen beim Screen-Wechsel
+  Object.keys(_kadenzTimers).forEach(k=>stopKadenz(k));
+  Object.keys(_supersetTimers).forEach(k=>stopSuperset(k));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const el=document.getElementById('screen-'+name);
   if(el)el.classList.add('active');
   if(btn)btn.classList.add('active');
   if(name==='home')updateDashboard();
-  if(name==='training')renderTraining();
+  if(name==='training'){renderTraining();renderRestIndicator();}
   if(name==='nutrition')renderNutrition();
   if(name==='progress')renderProgress();
   if(name==='coach')initCoach();
@@ -822,14 +1073,15 @@ function renderTraining(){
   currentPlanIndex=loadData('plan_index',0);
   const tabs=document.getElementById('day-tabs');
   tabs.innerHTML='';
+  // Labels basieren auf Plan-Sequenz, nicht auf Kalender
+  // i=0: aktuelle Einheit, i=-1: letzte, i=1..3: nächste
+  const seqLabels={'-1':'Letzte',0:'Jetzt',1:'Nächste',2:'Übernächste',3:'Danach'};
   for(let i=-1;i<=3;i++){
-    const idx=(currentPlanIndex+i+40)%PLAN.length;
+    const idx=((currentPlanIndex+i)%PLAN.length+PLAN.length)%PLAN.length;
     const day=PLAN[idx];
-    const d=new Date();d.setDate(d.getDate()+i);
-    const label=i===0?'Heute':(i===1?'Morgen':DAYS[d.getDay()]);
     const tab=document.createElement('div');
     tab.className='day-tab'+(i===0?' active':'')+(day.type==='rest'?' rest':'');
-    tab.textContent=label+' – '+day.name;
+    tab.textContent=(seqLabels[i]||('+'+(i)+' Einh.'))+' – '+day.name;
     const ii=i;tab.onclick=()=>{document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');renderExercises(idx)};
     tabs.appendChild(tab);
   }
@@ -840,17 +1092,48 @@ function renderExercises(planIdx){
   const plan=PLAN[planIdx%PLAN.length];
   const el=document.getElementById('exercise-list');
   document.getElementById('workout-done-box').classList.remove('show');
+  // Tab-Wechsel setzt State zurück auf idle (andere Einheit)
+  if(planIdx !== currentPlanIndex%PLAN.length){
+    workoutState='idle';
+    clearAllTimers();
+  }
+  renderActionBar(planIdx);
   if(plan.type==='rest'){el.innerHTML=`<div class="card-body" style="text-align:center;padding:24px"><div style="font-size:40px;margin-bottom:12px">🛌</div><div style="font-weight:800;font-size:16px;margin-bottom:8px">Ruhetag</div><div style="font-size:13px;color:var(--text2);line-height:1.6">${plan.note}</div></div>`;return}
   const stateKey='workout_'+today()+'_'+plan.id;
   const state=loadData(stateKey,{});
   el.innerHTML=`<div style="padding:12px 16px;border-bottom:1px solid var(--border)"><div style="font-size:12px;color:var(--text3);line-height:1.5">⚡ ${plan.note}</div></div>`+
   plan.exercises.map((ex,i)=>{
     const isDone=state['ex_'+i]===true;
-    const superset=ex.supersetnext?`<div style="font-size:10px;color:var(--accent);margin-top:6px;font-family:'DM Mono',monospace">⟶ SOFORT WEITER:</div>`:'';
+    const origKey=ex.exKey||('ex_'+plan.id+'_'+i);
+    // Check if this exercise has been swapped
+    const swap=activeSwaps[origKey];
+    const displayEx=swap?{...ex, name:swap.name, detail:swap.detail, note:swap.note, exKey:swap.exKey}:ex;
+    const wKey=displayEx.exKey||origKey;
+    const superset=ex.supersetnext
+      ?`<div style="font-size:10px;color:var(--accent);margin-top:6px;font-family:'DM Mono',monospace">⟶ SOFORT WEITER:</div>
+         <div class="superset-countdown" id="sscnt-${wKey}">
+           <div class="superset-count-num" id="ssnum-${wKey}">10</div>
+           <div><div class="superset-count-label">Sofort weiter!</div><div class="superset-count-sub">Nachermüdungs-Supersatz</div></div>
+           <button style="margin-left:auto;background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;" onclick="stopSuperset('${wKey}');event.stopPropagation()">✕</button>
+         </div>`
+      :'';
     const hasGuide=EXERCISES[ex.exKey]?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:'';
-    const wKey=ex.exKey||('ex_'+plan.id+'_'+i);
+    const hasAlts=ALTERNATIVES[origKey]&&ALTERNATIVES[origKey].length>0;
+    const swapBtn=hasAlts?`<button class="ex-swap-btn ${swap?'swapped':''}" onclick="openAltModal('${origKey}',event)" title="Alternative Übung">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:'';
     const wWidget=buildWeightWidget(wKey);
-    return `<div class="exercise-item"><div class="ex-check ${isDone?'done':''}" onclick="toggleExercise('${stateKey}',${i},this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ex-info"><div class="ex-name" onclick="openExModal('${ex.exKey||''}')" style="${isDone?'text-decoration:line-through;color:var(--text3)':''}"> ${ex.name}${hasGuide}</div><div class="ex-detail">${ex.detail}</div><div class="ex-note">${ex.note}</div>${superset}${wWidget}</div></div>`;
+    return `<div class="exercise-item">
+      <div class="ex-check ${isDone?'done':''}" onclick="toggleExercise('${stateKey}',${i},this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="ex-info">
+        <div class="ex-name" onclick="openExModal('${ex.exKey||''}')" style="${isDone?'text-decoration:line-through;color:var(--text3)':''}">
+          ${displayEx.name}${hasGuide}${swapBtn}
+        </div>
+        <div class="ex-detail">${displayEx.detail}</div>
+        <div class="ex-note">${displayEx.note}</div>
+        ${superset}${wWidget}
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -863,6 +1146,24 @@ function toggleExercise(stateKey,idx,el){
   if(nameEl)nameEl.style.cssText=state['ex_'+idx]?'text-decoration:line-through;color:var(--text3)':'';
   const svgEl=el.querySelector('svg');
   if(svgEl)svgEl.style.opacity=state['ex_'+idx]?'1':'0';
+  vibrate([15]);
+  // Supersatz-Countdown starten wenn diese Übung 'supersetnext' hat und gerade abgehakt wird
+  if(state['ex_'+idx]){
+    const plan=PLAN[currentPlanIndex%PLAN.length];
+    const ex=plan.exercises[idx];
+    if(ex&&ex.supersetnext){
+      const origKey=ex.exKey||('ex_'+plan.id+'_'+idx);
+      const swap=activeSwaps[origKey];
+      const wKey=swap?swap.exKey:origKey;
+      setTimeout(()=>startSuperset(wKey),100);
+    }
+    // Nächste Übung hervorheben (mit kurzem Delay damit Supersatz-Countdown sichtbar)
+    const delay=ex&&ex.supersetnext?11000:400;
+    setTimeout(()=>highlightNextExercise(currentPlanIndex%PLAN.length), delay);
+  } else {
+    // Wieder abgehakt → Highlight sofort aktualisieren
+    highlightNextExercise(currentPlanIndex%PLAN.length);
+  }
 }
 
 function finishWorkout(){
@@ -872,11 +1173,20 @@ function finishWorkout(){
     // Trainingslog-Eintrag: Einheit + Übungen mit aktuellem Gewicht + erledigt-Status
     const stateKey='workout_'+today()+'_'+plan.id;
     const state=loadData(stateKey,{});
-    const exLog=plan.exercises.map((ex,i)=>({
-      name:ex.name,
-      weight:getCurrentW(ex.exKey||('ex_'+plan.id+'_'+i)),
-      done:state['ex_'+i]===true
-    }));
+    const exLog=plan.exercises.map((ex,i)=>{
+      const origKey=ex.exKey||('ex_'+plan.id+'_'+i);
+      const swap=activeSwaps[origKey];
+      const wKey=swap?swap.exKey:origKey;
+      return {
+        name:swap?swap.name:ex.name,
+        exKey:wKey,
+        wasSwapped:!!swap,
+        originalName:swap?ex.name:null,
+        weight:getCurrentW(wKey),
+        repsAtFailure:getReps(wKey)||null,
+        done:state['ex_'+i]===true
+      };
+    });
     const log=loadData('training_history',[]);
     log.push({date:today(),plan:plan.name,id:plan.id,exercises:exLog});
     if(log.length>200)log.shift();
@@ -885,19 +1195,311 @@ function finishWorkout(){
     currentPlanIndex=(currentPlanIndex+1)%PLAN.length;
   }
   document.getElementById('workout-done-box').classList.add('show');
-  showToast('Training gespeichert ✓');
-  setTimeout(()=>renderTraining(),1000);
+  showToast('Einheit gespeichert ✓');
+  vibrate([80,50,80,50,200]);
+  workoutState='done';
+  clearAllTimers();
+  activeSwaps={};
+  saveSwaps();
+  setTimeout(()=>{workoutState='idle';renderTraining();},1200);
 }
 
 function resetWorkout(){
   const planIdx=currentPlanIndex%PLAN.length;
   const plan=PLAN[planIdx];
+  if(!confirm('Alle Häkchen dieser Einheit zurücksetzen?'))return;
   saveData('workout_'+today()+'_'+plan.id,{});
+  workoutState='idle';
+  clearAllTimers();
   renderExercises(planIdx);
-  showToast('Reset');
+  showToast('Zurückgesetzt');
 }
 
-function openExModal(exKey){
+// ===== ÜBUNGSALTERNATIVEN SWAP =====
+let _altCurrentOrigKey=null;
+
+function openAltModal(origKey, event){
+  if(event)event.stopPropagation();
+  _altCurrentOrigKey=origKey;
+  const plan=PLAN[currentPlanIndex%PLAN.length];
+  const origEx=plan.exercises.find(e=>(e.exKey||'')===origKey)||{name:origKey};
+  const swap=activeSwaps[origKey];
+  const alts=ALTERNATIVES[origKey]||[];
+  document.getElementById('alt-modal-orig').textContent=origEx.name;
+  const resetBtn=document.getElementById('alt-reset-btn');
+  resetBtn.style.display=swap?'block':'none';
+  const optionsEl=document.getElementById('alt-modal-options');
+  optionsEl.innerHTML=alts.map(a=>`
+    <div class="alt-option ${swap&&swap.exKey===a.exKey?'':''}
+      " onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
+      <div class="alt-option-name">${a.name}${swap&&swap.exKey===a.exKey?' ✓':''}</div>
+      <div class="alt-option-detail">${a.detail}</div>
+      <div class="alt-option-note">${a.note}</div>
+    </div>`).join('');
+  document.getElementById('alt-modal-overlay').classList.add('open');
+}
+
+function closeAltModal(){
+  document.getElementById('alt-modal-overlay').classList.remove('open');
+  _altCurrentOrigKey=null;
+}
+
+function applySwap(origKey, altKey, altName, altDetail, altNote){
+  activeSwaps[origKey]={exKey:altKey, name:altName, detail:altDetail, note:altNote};
+  saveSwaps();
+  closeAltModal();
+  renderExercises(currentPlanIndex%PLAN.length);
+  showToast('⇄ '+altName.split(' ').slice(0,3).join(' ')+' eingesetzt');
+}
+
+function resetSwap(){
+  if(_altCurrentOrigKey)delete activeSwaps[_altCurrentOrigKey];
+  saveSwaps();
+  closeAltModal();
+  renderExercises(currentPlanIndex%PLAN.length);
+  showToast('Originalübung wiederhergestellt');
+}
+
+// ===== KADENZ-TIMER =====
+// TODO-ERNÄHRUNG: Ernährungsscreen (Mahlzeiten, Verlauf, FDDB-Import, Schnellauswahl)
+// ist vollständig implementiert unter screen-nutrition. Beim nächsten Sprint:
+// - Ernährungs-Tracking wieder in Fokus nehmen
+// - FDDB-Import via Apple Shortcuts reaktivieren
+// - Tiefschlaf/RHR-Tracking wieder einblenden (screen-progress, logProgress)
+// Referenz: hitcoach-2.0-blaupause.md, FDDB-IMPORT-ANLEITUNG.md
+
+const KADENZ_DEFAULT={up:2,hold:1,down:4};
+let kadenzSettings=loadData('kadenz_settings',KADENZ_DEFAULT);
+
+let _kadenzTimers={};  // key → {interval, phase, remaining, total}
+
+function startKadenz(key){
+  // Stop any other running timer
+  Object.keys(_kadenzTimers).forEach(k=>{ if(k!==key) stopKadenz(k); });
+  if(_kadenzTimers[key]) { stopKadenz(key); return; }
+
+  const phases=[
+    {id:'up',   label:'↑ Heben',   dur:kadenzSettings.up,   color:'var(--accent)', barColor:'#00e5a0'},
+    {id:'hold', label:'— Halten',  dur:kadenzSettings.hold,  color:'var(--amber)',  barColor:'#ffb347'},
+    {id:'down', label:'↓ Senken',  dur:kadenzSettings.down,  color:'var(--blue)',   barColor:'#4d9fff'},
+  ];
+
+  const btn=document.getElementById('kbtn-'+key);
+  const display=document.getElementById('kdisplay-'+key);
+  const phaseEl=document.getElementById('kphase-'+key);
+  const countEl=document.getElementById('kcount-'+key);
+  const barEl=document.getElementById('kbar-'+key);
+  if(!btn||!display)return;
+
+  btn.classList.add('running');
+  btn.textContent='⏸ Läuft...';
+  display.classList.add('active');
+
+  let pi=0, remaining=phases[0].dur, total=phases[0].dur;
+
+  function tick(){
+    const p=phases[pi];
+    phaseEl.textContent=p.label;
+    phaseEl.className='kadenz-phase '+p.id;
+    countEl.textContent=remaining;
+    barEl.style.width=((remaining/total)*100)+'%';
+    barEl.style.background=p.barColor;
+
+    // Vibration bei Phasenwechsel
+    if(remaining===p.dur && pi>0) vibrate([30]);
+
+    remaining--;
+    if(remaining<0){
+      pi=(pi+1)%phases.length;
+      // Wiederholung komplett → kurze Pause + Vibration
+      if(pi===0) vibrate([20,50,20]);
+      remaining=phases[pi].dur;
+      total=phases[pi].dur;
+    }
+  }
+
+  tick();
+  _kadenzTimers[key]={interval:setInterval(tick,1000)};
+}
+
+function stopKadenz(key){
+  if(_kadenzTimers[key]){
+    clearInterval(_kadenzTimers[key].interval);
+    delete _kadenzTimers[key];
+  }
+  const btn=document.getElementById('kbtn-'+key);
+  const display=document.getElementById('kdisplay-'+key);
+  if(btn){btn.classList.remove('running');btn.textContent='▶ Kadenz 2/1/4';}
+  if(display)display.classList.remove('active');
+}
+
+function showKadenzSettings(){
+  const s=kadenzSettings;
+  const neu=prompt(`Kadenz-Einstellung (Sekunden)\nFormat: HEBEN/HALTEN/SENKEN\nAktuell: ${s.up}/${s.hold}/${s.down}\n\nEingabe:`);
+  if(!neu)return;
+  const parts=neu.split('/').map(n=>parseInt(n.trim()));
+  if(parts.length===3&&parts.every(n=>!isNaN(n)&&n>0&&n<=10)){
+    kadenzSettings={up:parts[0],hold:parts[1],down:parts[2]};
+    saveData('kadenz_settings',kadenzSettings);
+    // Update button labels
+    document.querySelectorAll('.kadenz-btn').forEach(b=>{
+      if(!b.classList.contains('running'))b.textContent=`▶ Kadenz ${parts[0]}/${parts[1]}/${parts[2]}`;
+    });
+    showToast(`Kadenz ${parts[0]}/${parts[1]}/${parts[2]} gespeichert`);
+  } else {
+    showToast('Format: 2/1/4 (max. 10s pro Phase)');
+  }
+}
+
+// ===== SUPERSATZ-COUNTDOWN =====
+let _supersetTimers={};
+
+function startSuperset(key){
+  if(_supersetTimers[key])return;
+  const numEl=document.getElementById('ssnum-'+key);
+  const cntEl=document.getElementById('sscnt-'+key);
+  if(!numEl||!cntEl)return;
+  cntEl.classList.add('active');
+  vibrate([50,30,50]);
+  let sec=10;
+  numEl.textContent=sec;
+  _supersetTimers[key]=setInterval(()=>{
+    sec--;
+    numEl.textContent=sec;
+    if(sec<=3)vibrate([20]);
+    if(sec<=0){
+      stopSuperset(key);
+      vibrate([100,50,100,50,100]);
+    }
+  },1000);
+}
+
+function stopSuperset(key){
+  if(_supersetTimers[key]){
+    clearInterval(_supersetTimers[key]);
+    delete _supersetTimers[key];
+  }
+  const cntEl=document.getElementById('sscnt-'+key);
+  if(cntEl){cntEl.classList.remove('active');}
+}
+
+// Supersatz-Countdown automatisch starten wenn Übung mit supersetnext abgehakt wird
+function vibrate(pattern){
+  try{if(navigator.vibrate)navigator.vibrate(pattern);}catch{}
+}
+
+// ===== RUHETAG-AMPEL =====
+function renderRestIndicator(){
+  const el=document.getElementById('rest-indicator');
+  if(!el)return;
+  const log=loadData('training_history',[]);
+  if(log.length===0){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='flex';
+  const last=log[log.length-1];
+  const lastDate=new Date(last.date);
+  const now=new Date();
+  const diffMs=now-lastDate;
+  const days=Math.floor(diffMs/(1000*60*60*24));
+  const recommended=5; // Gießing: 4-5 Tage
+
+  let dotColor, bg, border, text, sub;
+  if(days===0){
+    dotColor='#ff4d6d'; bg='rgba(255,77,109,0.07)'; border='rgba(255,77,109,0.25)';
+    text='Heute bereits trainiert';
+    sub='Gießing: mindestens 4 Ruhetage einhalten';
+  } else if(days<4){
+    dotColor='#ffb347'; bg='rgba(255,179,71,0.07)'; border='rgba(255,179,71,0.25)';
+    text=`${days} Tag${days>1?'e':''} seit letzter Einheit`;
+    sub=`Noch ${recommended-days} Tag${recommended-days>1?'e':''} bis Gießing-Empfehlung`;
+  } else if(days<=6){
+    dotColor='#00e5a0'; bg='rgba(0,229,160,0.07)'; border='rgba(0,229,160,0.25)';
+    text=`${days} Tage erholt – optimaler Zeitpunkt`;
+    sub='Letztes Training: '+new Date(last.date).toLocaleDateString('de-DE')+' · '+last.plan;
+  } else {
+    dotColor='#4d9fff'; bg='rgba(77,159,255,0.07)'; border='rgba(77,159,255,0.25)';
+    text=`${days} Tage seit letzter Einheit`;
+    sub='Lange Pause – Gewichte ggf. konservativ starten';
+  }
+  el.style.background=bg;
+  el.style.borderColor=border;
+  el.innerHTML=`<div class="rest-dot" style="background:${dotColor}"></div>
+    <div><div class="rest-text">${text}</div><div class="rest-sub">${sub}</div></div>`;
+}
+
+// ===== WORKOUT STATE MACHINE =====
+// States: 'idle' | 'active' | 'done'
+let workoutState = 'idle';
+
+function renderActionBar(planIdx){
+  const bar = document.getElementById('training-action-bar');
+  if(!bar) return;
+  const plan = PLAN[planIdx%PLAN.length];
+  if(plan.type === 'rest'){
+    bar.innerHTML = '';
+    return;
+  }
+  if(workoutState === 'idle'){
+    bar.innerHTML = `<button class="btn-start-training" onclick="startWorkout(${planIdx})">Training starten ⚡</button>`;
+  } else if(workoutState === 'active'){
+    bar.innerHTML = `
+      <button class="btn-finish-training" onclick="finishWorkout()">Einheit beenden ✓</button>
+      <button class="btn-abort-training" onclick="abortWorkout(${planIdx})">Abbrechen</button>`;
+  } else {
+    bar.innerHTML = ''; // done – workout-done-box zeigt sich
+  }
+}
+
+function startWorkout(planIdx){
+  workoutState = 'active';
+  vibrate([30, 50, 80]);
+  renderActionBar(planIdx);
+  highlightNextExercise(planIdx);
+  // Scroll zur ersten Übung
+  const el = document.getElementById('exercise-list');
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function abortWorkout(planIdx){
+  if(!confirm('Training abbrechen? Abgehakte Übungen bleiben gespeichert.')) return;
+  workoutState = 'idle';
+  clearAllTimers();
+  renderActionBar(planIdx);
+  // Highlight entfernen
+  document.querySelectorAll('.exercise-item.active-ex')
+    .forEach(el => el.classList.remove('active-ex'));
+}
+
+function clearAllTimers(){
+  Object.keys(_kadenzTimers).forEach(k => stopKadenz(k));
+  Object.keys(_supersetTimers).forEach(k => stopSuperset(k));
+}
+
+function highlightNextExercise(planIdx){
+  // Entferne altes Highlight
+  document.querySelectorAll('.exercise-item.active-ex')
+    .forEach(el => el.classList.remove('active-ex'));
+  if(workoutState !== 'active') return;
+  const plan = PLAN[planIdx%PLAN.length];
+  const stateKey = 'workout_'+today()+'_'+plan.id;
+  const state = loadData(stateKey, {});
+  // Erste nicht-abgehakte Übung finden
+  const nextIdx = plan.exercises.findIndex((_, i) => !state['ex_'+i]);
+  if(nextIdx === -1){
+    // Alle abgehakt – kein weiteres Highlight
+    return;
+  }
+  // Das n-te exercise-item hervorheben (erste Div ist der Plan-Hinweis → +1 Offset)
+  const items = document.querySelectorAll('#exercise-list .exercise-item');
+  if(items[nextIdx]){
+    items[nextIdx].classList.add('active-ex');
+    items[nextIdx].scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function openExModal(key){
   if(!exKey||!EXERCISES[exKey])return;
   const ex=EXERCISES[exKey];
   document.getElementById('em-title').textContent=ex.title;
@@ -979,8 +1581,18 @@ function logProgress(){
   const f=parseFloat(document.getElementById('log-fat').value);
   const m=parseFloat(document.getElementById('log-muscle').value);
   const wt=parseFloat(document.getElementById('log-waist').value);
-  const entry={date:today(),weight:w||null,fat:f||null,muscle:m||null,waist:wt||null};
+  // Plausibilitaet gegen letzten Eintrag
   const hist=loadData('progress_history',[]);
+  const last=hist.length>0?hist[hist.length-1]:null;
+  if(last){
+    if(w&&last.weight&&(w<last.weight*0.90||w>last.weight*1.10)){
+      if(!confirm('Gewicht '+w+' kg weicht stark vom letzten Wert ('+last.weight+' kg) ab. Tippfehler? Trotzdem speichern?'))return;
+    }
+    if(f&&last.fat&&(f<last.fat-5||f>last.fat+5)){
+      if(!confirm('KF '+f+'% weicht stark vom letzten Wert ('+last.fat+'%) ab. Trotzdem speichern?'))return;
+    }
+  }
+  const entry={date:today(),weight:w||null,fat:f||null,muscle:m||null,waist:wt||null};
   hist.push(entry);
   saveData('progress_history',hist);
   ['log-weight','log-fat','log-muscle','log-waist'].forEach(id=>document.getElementById(id).value='');
@@ -1025,7 +1637,9 @@ function renderTrainingLog(){
   if(log.length===0){el.innerHTML='<div class="card-body" style="color:var(--text3);font-size:13px">Noch keine abgeschlossenen Einheiten</div>';return}
   el.innerHTML=[...log].reverse().slice(0,15).map(t=>{
     const doneCount=t.exercises.filter(e=>e.done).length;
-    const exStr=t.exercises.filter(e=>e.done).slice(0,4).map(e=>e.name+(e.weight?' '+e.weight+'kg':'')).join(' · ');
+    const exStr=t.exercises.filter(e=>e.done).slice(0,4).map(e=>
+      e.name+(e.weight?' '+e.weight+'kg':'')+(e.repsAtFailure?' ×'+e.repsAtFailure:'')
+    ).join(' · ');
     const more=doneCount>4?' +'+(doneCount-4):'';
     return `<div class="meal-item"><div style="flex:1"><div class="meal-name">${new Date(t.date).toLocaleDateString('de-DE')} – ${t.plan}</div><div class="meal-macros">${doneCount}/${t.exercises.length} Übungen · ${exStr}${more}</div></div></div>`;
   }).join('');
@@ -1066,7 +1680,7 @@ function renderNutritionHistory(){
           const sum=meals.reduce((a,m)=>({kcal:a.kcal+m.kcal,p:a.p+m.p,c:a.c+m.c,f:a.f+m.f}),{kcal:0,p:0,c:0,f:0});
           days.push({date:k.slice(6),count:meals.length,...sum});
         }
-      }catch{}
+      }catch(e){console.warn('Fehler beim Lesen von '+k,e);}
     }
   }
   if(days.length===0){el.innerHTML='<div class="card-body" style="color:var(--text3);font-size:13px">Noch keine vergangenen Tage</div>';return}
