@@ -141,34 +141,33 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
 .superset-count-label{font-size:12px;font-weight:700;color:var(--accent);line-height:1.4;}
 .superset-count-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
 
-/* TRAINING STATE */
+/* TRAINING STATE – dezente Leiste im Kartenheader */
 .exercise-item.active-ex{
   background:rgba(0,229,160,0.05);
   border-left:3px solid var(--accent);
   padding-left:13px;
 }
 .training-action-bar{
-  position:sticky;bottom:0;
-  padding:12px 16px calc(12px + var(--safe-bottom));
-  background:linear-gradient(transparent,var(--bg0) 30%);
+  padding:0 16px 16px;
   display:flex;gap:8px;
 }
 .btn-start-training{
-  flex:1;background:var(--accent);color:var(--bg0);border:none;
+  flex:1;background:var(--accent-dim);color:var(--accent);
+  border:1px solid rgba(0,229,160,0.35);
   border-radius:var(--radius-sm);font-family:'Syne',sans-serif;
-  font-size:15px;font-weight:800;padding:14px 16px;cursor:pointer;
-  letter-spacing:-0.3px;
+  font-size:13px;font-weight:700;padding:11px 16px;cursor:pointer;
+  letter-spacing:-0.2px;
 }
 .btn-finish-training{
   flex:1;background:var(--bg2);color:var(--accent);
   border:1px solid var(--accent);border-radius:var(--radius-sm);
-  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
-  padding:14px 16px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  padding:11px 16px;cursor:pointer;
 }
 .btn-abort-training{
   background:var(--bg2);color:var(--text3);border:1px solid var(--border);
   border-radius:var(--radius-sm);font-family:'Syne',sans-serif;
-  font-size:12px;font-weight:600;padding:14px 12px;cursor:pointer;
+  font-size:12px;font-weight:600;padding:11px 12px;cursor:pointer;
   white-space:nowrap;
 }
   padding:12px 14px;display:flex;align-items:center;gap:12px;border:1px solid var(--border);}
@@ -1221,8 +1220,11 @@ function resetWorkout(){
 let _altCurrentOrigKey=null;
 
 function openAltModal(origKey, event){
-  if(event)event.stopPropagation();
+  if(event){ event.stopPropagation(); event.preventDefault(); }
   _altCurrentOrigKey=origKey;
+  // Scroll-Position merken damit Modal-Schließen nicht wegscrollt
+  const screen=document.getElementById('screen-training');
+  if(screen) _altScrollY=screen.scrollTop;
   const plan=PLAN[currentPlanIndex%PLAN.length];
   const origEx=plan.exercises.find(e=>(e.exKey||'')===origKey)||{name:origKey};
   const swap=activeSwaps[origKey];
@@ -1232,8 +1234,7 @@ function openAltModal(origKey, event){
   resetBtn.style.display=swap?'block':'none';
   const optionsEl=document.getElementById('alt-modal-options');
   optionsEl.innerHTML=alts.map(a=>`
-    <div class="alt-option ${swap&&swap.exKey===a.exKey?'':''}
-      " onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
+    <div class="alt-option" onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
       <div class="alt-option-name">${a.name}${swap&&swap.exKey===a.exKey?' ✓':''}</div>
       <div class="alt-option-detail">${a.detail}</div>
       <div class="alt-option-note">${a.note}</div>
@@ -1241,9 +1242,16 @@ function openAltModal(origKey, event){
   document.getElementById('alt-modal-overlay').classList.add('open');
 }
 
+let _altScrollY=0;
+
 function closeAltModal(){
   document.getElementById('alt-modal-overlay').classList.remove('open');
   _altCurrentOrigKey=null;
+  // Scroll-Position wiederherstellen
+  requestAnimationFrame(()=>{
+    const screen=document.getElementById('screen-training');
+    if(screen) screen.scrollTop=_altScrollY;
+  });
 }
 
 function applySwap(origKey, altKey, altName, altDetail, altNote){
@@ -1251,6 +1259,11 @@ function applySwap(origKey, altKey, altName, altDetail, altNote){
   saveSwaps();
   closeAltModal();
   renderExercises(currentPlanIndex%PLAN.length);
+  // Scroll-Position nach renderExercises wiederherstellen
+  requestAnimationFrame(()=>{
+    const screen=document.getElementById('screen-training');
+    if(screen) screen.scrollTop=_altScrollY;
+  });
   showToast('⇄ '+altName.split(' ').slice(0,3).join(' ')+' eingesetzt');
 }
 
@@ -1259,10 +1272,14 @@ function resetSwap(){
   saveSwaps();
   closeAltModal();
   renderExercises(currentPlanIndex%PLAN.length);
+  requestAnimationFrame(()=>{
+    const screen=document.getElementById('screen-training');
+    if(screen) screen.scrollTop=_altScrollY;
+  });
   showToast('Originalübung wiederhergestellt');
 }
 
-// ===== KADENZ-TIMER =====
+// ===== KADENZ-TIMER (Metronom) =====
 // TODO-ERNÄHRUNG: Ernährungsscreen (Mahlzeiten, Verlauf, FDDB-Import, Schnellauswahl)
 // ist vollständig implementiert unter screen-nutrition. Beim nächsten Sprint:
 // - Ernährungs-Tracking wieder in Fokus nehmen
@@ -1272,18 +1289,16 @@ function resetSwap(){
 
 const KADENZ_DEFAULT={up:2,hold:1,down:4};
 let kadenzSettings=loadData('kadenz_settings',KADENZ_DEFAULT);
-
-let _kadenzTimers={};  // key → {interval, phase, remaining, total}
+let _kadenzTimers={};
 
 function startKadenz(key){
-  // Stop any other running timer
   Object.keys(_kadenzTimers).forEach(k=>{ if(k!==key) stopKadenz(k); });
-  if(_kadenzTimers[key]) { stopKadenz(key); return; }
+  if(_kadenzTimers[key]){ stopKadenz(key); return; }
 
   const phases=[
-    {id:'up',   label:'↑ Heben',   dur:kadenzSettings.up,   color:'var(--accent)', barColor:'#00e5a0'},
-    {id:'hold', label:'— Halten',  dur:kadenzSettings.hold,  color:'var(--amber)',  barColor:'#ffb347'},
-    {id:'down', label:'↓ Senken',  dur:kadenzSettings.down,  color:'var(--blue)',   barColor:'#4d9fff'},
+    {id:'up',   label:'↑ Heben',  dur:kadenzSettings.up,   barColor:'#00e5a0'},
+    {id:'hold', label:'— Halten', dur:kadenzSettings.hold,  barColor:'#ffb347'},
+    {id:'down', label:'↓ Senken', dur:kadenzSettings.down,  barColor:'#4d9fff'},
   ];
 
   const btn=document.getElementById('kbtn-'+key);
@@ -1298,20 +1313,19 @@ function startKadenz(key){
   display.classList.add('active');
 
   let pi=0, remaining=phases[0].dur, total=phases[0].dur;
-  let firstTick=true;
-
-  function playPhaseSound(id){
-    if(id==='up')   SND.kadenzUp();
-    else if(id==='hold') SND.kadenzHold();
-    else if(id==='down') SND.kadenzDown();
-  }
 
   function tick(){
     const p=phases[pi];
+    const isPhaseStart=(remaining===p.dur);
 
-    // Ton am Anfang jeder Phase (auch der allerersten)
-    if(remaining===p.dur){
-      playPhaseSound(p.id);
+    // Phasenwechsel-Ton
+    if(isPhaseStart){
+      if(p.id==='up')   SND.kadenzUp();
+      else if(p.id==='hold') SND.kadenzHold();
+      else if(p.id==='down') SND.kadenzDown();
+    } else {
+      // Metronom-Klick auf jeder Sekunde innerhalb der Phase
+      SND.kadenzTick();
     }
 
     phaseEl.textContent=p.label;
@@ -1323,13 +1337,12 @@ function startKadenz(key){
     remaining--;
     if(remaining<0){
       pi=(pi+1)%phases.length;
-      if(pi===0){ SND.kadenzRep(); } // Wiederholung komplett
+      if(pi===0) SND.kadenzRep();
       remaining=phases[pi].dur;
       total=phases[pi].dur;
     }
   }
 
-  // iOS AudioContext vor dem Start explizit aufwecken, dann sofort ersten Tick
   const ctx=getAudioCtx();
   const startTimer=()=>{ tick(); _kadenzTimers[key]={interval:setInterval(tick,1000)}; };
   if(ctx&&ctx.state==='suspended'){ ctx.resume().then(startTimer); }
@@ -1343,26 +1356,23 @@ function stopKadenz(key){
   }
   const btn=document.getElementById('kbtn-'+key);
   const display=document.getElementById('kdisplay-'+key);
-  if(btn){btn.classList.remove('running');btn.textContent='▶ Kadenz 2/1/4';}
+  if(btn){btn.classList.remove('running');btn.textContent=`▶ Kadenz ${kadenzSettings.up}/${kadenzSettings.hold}/${kadenzSettings.down}`;}
   if(display)display.classList.remove('active');
 }
 
 function showKadenzSettings(){
   const s=kadenzSettings;
-  const neu=prompt(`Kadenz-Einstellung (Sekunden)\nFormat: HEBEN/HALTEN/SENKEN\nAktuell: ${s.up}/${s.hold}/${s.down}\n\nEingabe:`);
+  const neu=prompt(`Kadenz (Sekunden)\nFormat: HEBEN/HALTEN/SENKEN\nAktuell: ${s.up}/${s.hold}/${s.down}`);
   if(!neu)return;
   const parts=neu.split('/').map(n=>parseInt(n.trim()));
   if(parts.length===3&&parts.every(n=>!isNaN(n)&&n>0&&n<=10)){
     kadenzSettings={up:parts[0],hold:parts[1],down:parts[2]};
     saveData('kadenz_settings',kadenzSettings);
-    // Update button labels
     document.querySelectorAll('.kadenz-btn').forEach(b=>{
       if(!b.classList.contains('running'))b.textContent=`▶ Kadenz ${parts[0]}/${parts[1]}/${parts[2]}`;
     });
     showToast(`Kadenz ${parts[0]}/${parts[1]}/${parts[2]} gespeichert`);
-  } else {
-    showToast('Format: 2/1/4 (max. 10s pro Phase)');
-  }
+  } else { showToast('Format: 2/1/4 (max. 10s)'); }
 }
 
 // ===== SUPERSATZ-COUNTDOWN =====
@@ -1444,10 +1454,11 @@ function beep(freq=440, dur=0.15, vol=0.4, type='sine', delay=0){
 
 // Vordefinierte Sound-Events
 const SND = {
-  // Kadenz – länger und lauter damit sie im Gym hörbar sind
+  // Kadenz – Phasentöne + Metronom-Klick
   kadenzUp:   ()=> beep(660, 0.18, 0.5, 'sine'),
   kadenzHold: ()=> beep(440, 0.14, 0.45, 'sine'),
   kadenzDown: ()=> beep(294, 0.20, 0.5, 'triangle'),
+  kadenzTick: ()=> beep(800, 0.04, 0.15, 'square'),   // kurzer Metronom-Klick
   kadenzRep:  ()=>{ beep(880,0.10,0.5,'sine'); beep(880,0.10,0.5,'sine',0.18); },
   // Abhaken
   check:      ()=> beep(523, 0.10, 0.35, 'sine'),
@@ -1589,14 +1600,13 @@ function highlightNextExercise(planIdx){
 }
 
 function openExModal(key){
-  if(!exKey||!EXERCISES[exKey])return;
-  const ex=EXERCISES[exKey];
+  if(!key||!EXERCISES[key])return;
+  const ex=EXERCISES[key];
   document.getElementById('em-title').textContent=ex.title;
   document.getElementById('em-target').textContent=ex.target;
   let html='';
-  // Show illustration from book (if available)
-  if(EXERCISE_IMAGES[exKey]){
-    html+='<div class="ex-modal-img-wrap"><img class="ex-modal-img" src="'+EXERCISE_IMAGES[exKey]+'" alt="'+ex.title+'" loading="lazy"></div>';
+  if(EXERCISE_IMAGES[key]){
+    html+='<div class="ex-modal-img-wrap"><img class="ex-modal-img" src="'+EXERCISE_IMAGES[key]+'" alt="'+ex.title+'" loading="lazy"></div>';
   }
   html+='<div class="ex-modal-section">Beteiligte Muskeln</div>';
   html+='<div class="muscle-row">';
@@ -1607,7 +1617,7 @@ function openExModal(key){
   html+=`<p class="ex-modal-text">${ex.execution}</p>`;
   html+='<div class="ex-modal-section">HIT-Hinweis</div>';
   html+=`<div class="ex-modal-tip"><strong>⚡</strong> ${ex.hitNote}</div>`;
-  html+=`<div class="ex-modal-tip"><strong>Kadenz:</strong> 2s heben · 1s halten · 4s senken</div>`;
+  html+=`<div class="ex-modal-tip"><strong>Kadenz:</strong> ${kadenzSettings.up}s heben · ${kadenzSettings.hold}s halten · ${kadenzSettings.down}s senken</div>`;
   html+=`<p style="font-size:10px;color:var(--text3);padding:8px 20px;font-family:'DM Mono',monospace">${ex.source}</p>`;
   document.getElementById('em-body').innerHTML=html;
   document.getElementById('ex-modal-overlay').classList.add('open');
@@ -1723,15 +1733,77 @@ function renderTrainingLog(){
   const el=document.getElementById('training-log');
   if(!el)return;
   const log=loadData('training_history',[]);
-  if(log.length===0){el.innerHTML='<div class="card-body" style="color:var(--text3);font-size:13px">Noch keine abgeschlossenen Einheiten</div>';return}
-  el.innerHTML=[...log].reverse().slice(0,15).map(t=>{
-    const doneCount=t.exercises.filter(e=>e.done).length;
-    const exStr=t.exercises.filter(e=>e.done).slice(0,4).map(e=>
-      e.name+(e.weight?' '+e.weight+'kg':'')+(e.repsAtFailure?' ×'+e.repsAtFailure:'')
-    ).join(' · ');
-    const more=doneCount>4?' +'+(doneCount-4):'';
-    return `<div class="meal-item"><div style="flex:1"><div class="meal-name">${new Date(t.date).toLocaleDateString('de-DE')} – ${t.plan}</div><div class="meal-macros">${doneCount}/${t.exercises.length} Übungen · ${exStr}${more}</div></div></div>`;
-  }).join('');
+  if(log.length===0){
+    el.innerHTML='<div class="card-body" style="color:var(--text3);font-size:13px">Noch keine abgeschlossenen Einheiten</div>';
+    return;
+  }
+  el.innerHTML=[...log].map((t,ri)=>{
+    const realIdx=log.length-1-ri; // Index im Original-Array (älteste zuerst)
+    const logIdx=log.length-1-ri;
+    return `<div style="border-bottom:1px solid var(--border);padding:14px 16px;" id="tlog-${logIdx}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <div style="font-size:13px;font-weight:700">${new Date(t.date).toLocaleDateString('de-DE')} – ${t.plan}</div>
+          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px">${t.exercises.filter(e=>e.done).length}/${t.exercises.length} Übungen</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-secondary" style="font-size:11px;padding:4px 8px" onclick="toggleLogEdit(${logIdx})">✎</button>
+          <button class="btn-secondary" style="font-size:11px;padding:4px 8px;color:var(--red);border-color:rgba(255,77,109,0.3)" onclick="deleteTrainingLog(${logIdx})">✕</button>
+        </div>
+      </div>
+      <div id="tlog-detail-${logIdx}">
+        ${t.exercises.map((e,ei)=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(42,42,50,0.4)">
+            <div style="width:8px;height:8px;border-radius:50%;background:${e.done?'var(--accent)':'var(--border)'};flex-shrink:0"></div>
+            <div style="flex:1;font-size:12px;color:${e.done?'var(--text1)':'var(--text3)'}">${e.name}${e.wasSwapped?` <span style="font-size:10px;color:var(--amber)">⇄</span>`:''}
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">${e.weight||'—'} kg</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">${e.repsAtFailure?'×'+e.repsAtFailure:''}</div>
+          </div>`).join('')}
+      </div>
+      <div id="tlog-edit-${logIdx}" style="display:none;margin-top:8px">
+        ${t.exercises.map((e,ei)=>`
+          <div style="display:grid;grid-template-columns:1fr 70px 55px;gap:6px;margin-bottom:6px;align-items:center">
+            <div style="font-size:12px;color:var(--text2);padding:6px 0">${e.name}</div>
+            <input class="inp" type="number" step="2.5" min="0" placeholder="kg"
+              value="${e.weight||''}"
+              style="font-size:12px;padding:6px 8px;text-align:center"
+              onchange="editLogEntry(${logIdx},${ei},'weight',this.value)">
+            <input class="inp" type="number" min="1" max="30" placeholder="Wdh"
+              value="${e.repsAtFailure||''}"
+              style="font-size:12px;padding:6px 8px;text-align:center"
+              onchange="editLogEntry(${logIdx},${ei},'reps',this.value)">
+          </div>`).join('')}
+        <button class="btn-secondary" style="width:100%;margin-top:4px;font-size:11px" onclick="toggleLogEdit(${logIdx})">Fertig</button>
+      </div>
+    </div>`;
+  }).reverse().join(''); // Neueste zuerst
+}
+
+function toggleLogEdit(logIdx){
+  const detail=document.getElementById('tlog-detail-'+logIdx);
+  const edit=document.getElementById('tlog-edit-'+logIdx);
+  if(!detail||!edit)return;
+  const isEditing=edit.style.display!=='none';
+  detail.style.display=isEditing?'block':'none';
+  edit.style.display=isEditing?'none':'block';
+}
+
+function editLogEntry(logIdx,exIdx,field,val){
+  const log=loadData('training_history',[]);
+  if(!log[logIdx]||!log[logIdx].exercises[exIdx])return;
+  if(field==='weight') log[logIdx].exercises[exIdx].weight=parseFloat(val)||null;
+  if(field==='reps')   log[logIdx].exercises[exIdx].repsAtFailure=parseInt(val)||null;
+  saveData('training_history',log);
+}
+
+function deleteTrainingLog(logIdx){
+  if(!confirm('Diesen Trainingseintrag löschen?'))return;
+  const log=loadData('training_history',[]);
+  log.splice(logIdx,1);
+  saveData('training_history',log);
+  renderTrainingLog();
+  showToast('Eintrag gelöscht');
 }
 
 function renderWeightHistory(){
