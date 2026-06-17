@@ -1329,8 +1329,11 @@ function startKadenz(key){
     }
   }
 
-  tick();
-  _kadenzTimers[key]={interval:setInterval(tick,1000)};
+  // iOS AudioContext vor dem Start explizit aufwecken, dann sofort ersten Tick
+  const ctx=getAudioCtx();
+  const startTimer=()=>{ tick(); _kadenzTimers[key]={interval:setInterval(tick,1000)}; };
+  if(ctx&&ctx.state==='suspended'){ ctx.resume().then(startTimer); }
+  else { startTimer(); }
 }
 
 function stopKadenz(key){
@@ -1405,53 +1408,68 @@ function getAudioCtx(){
     try{ _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
     catch(e){ return null; }
   }
-  // iOS suspendiert AudioContext bis User-Interaction – resume wenn nötig
-  if(_audioCtx.state === 'suspended') _audioCtx.resume();
   return _audioCtx;
 }
 
-function beep(freq=440, dur=0.08, vol=0.3, type='sine', delay=0){
+// Stellt sicher dass Context läuft, dann führt Callback aus
+function withAudio(fn){
   const ctx = getAudioCtx();
   if(!ctx) return;
-  try{
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
-    gain.gain.setValueAtTime(0, ctx.currentTime + delay);
-    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
-    osc.start(ctx.currentTime + delay);
-    osc.stop(ctx.currentTime + delay + dur + 0.05);
-  }catch(e){}
+  if(ctx.state === 'suspended'){
+    ctx.resume().then(fn).catch(()=>{});
+  } else {
+    fn();
+  }
+}
+
+function beep(freq=440, dur=0.15, vol=0.4, type='sine', delay=0){
+  withAudio(()=>{
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    try{
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + dur + 0.05);
+    }catch(e){}
+  });
 }
 
 // Vordefinierte Sound-Events
 const SND = {
-  // Kadenz-Phasenwechsel
-  kadenzUp:   ()=> beep(660, 0.06, 0.25, 'sine'),        // hell = heben
-  kadenzHold: ()=> beep(440, 0.05, 0.20, 'sine'),        // mittel = halten
-  kadenzDown: ()=> beep(294, 0.08, 0.25, 'triangle'),    // tief = senken
-  kadenzRep:  ()=>{ beep(880,0.05,0.3,'sine'); beep(880,0.05,0.3,'sine',0.12); }, // Wiederholung komplett
+  // Kadenz – länger und lauter damit sie im Gym hörbar sind
+  kadenzUp:   ()=> beep(660, 0.18, 0.5, 'sine'),
+  kadenzHold: ()=> beep(440, 0.14, 0.45, 'sine'),
+  kadenzDown: ()=> beep(294, 0.20, 0.5, 'triangle'),
+  kadenzRep:  ()=>{ beep(880,0.10,0.5,'sine'); beep(880,0.10,0.5,'sine',0.18); },
   // Abhaken
-  check:      ()=> beep(523, 0.07, 0.20, 'sine'),        // kurzes C
+  check:      ()=> beep(523, 0.10, 0.35, 'sine'),
   // Supersatz
-  supersetStart: ()=>{ beep(660,0.08,0.3,'sine'); beep(880,0.10,0.35,'sine',0.12); },
-  supersetWarn:  ()=> beep(660, 0.05, 0.25, 'square'),   // 3-Sek-Warnung
-  supersetEnd:   ()=>{ // dreifacher Akzent
-    beep(880,0.08,0.4,'sine');
-    beep(880,0.08,0.4,'sine',0.15);
-    beep(1100,0.12,0.45,'sine',0.30);
+  supersetStart: ()=>{ beep(660,0.12,0.45,'sine'); beep(880,0.14,0.5,'sine',0.18); },
+  supersetWarn:  ()=> beep(660, 0.08, 0.4, 'square'),
+  supersetEnd:   ()=>{
+    beep(880,0.10,0.5,'sine');
+    beep(880,0.10,0.5,'sine',0.18);
+    beep(1100,0.16,0.55,'sine',0.38);
   },
   // Training Start / Ende
-  start: ()=>{ beep(440,0.08,0.3,'sine'); beep(550,0.08,0.3,'sine',0.12); beep(660,0.12,0.35,'sine',0.26); },
+  start: ()=>{
+    beep(440,0.10,0.4,'sine');
+    beep(550,0.10,0.4,'sine',0.16);
+    beep(660,0.16,0.45,'sine',0.34);
+  },
   finish: ()=>{
-    beep(660,0.08,0.3,'sine');
-    beep(784,0.08,0.3,'sine',0.14);
-    beep(880,0.08,0.3,'sine',0.28);
-    beep(1047,0.18,0.4,'sine',0.44);
+    beep(660,0.10,0.4,'sine');
+    beep(784,0.10,0.4,'sine',0.18);
+    beep(880,0.10,0.4,'sine',0.36);
+    beep(1047,0.22,0.5,'sine',0.56);
   },
 };
 
