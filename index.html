@@ -1298,28 +1298,32 @@ function startKadenz(key){
   display.classList.add('active');
 
   let pi=0, remaining=phases[0].dur, total=phases[0].dur;
+  let firstTick=true;
+
+  function playPhaseSound(id){
+    if(id==='up')   SND.kadenzUp();
+    else if(id==='hold') SND.kadenzHold();
+    else if(id==='down') SND.kadenzDown();
+  }
 
   function tick(){
     const p=phases[pi];
+
+    // Ton am Anfang jeder Phase (auch der allerersten)
+    if(remaining===p.dur){
+      playPhaseSound(p.id);
+    }
+
     phaseEl.textContent=p.label;
     phaseEl.className='kadenz-phase '+p.id;
     countEl.textContent=remaining;
     barEl.style.width=((remaining/total)*100)+'%';
     barEl.style.background=p.barColor;
 
-    // Ton + Vibration bei Phasenwechsel
-    if(remaining===p.dur && pi>0){
-      vibrate([30]);
-      if(p.id==='up')   SND.kadenzUp();
-      if(p.id==='hold') SND.kadenzHold();
-      if(p.id==='down') SND.kadenzDown();
-    }
-
     remaining--;
     if(remaining<0){
       pi=(pi+1)%phases.length;
-      // Wiederholung komplett
-      if(pi===0){ vibrate([20,50,20]); SND.kadenzRep(); }
+      if(pi===0){ SND.kadenzRep(); } // Wiederholung komplett
       remaining=phases[pi].dur;
       total=phases[pi].dur;
     }
