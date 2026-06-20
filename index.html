@@ -171,6 +171,20 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
   white-space:nowrap;
 }
   padding:12px 14px;display:flex;align-items:center;gap:12px;border:1px solid var(--border);}
+.seg-ctrl{flex:1;padding:8px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);background:none;border:none;cursor:pointer;transition:all 0.15s}
+.seg-ctrl.active{background:var(--accent);color:#fff;border-radius:calc(var(--radius-sm) - 1px)}
+.run-entry{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;position:relative}
+.run-entry-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:4px}
+.run-entry-main{font-size:14px;font-weight:700;margin-bottom:6px}
+.run-chips{display:flex;gap:6px;flex-wrap:wrap}
+.run-chip{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(0,229,160,0.1);color:var(--accent);border:1px solid rgba(0,229,160,0.25)}
+.run-chip.pace{background:rgba(77,159,255,0.1);color:#4d9fff;border-color:rgba(77,159,255,0.25)}
+.run-chip.hr{background:rgba(255,107,107,0.1);color:#ff6b6b;border-color:rgba(255,107,107,0.25)}
+.run-chip.rpe{background:rgba(255,179,71,0.1);color:#ffb347;border-color:rgba(255,179,71,0.25)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.stat-box{background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.stat-box-val{font-size:1.3rem;font-weight:800}
+.stat-box-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
 .rest-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .rest-text{font-size:12px;font-weight:600;flex:1;}
 .rest-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;}
@@ -342,6 +356,115 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
 </div>
 
 <!-- NUTRITION -->
+<div class="screen" id="screen-running">
+  <div class="page-header">
+    <div><div class="page-title">Laufen</div><div class="page-sub" id="run-stats-sub">Lade...</div></div>
+    <button class="btn-secondary" style="font-size:10px;padding:5px 10px" onclick="showRunImport()">⬇ Import</button>
+  </div>
+
+  <!-- SEGMENTED -->
+  <div style="display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin:0 16px 12px">
+    <button class="seg-ctrl active" id="seg-run-log" onclick="showRunTab('log')">Eintragen</button>
+    <button class="seg-ctrl" id="seg-run-hist" onclick="showRunTab('history')">Verlauf</button>
+    <button class="seg-ctrl" id="seg-run-stats" onclick="showRunTab('stats')">Statistik</button>
+  </div>
+
+  <!-- LOG TAB -->
+  <div id="run-log-section">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Lauf eintragen</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><div class="inp-label">Datum</div><input class="inp" id="r-date" type="date" style="width:100%"></div>
+          <div><div class="inp-label">Typ</div>
+            <select class="inp" id="r-type" style="width:100%">
+              <option>LISS – locker</option>
+              <option>Regeneration</option>
+              <option>Tempo</option>
+              <option>Langer Lauf</option>
+              <option>Intervall</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><div class="inp-label">Distanz (km)</div><input class="inp" id="r-dist" type="number" step="0.1" min="0" max="100" placeholder="5.0" style="width:100%"></div>
+          <div><div class="inp-label">Dauer (min)</div><input class="inp" id="r-dur" type="number" step="1" min="0" max="600" placeholder="30" style="width:100%"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><div class="inp-label">Ø Herzfrequenz</div><input class="inp" id="r-hr-avg" type="number" step="1" min="50" max="220" placeholder="140" style="width:100%"></div>
+          <div><div class="inp-label">Max Herzfrequenz</div><input class="inp" id="r-hr-max" type="number" step="1" min="50" max="220" placeholder="165" style="width:100%"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><div class="inp-label">RPE (1–10)</div>
+            <select class="inp" id="r-rpe" style="width:100%">
+              <option value="">—</option>
+              <option>1 – sehr leicht</option>
+              <option>2</option><option>3</option><option>4</option>
+              <option>5 – moderat</option>
+              <option>6</option><option>7</option>
+              <option>8 – hart</option>
+              <option>9</option>
+              <option>10 – maximal</option>
+            </select>
+          </div>
+          <div><div class="inp-label">Bedingungen</div>
+            <select class="inp" id="r-cond" style="width:100%">
+              <option>Normal · Flach</option>
+              <option>Warm · Flach</option>
+              <option>Kalt · Flach</option>
+              <option>Normal · Hügelig</option>
+              <option>Warm · Hügelig</option>
+              <option>Kalt · Hügelig</option>
+              <option>Regen · Flach</option>
+              <option>Regen · Hügelig</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div class="inp-label">Notiz</div>
+          <input class="inp" id="r-note" type="text" placeholder="Gefühl, Route, Besonderes..." style="width:100%">
+        </div>
+        <!-- Pace-Vorschau -->
+        <div id="r-pace-preview" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)"></div>
+        <button class="btn-primary" style="width:100%" onclick="saveRun()">Lauf speichern</button>
+      </div>
+    </div>
+
+    <!-- IMPORT INFO -->
+    <div id="run-import-section" style="display:none">
+      <div class="card" style="border-color:rgba(0,229,160,0.25)">
+        <div class="card-header" style="border-color:rgba(0,229,160,0.2)"><span class="card-title" style="color:var(--accent)">Apple Watch Import</span></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px">JSON aus Apple-Kurzbefehl hier einfügen. Adidas Running muss Apple Health-Schreibrecht haben.</div>
+          <textarea class="inp" id="run-import-json" rows="4" placeholder='{"runs":[{"date":"2026-06-20","dist":5.2,"dur":28,"hrAvg":142,"hrMax":168}]}' style="width:100%;font-family:'DM Mono',monospace;font-size:11px;resize:none;margin-bottom:8px"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn-primary" onclick="importRuns()">Importieren</button>
+            <button class="btn-secondary" onclick="hideRunImport()">Abbrechen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="run-history-section" style="display:none">
+    <div class="card" style="overflow:hidden;margin-bottom:12px">
+      <div style="padding:10px 14px 0;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">Pace min/km – Verlauf</div>
+      <div style="padding:8px 14px 12px"><canvas id="run-pace-chart" height="90"></canvas></div>
+    </div>
+    <div class="card" style="overflow:hidden;margin-bottom:12px">
+      <div style="padding:10px 14px 0;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">km/Woche</div>
+      <div style="padding:8px 14px 12px"><canvas id="run-weekly-chart" height="90"></canvas></div>
+    </div>
+    <div id="run-history-list"></div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="run-stats-section" style="display:none">
+    <div id="run-stats-cards"></div>
+  </div>
+</div>
+
 <div class="screen" id="screen-nutrition">
   <div class="page-header">
     <div><div class="page-title">Ernährung</div></div>
@@ -443,6 +566,17 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
     <div class="card-body" style="color:var(--text3);font-size:13px">Noch keine Einträge</div>
   </div>
 
+  <div class="section-label">TVL-Verlauf – Temporal Volume Load</div>
+  <div class="card" style="overflow:hidden;margin-bottom:12px">
+    <div style="padding:10px 14px 0;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3)">kg·s pro Einheit</div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)">Gewicht × Wdh × Kadenz-Sek.</div>
+    </div>
+    <div style="padding:8px 14px 12px">
+      <canvas id="tvl-chart" height="90"></canvas>
+    </div>
+    <div style="padding:0 14px 10px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace" id="tvl-summary"></div>
+  </div>
   <div class="section-label">Trainingslog – absolvierte Einheiten</div>
   <div class="card" id="training-log">
     <div class="card-body" style="color:var(--text3);font-size:13px">Noch keine abgeschlossenen Einheiten</div>
@@ -579,9 +713,9 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4v6m0 4v6M18 4v6m0 4v6M2 9h4M18 9h4M2 15h4M18 15h4"/></svg>
     Training
   </button>
-  <button class="nav-btn" onclick="showScreen('nutrition',this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>
-    Ernährung
+  <button class="nav-btn" onclick="showScreen('running',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/><path d="M5.5 14.5l2-3.5 3 2.5 2.5-5 2.5 4.5M17 16.5l-1.5-3"/><path d="M7 20l1.5-4 2.5 2 2-4 3 5"/></svg>
+    Laufen
   </button>
   <button class="nav-btn" onclick="showScreen('progress',this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -1034,6 +1168,7 @@ function showScreen(name,btn){
   if(btn)btn.classList.add('active');
   if(name==='home')updateDashboard();
   if(name==='training'){renderTraining();renderRestIndicator();}
+  if(name==='running'){renderRunning();showRunTab('log');}
   if(name==='nutrition')renderNutrition();
   if(name==='progress')renderProgress();
   if(name==='coach')initCoach();
@@ -1188,7 +1323,7 @@ function finishWorkout(){
       };
     });
     const log=loadData('training_history',[]);
-    log.push({date:today(),plan:plan.name,id:plan.id,exercises:exLog});
+    log.push({date:today(),plan:plan.name,id:plan.id,exercises:exLog,kadenz:{...kadenzSettings}});
     if(log.length>200)log.shift();
     saveData('training_history',log);
     saveData('plan_index',(currentPlanIndex+1)%PLAN.length);
@@ -1599,6 +1734,329 @@ function highlightNextExercise(planIdx){
   }
 }
 
+// ===== LAUF-TAGEBUCH =====
+const RUN_KEY='hit_runs_v1';
+
+function loadRuns(){ try{return JSON.parse(localStorage.getItem(RUN_KEY)||'[]')}catch(e){console.error('loadRuns:',e);return[]} }
+function saveRuns(d){ try{localStorage.setItem(RUN_KEY,JSON.stringify(d))}catch(e){showToast('⚠ Speicherfehler');} }
+
+function calcPace(distKm, durMin){
+  if(!distKm||!durMin||distKm<=0)return null;
+  const total=durMin/distKm; // min/km
+  const min=Math.floor(total);
+  const sec=Math.round((total-min)*60);
+  return {val:total, str:min+':'+(sec<10?'0':'')+sec+' min/km'};
+}
+
+function formatPace(val){
+  if(!val)return'—';
+  const min=Math.floor(val);
+  const sec=Math.round((val-min)*60);
+  return min+':'+(sec<10?'0':'')+sec;
+}
+
+// Pace-Vorschau beim Tippen
+function updatePacePreview(){
+  const dist=parseFloat(document.getElementById('r-dist').value);
+  const dur=parseFloat(document.getElementById('r-dur').value);
+  const el=document.getElementById('r-pace-preview');
+  if(dist>0&&dur>0){
+    const p=calcPace(dist,dur);
+    el.style.display='block';
+    el.textContent='→ Pace: '+p.str+'  ·  '+dur.toFixed(0)+' Min  ·  '+dist.toFixed(1)+' km';
+  } else { el.style.display='none'; }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const rDist=document.getElementById('r-dist');
+  const rDur=document.getElementById('r-dur');
+  if(rDist) rDist.addEventListener('input',updatePacePreview);
+  if(rDur) rDur.addEventListener('input',updatePacePreview);
+});
+
+async function saveRun(){
+  const date=document.getElementById('r-date').value;
+  const type=document.getElementById('r-type').value;
+  const dist=parseFloat(document.getElementById('r-dist').value)||null;
+  const dur=parseFloat(document.getElementById('r-dur').value)||null;
+  const hrAvg=parseInt(document.getElementById('r-hr-avg').value)||null;
+  const hrMax=parseInt(document.getElementById('r-hr-max').value)||null;
+  const rpeRaw=document.getElementById('r-rpe').value;
+  const rpe=rpeRaw?parseInt(rpeRaw):null;
+  const cond=document.getElementById('r-cond').value;
+  const note=document.getElementById('r-note').value.trim();
+  if(!date){showToast('Datum fehlt');return}
+  if(!dist&&!dur){showToast('Distanz oder Dauer fehlt');return}
+  const pace=calcPace(dist,dur);
+  const run={id:Date.now(),date,type,dist,dur,pace:pace?pace.val:null,hrAvg,hrMax,rpe,cond,note,source:'manual'};
+  const runs=loadRuns();
+  runs.push(run);
+  runs.sort((a,b)=>b.date.localeCompare(a.date));
+  saveRuns(runs);
+  // Felder leeren
+  ['r-dist','r-dur','r-hr-avg','r-hr-max','r-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('r-rpe').value='';
+  document.getElementById('r-pace-preview').style.display='none';
+  renderRunning();
+  showToast('Lauf gespeichert ✓');
+  SND.check();
+}
+
+function deleteRun(id){
+  if(!confirm('Lauf löschen?'))return;
+  const runs=loadRuns().filter(r=>r.id!==id);
+  saveRuns(runs);
+  renderRunning();
+  showToast('Lauf gelöscht');
+}
+
+// ===== RUNNING RENDER =====
+function renderRunning(){
+  const runs=loadRuns();
+  // Sub-Header Statistik
+  const totalKm=runs.reduce((s,r)=>s+(r.dist||0),0);
+  const sub=document.getElementById('run-stats-sub');
+  if(sub) sub.textContent=runs.length+' Läufe · '+totalKm.toFixed(1)+' km gesamt';
+  renderRunHistory();
+  renderRunStats();
+}
+
+function renderRunHistory(){
+  const runs=loadRuns();
+  const listEl=document.getElementById('run-history-list');
+  if(!listEl)return;
+  if(!runs.length){
+    listEl.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Noch keine Läufe gespeichert.</div>';
+    drawRunPaceChart([]);
+    drawRunWeeklyChart([]);
+    return;
+  }
+  drawRunPaceChart(runs);
+  drawRunWeeklyChart(runs);
+  listEl.innerHTML=runs.slice(0,30).map(r=>{
+    const lastHIT=lastHITDaysBefore(r.date);
+    return `<div class="run-entry">
+      <button class="del-btn" onclick="deleteRun(${r.id})">✕</button>
+      <div class="run-entry-date">${new Date(r.date).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})}${lastHIT!==null?' · '+lastHIT+'d nach HIT':''}</div>
+      <div class="run-entry-main">${r.type}${r.dist?' · '+r.dist.toFixed(1)+' km':''}${r.dur?' · '+r.dur+' min':''}</div>
+      <div class="run-chips">
+        ${r.pace?`<span class="run-chip pace">⏱ ${formatPace(r.pace)} /km</span>`:''}
+        ${r.hrAvg?`<span class="run-chip hr">♥ Ø${r.hrAvg}`+(r.hrMax?' Max'+r.hrMax:'')+' bpm</span>':''}
+        ${r.rpe?`<span class="run-chip rpe">RPE ${r.rpe}</span>`:''}
+        ${r.cond?`<span class="run-chip">${r.cond}</span>`:''}
+        ${r.source==='watch'?`<span class="run-chip" style="background:rgba(155,93,229,0.12);color:#9b5de5;border-color:rgba(155,93,229,0.3)">⌚ Watch</span>`:''}
+      </div>
+      ${r.note?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${r.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function lastHITDaysBefore(dateStr){
+  const log=loadData('training_history',[]);
+  const trainDates=log.map(t=>t.date).filter(d=>d<dateStr).sort();
+  if(!trainDates.length)return null;
+  const last=trainDates[trainDates.length-1];
+  const diff=Math.floor((new Date(dateStr)-new Date(last))/(1000*60*60*24));
+  return diff;
+}
+
+function renderRunStats(){
+  const runs=loadRuns();
+  const el=document.getElementById('run-stats-cards');
+  if(!el)return;
+  if(!runs.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3);font-size:13px">Noch keine Läufe.</div>';return}
+  const totalKm=runs.reduce((s,r)=>s+(r.dist||0),0);
+  const totalRuns=runs.length;
+  const avgDist=totalKm/totalRuns;
+  const paceRuns=runs.filter(r=>r.pace);
+  const avgPace=paceRuns.length?paceRuns.reduce((s,r)=>s+r.pace,0)/paceRuns.length:null;
+  const bestPace=paceRuns.length?Math.min(...paceRuns.map(r=>r.pace)):null;
+  const hrRuns=runs.filter(r=>r.hrAvg);
+  const avgHR=hrRuns.length?Math.round(hrRuns.reduce((s,r)=>s+r.hrAvg,0)/hrRuns.length):null;
+  // Letzte 4 Wochen km
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-28);
+  const cutStr=cutoff.toISOString().split('T')[0];
+  const last4wKm=runs.filter(r=>r.date>=cutStr).reduce((s,r)=>s+(r.dist||0),0);
+  // Längster Lauf
+  const maxDist=runs.reduce((m,r)=>r.dist&&r.dist>m?r.dist:m,0);
+  el.innerHTML=`
+    <div class="section-label">Gesamtstatistik</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--accent)">${totalKm.toFixed(1)}</div><div class="stat-box-lbl">km gesamt</div></div>
+      <div class="stat-box"><div class="stat-box-val">${totalRuns}</div><div class="stat-box-lbl">Läufe</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:#4d9fff">${avgPace?formatPace(avgPace):'—'}</div><div class="stat-box-lbl">Ø Pace /km</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--accent)">${bestPace?formatPace(bestPace):'—'}</div><div class="stat-box-lbl">Bestpace /km</div></div>
+    </div>
+    <div class="section-label">Letzte 4 Wochen</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-box-val" style="color:var(--accent)">${last4wKm.toFixed(1)}</div><div class="stat-box-lbl">km / 4 Wochen</div></div>
+      <div class="stat-box"><div class="stat-box-val">${avgDist.toFixed(1)}</div><div class="stat-box-lbl">Ø km/Lauf</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:#ff6b6b">${avgHR||'—'}</div><div class="stat-box-lbl">Ø Herzfreq.</div></div>
+      <div class="stat-box"><div class="stat-box-val">${maxDist.toFixed(1)}</div><div class="stat-box-lbl">Längster Lauf</div></div>
+    </div>
+    <div class="section-label">Lauftypen</div>
+    <div class="card"><div class="card-body" id="run-type-breakdown"></div></div>`;
+  // Typen aufschlüsseln
+  const types={};
+  runs.forEach(r=>{types[r.type]=(types[r.type]||0)+1});
+  const tbEl=document.getElementById('run-type-breakdown');
+  if(tbEl) tbEl.innerHTML=Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([t,n])=>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(42,42,50,0.4);font-size:13px">
+      <span>${t}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">${n}×</span>
+    </div>`).join('');
+}
+
+// ===== CHARTS =====
+function drawRunPaceChart(runs){
+  const canvas=document.getElementById('run-pace-chart');
+  if(!canvas)return;
+  const data=runs.filter(r=>r.pace).slice(0,20).reverse();
+  if(data.length<2){canvas.style.height='0';return}
+  canvas.style.height='90px';
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-28, H=90;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const vals=data.map(d=>d.pace);
+  const labels=data.map(d=>new Date(d.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}));
+  const minV=Math.min(...vals)*0.97, maxV=Math.max(...vals)*1.03;
+  const pad={top:8,right:8,bottom:22,left:44};
+  const w=W-pad.left-pad.right, h=H-pad.top-pad.bottom;
+  const n=data.length;
+  const xPos=i=>pad.left+i/(n-1)*w;
+  const yPos=v=>pad.top+h-(v-minV)/(maxV-minV)*h;
+  ctx.strokeStyle='#1a1a28'; ctx.lineWidth=1;
+  [0,0.5,1].forEach(f=>{
+    const val=minV+(maxV-minV)*f;
+    const y=yPos(val);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+w,y);ctx.stroke();
+    ctx.fillStyle='#44445a';ctx.font='8px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText(formatPace(val),pad.left-3,y+3);
+  });
+  ctx.fillStyle='#44445a';ctx.font='8px DM Mono,monospace';ctx.textAlign='center';
+  const step=Math.max(1,Math.floor(n/5));
+  for(let i=0;i<n;i+=step) ctx.fillText(labels[i],xPos(i),H-4);
+  ctx.fillText(labels[n-1],xPos(n-1),H-4);
+  // Area
+  ctx.beginPath();ctx.moveTo(xPos(0),yPos(vals[0]));
+  vals.forEach((v,i)=>ctx.lineTo(xPos(i),yPos(v)));
+  ctx.lineTo(xPos(n-1),pad.top+h);ctx.lineTo(xPos(0),pad.top+h);ctx.closePath();
+  ctx.fillStyle='rgba(77,159,255,0.08)';ctx.fill();
+  // Line
+  ctx.beginPath();ctx.strokeStyle='#4d9fff';ctx.lineWidth=2;
+  vals.forEach((v,i)=>{if(i===0)ctx.moveTo(xPos(i),yPos(v));else ctx.lineTo(xPos(i),yPos(v));});
+  ctx.stroke();
+  vals.forEach((v,i)=>{ctx.beginPath();ctx.arc(xPos(i),yPos(v),3,0,Math.PI*2);ctx.fillStyle='#4d9fff';ctx.fill();});
+}
+
+function drawRunWeeklyChart(runs){
+  const canvas=document.getElementById('run-weekly-chart');
+  if(!canvas)return;
+  if(!runs.length){canvas.style.height='0';return}
+  // Letzte 8 Wochen aggregieren
+  const weeks={};
+  runs.forEach(r=>{
+    if(!r.dist)return;
+    const d=new Date(r.date);
+    const day=d.getDay();
+    const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1));
+    const key=mon.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+    weeks[key]=(weeks[key]||0)+r.dist;
+  });
+  const sorted=Object.entries(weeks).sort((a,b)=>{
+    const da=a[0].split('.').reverse().join('-');
+    const db=b[0].split('.').reverse().join('-');
+    return da.localeCompare(db);
+  }).slice(-8);
+  if(sorted.length<2){canvas.style.height='0';return}
+  canvas.style.height='90px';
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-28, H=90;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const vals=sorted.map(s=>s[1]);
+  const labels=sorted.map(s=>s[0]);
+  const maxV=Math.max(...vals)*1.1||10;
+  const pad={top:8,right:8,bottom:22,left:36};
+  const w=W-pad.left-pad.right, h=H-pad.top-pad.bottom;
+  const n=vals.length;
+  const bw=w/n*0.6;
+  ctx.fillStyle='#44445a';ctx.font='8px DM Mono,monospace';ctx.textAlign='right';
+  ctx.fillText(maxV.toFixed(0),pad.left-3,pad.top+6);
+  ctx.fillText('0',pad.left-3,pad.top+h);
+  ctx.fillStyle='#44445a';ctx.font='8px DM Mono,monospace';ctx.textAlign='center';
+  vals.forEach((v,i)=>{
+    const x=pad.left+i/n*w+w/n/2;
+    const bh=v/maxV*h;
+    ctx.fillStyle='rgba(0,229,160,0.35)';
+    ctx.fillRect(x-bw/2,pad.top+h-bh,bw,bh);
+    ctx.fillStyle='#44445a';ctx.font='8px DM Mono,monospace';
+    if(i===0||i===n-1||i===Math.floor(n/2)) ctx.fillText(labels[i],x,H-4);
+    ctx.fillStyle='rgba(0,229,160,0.9)';ctx.font='7px DM Mono,monospace';
+    if(v>0) ctx.fillText(v.toFixed(1),x,pad.top+h-bh-2);
+  });
+}
+
+// ===== IMPORT =====
+function showRunImport(){
+  document.getElementById('run-import-section').style.display='block';
+  showRunTab('log');
+}
+function hideRunImport(){
+  document.getElementById('run-import-section').style.display='none';
+  document.getElementById('run-import-json').value='';
+}
+
+function importRuns(){
+  const raw=document.getElementById('run-import-json').value.trim();
+  if(!raw){showToast('Kein JSON');return}
+  let parsed;
+  try{parsed=JSON.parse(raw)}catch{showToast('Ungültiges JSON');return}
+  const incoming=Array.isArray(parsed.runs)?parsed.runs:Array.isArray(parsed)?parsed:[];
+  if(!incoming.length){showToast('Keine Läufe gefunden');return}
+  const runs=loadRuns();
+  const existDates=new Set(runs.filter(r=>r.source==='watch').map(r=>r.date));
+  let added=0;
+  incoming.forEach(r=>{
+    if(!r.date)return;
+    if(existDates.has(r.date))return; // kein Duplikat per Tag von Watch
+    const dist=parseFloat(r.dist||r.distance||r.km)||null;
+    const dur=parseFloat(r.dur||r.duration||r.min)||null;
+    const pace=calcPace(dist,dur);
+    runs.push({
+      id:Date.now()+added,
+      date:r.date,
+      type:r.type||'LISS – locker',
+      dist,dur,
+      pace:pace?pace.val:null,
+      hrAvg:parseInt(r.hrAvg||r.hr_avg||r.heartrate)||null,
+      hrMax:parseInt(r.hrMax||r.hr_max||r.heartrate_max)||null,
+      rpe:parseInt(r.rpe)||null,
+      cond:r.cond||'Normal · Flach',
+      note:r.note||'',
+      source:'watch'
+    });
+    added++;
+  });
+  runs.sort((a,b)=>b.date.localeCompare(a.date));
+  saveRuns(runs);
+  hideRunImport();
+  renderRunning();
+  showToast(added+' Läufe importiert ✓');
+}
+
+// ===== TABS =====
+function showRunTab(tab){
+  ['log','history','stats'].forEach(t=>{
+    document.getElementById('run-'+t+'-section').style.display=tab===t?'block':'none';
+    document.getElementById('seg-run-'+t).classList.toggle('active',tab===t);
+  });
+  if(tab==='history'){setTimeout(()=>{drawRunPaceChart(loadRuns());drawRunWeeklyChart(loadRuns());},50);}
+  if(tab==='stats')renderRunStats();
+}
+
 function openExModal(key){
   if(!key||!EXERCISES[key])return;
   const ex=EXERCISES[key];
@@ -1717,6 +2175,7 @@ function renderProgress(){
     const realIdx=hist.length-1-ri;
     return `<div class="meal-item"><div style="flex:1"><div class="meal-name">${new Date(e.date).toLocaleDateString('de-DE')}</div><div class="meal-macros">${e.weight?e.weight+'kg':''} ${e.fat?'· KF:'+e.fat+'%':''} ${e.muscle?'· M:'+e.muscle+'kg':''} ${e.waist?'· T:'+e.waist+'cm':''}</div></div><button class="del-btn" onclick="deleteProgress(${realIdx})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
   }).join('')}
+  renderTVLChart();
   renderTrainingLog();
   renderWeightHistory();
 }
@@ -1729,6 +2188,104 @@ function deleteProgress(idx){
   showToast('Eintrag gelöscht');
 }
 
+function calcTVL(weight, reps, kadenz){
+  // Temporal Volume Load = kg × Sekunden unter Spannung
+  if(!weight||!reps)return null;
+  const k=kadenz||kadenzSettings;
+  const secsPerRep=(k.up||2)+(k.hold||1)+(k.down||4);
+  return Math.round(weight*reps*secsPerRep);
+}
+
+function formatTVL(tvl){
+  if(!tvl)return'—';
+  if(tvl>=1000)return(Math.round(tvl/100)/10)+'k kg·s';
+  return tvl+' kg·s';
+}
+
+function renderTVLChart(){
+  const canvas=document.getElementById('tvl-chart');
+  if(!canvas)return;
+  const log=loadData('training_history',[]);
+  // Nur Einheiten mit mind. einer TVL-fähigen Übung
+  const data=log.map(t=>({
+    date:t.date,
+    label:new Date(t.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}),
+    tvl:t.exercises.filter(e=>e.done).reduce((s,e)=>{
+      const v=calcTVL(e.weight,e.repsAtFailure,t.kadenz);
+      return s+(v||0);
+    },0)
+  })).filter(d=>d.tvl>0);
+
+  const sumEl=document.getElementById('tvl-summary');
+  if(data.length===0){
+    canvas.style.display='none';
+    if(sumEl)sumEl.textContent='Noch keine TVL-Daten. Wiederholungen eintragen um TVL zu berechnen.';
+    return;
+  }
+  canvas.style.display='block';
+
+  // Trend: letzte vs. erste Einheit
+  const first=data[0].tvl, last=data[data.length-1].tvl;
+  const trend=data.length>1?Math.round((last-first)/first*100):0;
+  const avg=Math.round(data.reduce((s,d)=>s+d.tvl,0)/data.length);
+  if(sumEl)sumEl.textContent=`Ø ${formatTVL(avg)} · Letzte: ${formatTVL(last)}${data.length>1?' · Trend: '+(trend>0?'+':'')+trend+'%':''}`;
+
+  // Chart zeichnen
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth-28;
+  const H=90;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const pad={top:8,right:8,bottom:22,left:44};
+  const w=W-pad.left-pad.right, h=H-pad.top-pad.bottom;
+  const vals=data.map(d=>d.tvl);
+  const minV=Math.min(...vals)*0.85;
+  const maxV=Math.max(...vals)*1.08;
+  const n=data.length;
+  const xPos=i=>pad.left+(n>1?i/(n-1)*w:w/2);
+  const yPos=v=>pad.top+h-(v-minV)/(maxV-minV)*h;
+
+  // Grid
+  ctx.strokeStyle='#1a1a28'; ctx.lineWidth=1;
+  [0,0.5,1].forEach(f=>{
+    const val=minV+(maxV-minV)*f;
+    const y=yPos(val);
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+w,y); ctx.stroke();
+    ctx.fillStyle='#44445a'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText(formatTVL(Math.round(val)),pad.left-3,y+3);
+  });
+
+  // X labels
+  ctx.fillStyle='#44445a'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+  const step=Math.max(1,Math.floor(n/5));
+  for(let i=0;i<n;i+=step) ctx.fillText(data[i].label,xPos(i),H-4);
+  if(n>1) ctx.fillText(data[n-1].label,xPos(n-1),H-4);
+
+  // Area fill
+  if(n>1){
+    ctx.beginPath();
+    ctx.moveTo(xPos(0),yPos(vals[0]));
+    vals.forEach((v,i)=>ctx.lineTo(xPos(i),yPos(v)));
+    ctx.lineTo(xPos(n-1),pad.top+h);
+    ctx.lineTo(xPos(0),pad.top+h);
+    ctx.closePath();
+    ctx.fillStyle='rgba(168,85,247,0.08)';
+    ctx.fill();
+  }
+
+  // Line + dots
+  ctx.beginPath(); ctx.strokeStyle='#a855f7'; ctx.lineWidth=2; ctx.setLineDash([]);
+  vals.forEach((v,i)=>{ if(i===0)ctx.moveTo(xPos(i),yPos(v)); else ctx.lineTo(xPos(i),yPos(v)); });
+  ctx.stroke();
+  vals.forEach((v,i)=>{
+    ctx.beginPath(); ctx.arc(xPos(i),yPos(v),3,0,Math.PI*2);
+    ctx.fillStyle='#a855f7'; ctx.fill();
+  });
+}
+
 function renderTrainingLog(){
   const el=document.getElementById('training-log');
   if(!el)return;
@@ -1738,13 +2295,21 @@ function renderTrainingLog(){
     return;
   }
   el.innerHTML=[...log].map((t,ri)=>{
-    const realIdx=log.length-1-ri; // Index im Original-Array (älteste zuerst)
-    const logIdx=log.length-1-ri;
+    const logIdx=ri;
+    // TVL pro Einheit berechnen
+    const unitTVL=t.exercises.filter(e=>e.done).reduce((sum,e)=>{
+      const v=calcTVL(e.weight,e.repsAtFailure,t.kadenz);
+      return sum+(v||0);
+    },0);
+    const tvlStr=unitTVL>0?formatTVL(unitTVL):'—';
     return `<div style="border-bottom:1px solid var(--border);padding:14px 16px;" id="tlog-${logIdx}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div>
           <div style="font-size:13px;font-weight:700">${new Date(t.date).toLocaleDateString('de-DE')} – ${t.plan}</div>
-          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px">${t.exercises.filter(e=>e.done).length}/${t.exercises.length} Übungen</div>
+          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px">
+            ${t.exercises.filter(e=>e.done).length}/${t.exercises.length} Übungen
+            ${unitTVL>0?`<span style="color:var(--purple);margin-left:8px">TVL ${tvlStr}</span>`:''}
+          </div>
         </div>
         <div style="display:flex;gap:6px">
           <button class="btn-secondary" style="font-size:11px;padding:4px 8px" onclick="toggleLogEdit(${logIdx})">✎</button>
@@ -1752,14 +2317,16 @@ function renderTrainingLog(){
         </div>
       </div>
       <div id="tlog-detail-${logIdx}">
-        ${t.exercises.map((e,ei)=>`
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(42,42,50,0.4)">
+        ${t.exercises.map((e,ei)=>{
+          const exTVL=calcTVL(e.weight,e.repsAtFailure,t.kadenz);
+          return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(42,42,50,0.4)">
             <div style="width:8px;height:8px;border-radius:50%;background:${e.done?'var(--accent)':'var(--border)'};flex-shrink:0"></div>
-            <div style="flex:1;font-size:12px;color:${e.done?'var(--text1)':'var(--text3)'}">${e.name}${e.wasSwapped?` <span style="font-size:10px;color:var(--amber)">⇄</span>`:''}
-            </div>
+            <div style="flex:1;font-size:12px;color:${e.done?'var(--text1)':'var(--text3)'}">${e.name}${e.wasSwapped?` <span style="font-size:10px;color:var(--amber)">⇄</span>`:''}</div>
             <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">${e.weight||'—'} kg</div>
             <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">${e.repsAtFailure?'×'+e.repsAtFailure:''}</div>
-          </div>`).join('')}
+            ${exTVL?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--purple)">${formatTVL(exTVL)}</div>`:''}
+          </div>`;
+        }).join('')}
       </div>
       <div id="tlog-edit-${logIdx}" style="display:none;margin-top:8px">
         ${t.exercises.map((e,ei)=>`
@@ -1959,6 +2526,9 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 document.addEventListener('DOMContentLoaded',()=>{
   updateDashboard();renderNutrition();renderProgress();
+  // Lauf-Datum vorbelegen
+  const rDate=document.getElementById('r-date');
+  if(rDate)rDate.value=today();
   // iOS Audio unlock: AudioContext beim ersten Touch initialisieren
   document.body.addEventListener('touchstart', function unlock(){
     getAudioCtx();
