@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script>
+// Theme sofort setzen – verhindert weißes Aufblitzen beim Start
+(function(){const t=localStorage.getItem('hit_theme');if(t==='light')document.documentElement.classList.add('light-pre');})();
+</script>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="HIT Coach">
 <link rel="manifest" href="manifest.json">
@@ -13,6 +17,10 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
 :root{--bg0:#0a0a0c;--bg1:#111114;--bg2:#18181d;--bg3:#222228;--border:#2a2a32;--text1:#f0f0f5;--text2:#9090a8;--text3:#55556a;--accent:#00e5a0;--accent-dim:#00e5a018;--accent2:#ff6b35;--blue:#4d9fff;--red:#ff4d6d;--amber:#ffb347;--purple:#a855f7;--radius:14px;--radius-sm:8px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+body.light{--bg0:#f4f4f8;--bg1:#ffffff;--bg2:#f0f0f4;--bg3:#e4e4ec;--border:#d0d0dc;--text1:#141420;--text2:#505068;--text3:#9090a8;--accent:#009970;--accent-dim:#00997018;--blue:#2a7fd4;--red:#d42a4a;--amber:#c47d00;--purple:#7c3aed}
+html.light-pre body{background:#f4f4f8}
+.theme-toggle{background:none;border:1px solid var(--border);border-radius:20px;color:var(--text2);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;cursor:pointer;transition:all 0.2s}
+.theme-toggle:active{opacity:0.7}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne',sans-serif;overflow:hidden}
 .app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;position:relative}
@@ -287,7 +295,10 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
       <div class="page-title">Dashboard</div>
       <div class="page-sub" id="today-label">Lade...</div>
     </div>
-    <div class="badge badge-green" id="day-type-badge">—</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">☀ Light</button>
+      <div class="badge badge-green" id="day-type-badge">—</div>
+    </div>
   </div>
   <div class="kcal-hero">
     <div>
@@ -2057,6 +2068,30 @@ function showRunTab(tab){
   if(tab==='stats')renderRunStats();
 }
 
+// ===== THEME TOGGLE =====
+function initTheme(){
+  const saved=localStorage.getItem('hit_theme')||'dark';
+  applyTheme(saved,false);
+  // documentElement pre-class aufräumen
+  document.documentElement.classList.remove('light-pre');
+}
+
+function toggleTheme(){
+  const isLight=document.body.classList.contains('light');
+  applyTheme(isLight?'dark':'light',true);
+}
+
+function applyTheme(mode, save){
+  const isLight=mode==='light';
+  document.body.classList.toggle('light',isLight);
+  const btn=document.getElementById('theme-toggle-btn');
+  if(btn){
+    btn.textContent=isLight?'☾ Dark':'☀ Light';
+    btn.title=isLight?'Zu Dark wechseln':'Zu Light wechseln';
+  }
+  if(save) localStorage.setItem('hit_theme',mode);
+}
+
 function openExModal(key){
   if(!key||!EXERCISES[key])return;
   const ex=EXERCISES[key];
@@ -2525,6 +2560,7 @@ function toggleLib(head){const body=head.nextElementSibling;const svg=head.query
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 
 document.addEventListener('DOMContentLoaded',()=>{
+  initTheme(); // als erstes – verhindert Dark→Light-Flackern
   updateDashboard();renderNutrition();renderProgress();
   // Lauf-Datum vorbelegen
   const rDate=document.getElementById('r-date');
