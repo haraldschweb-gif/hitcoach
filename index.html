@@ -45,7 +45,7 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--t1); font-family: 'Syne', sans-serif; }
 button { font-family: 'Syne', sans-serif; cursor: pointer; border: none; background: none; }
-input, select, textarea { font-family: 'Syne', sans-serif; color: var(--t1); background: var(--surf); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 9px 12px; font-size: 14px; width: 100%; outline: none; }
+input, select, textarea { font-family: 'Syne', sans-serif; color: var(--t1); background: var(--surf); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 9px 12px; font-size: 16px; width: 100%; outline: none; -webkit-text-size-adjust: 100%; }
 input:focus, select:focus, textarea:focus { border-color: var(--grn); }
 select option { background: #fff; }
 
@@ -165,8 +165,7 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 /* REPS */
 .reps-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .reps-label { font-size: 10px; color: var(--t3); font-family: 'DM Mono', monospace; white-space: nowrap; }
-.reps-inp { width: 54px; text-align: center; font-size: 13px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 4px 6px; -moz-appearance: textfield; }
-.reps-inp::-webkit-outer-spin-button, .reps-inp::-webkit-inner-spin-button { -webkit-appearance: none; }
+.reps-inp { width: 70px; text-align: center; font-size: 16px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 4px 6px; -webkit-appearance: none; appearance: none; background: var(--surf); border: 1.5px solid var(--line); border-radius: var(--rs); color: var(--t1); }
 .sug { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
 .sug-up { background: var(--grn-l); color: var(--grn); border: 1.5px solid #b0ddd0; }
 .sug-ok { background: var(--surf2); color: var(--t3); border: 1.5px solid var(--line); }
@@ -295,6 +294,11 @@ canvas { display: block; width: 100% !important; }
 
       <div class="sec-label">Ruhetage-Status</div>
       <div class="rest-bar" id="home-rest" style="display:none"></div>
+
+      <div class="sec-label">Laufen</div>
+      <div class="card" id="home-run" style="cursor:pointer" onclick="goTo('running')">
+        <div class="card-body" style="color:var(--t3);font-size:13px">Noch kein Lauf gespeichert.</div>
+      </div>
     </div>
 
     <!-- ═══════════════ TRAINING ═══════════════ -->
@@ -305,6 +309,7 @@ canvas { display: block; width: 100% !important; }
       </div>
       <div id="rest-indicator" class="rest-bar" style="display:none"></div>
       <div class="day-tabs" id="day-tabs"></div>
+      <div class="action-bar" id="action-bar-top"></div>
       <div class="card" style="overflow:visible" id="ex-list"></div>
       <div class="action-bar" id="action-bar"></div>
       <div id="workout-done" style="display:none;margin:0 16px;padding:16px;background:var(--grn-l);border:1.5px solid #b0ddd0;border-radius:var(--r);text-align:center">
@@ -327,8 +332,10 @@ canvas { display: block; width: 100% !important; }
         <div class="card">
           <div class="card-head"><span class="card-label">Lauf eintragen</span></div>
           <div class="card-body">
-            <div class="form-row form-2">
+            <div class="form-row">
               <div><div class="inp-label">Datum</div><input type="date" id="r-date"></div>
+            </div>
+            <div class="form-row">
               <div><div class="inp-label">Typ</div>
                 <select id="r-type">
                   <option>LISS – locker</option><option>Regeneration</option>
@@ -345,13 +352,31 @@ canvas { display: block; width: 100% !important; }
               <div><div class="inp-label">Max Herzfreq.</div><input type="number" id="r-hr-max" step="1" placeholder="165"></div>
             </div>
             <div class="form-row form-2">
-              <div><div class="inp-label">RPE (1–10)</div>
-                <select id="r-rpe"><option value="">—</option>
-                  <option>1</option><option>2</option><option>3</option><option>4</option>
-                  <option>5</option><option>6</option><option>7</option><option>8</option>
-                  <option>9</option><option>10</option>
+              <div><div class="inp-label">Anstrengung (RPE)</div>
+                <select id="r-rpe">
+                  <option value="">— nicht angegeben</option>
+                  <option value="1">1 – sehr leicht</option>
+                  <option value="2">2 – leicht</option>
+                  <option value="3">3 – moderat leicht</option>
+                  <option value="4">4 – moderat</option>
+                  <option value="5">5 – etwas hart</option>
+                  <option value="6">6 – hart</option>
+                  <option value="7">7 – sehr hart</option>
+                  <option value="8">8 – sehr sehr hart</option>
+                  <option value="9">9 – extrem hart</option>
+                  <option value="10">10 – maximale Belastung</option>
                 </select>
               </div>
+              <div><div class="inp-label">Schuhwerk</div>
+                <select id="r-shoe">
+                  <option>Laufschuh</option>
+                  <option>Barfußschuh / Minimal</option>
+                  <option>Trailschuh</option>
+                  <option>Andere</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
               <div><div class="inp-label">Bedingungen</div>
                 <select id="r-cond">
                   <option>Normal · Flach</option><option>Warm · Flach</option>
@@ -398,21 +423,41 @@ canvas { display: block; width: 100% !important; }
       <div class="sec-label">Körperwerte erfassen</div>
       <div class="card">
         <div class="card-body">
-          <div class="form-row form-2">
+          <div class="form-row">
             <div><div class="inp-label">Datum</div><input type="date" id="p-date"></div>
+          </div>
+          <div class="form-row">
             <div><div class="inp-label">Quelle</div>
               <select id="p-src"><option>Withings</option><option>Apple Health</option><option>Manuell</option></select>
             </div>
           </div>
           <div class="form-row form-2">
             <div><div class="inp-label">Gewicht (kg)</div><input type="number" id="p-weight" step="0.1" placeholder="98.3"></div>
-            <div><div class="inp-label">KF%</div><input type="number" id="p-fat" step="0.1" placeholder="33.1"></div>
+            <div>
+              <div class="inp-label" style="display:flex;align-items:center;justify-content:space-between">
+                <span id="fat-label">KF%</span>
+                <span style="display:flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden">
+                  <button id="fat-btn-pct" onclick="setFatUnit('pct')" style="padding:1px 8px;font-size:10px;font-weight:700;background:var(--grn);color:#fff;border:none;cursor:pointer">%</button>
+                  <button id="fat-btn-kg" onclick="setFatUnit('kg')" style="padding:1px 8px;font-size:10px;font-weight:700;background:var(--surf2);color:var(--t3);border:none;cursor:pointer">kg</button>
+                </span>
+              </div>
+              <input type="number" id="p-fat" step="0.1" placeholder="33.1">
+            </div>
           </div>
           <div class="form-row form-2">
-            <div><div class="inp-label">Muskelmasse (kg)</div><input type="number" id="p-muscle" step="0.1" placeholder="62.4"></div>
+            <div>
+              <div class="inp-label" style="display:flex;align-items:center;justify-content:space-between">
+                <span id="muscle-label">Muskel%</span>
+                <span style="display:flex;border:1.5px solid var(--line);border-radius:6px;overflow:hidden">
+                  <button id="muscle-btn-pct" onclick="setMuscleUnit('pct')" style="padding:1px 8px;font-size:10px;font-weight:700;background:var(--grn);color:#fff;border:none;cursor:pointer">%</button>
+                  <button id="muscle-btn-kg" onclick="setMuscleUnit('kg')" style="padding:1px 8px;font-size:10px;font-weight:700;background:var(--surf2);color:var(--t3);border:none;cursor:pointer">kg</button>
+                </span>
+              </div>
+              <input type="number" id="p-muscle" step="0.1" placeholder="63.5">
+            </div>
             <div><div class="inp-label">Taille (cm)</div><input type="number" id="p-waist" step="0.5" placeholder="104"></div>
           </div>
-          <button class="btn btn-p btn-full" onclick="saveProgress()">Speichern</button>
+          <button class="btn btn-p btn-full" onclick="saveProgressForm()">Speichern</button>
         </div>
       </div>
 
@@ -742,7 +787,14 @@ function getCurrentW(key) { const d = wlLoad(); const h = d[key]; return h && h.
 function saveW(key, w) {
   const d = wlLoad();
   if (!d[key]) d[key] = [];
-  d[key].push({date: localDate(), w});
+  const today = localDate();
+  // Nur einmal pro Tag speichern – letzten Eintrag desselben Tages ersetzen
+  const lastIdx = d[key].length - 1;
+  if (lastIdx >= 0 && d[key][lastIdx].date === today) {
+    d[key][lastIdx].w = w; // Überschreiben statt Anhängen
+  } else {
+    d[key].push({date: today, w});
+  }
   if (d[key].length > 60) d[key].shift();
   wlSave(d);
 }
@@ -782,6 +834,34 @@ function daysSince(dateStr) {
   if (!dateStr) return null;
   const diff = new Date(localDate()) - new Date(dateStr);
   return Math.floor(diff / 86400000);
+}
+
+// Delavier Muskelatlas – Übungsnummern nach Kapitelstruktur
+// Brust: D-1..8, Schulter: D-9..18, Rücken: D-19..28, Arme: D-29..40, Beine: D-41..55
+const DELAVIER_NR = {
+  bankdruecken:   {nr:'D-4',  kap:'Brust'},
+  butterfly:      {nr:'D-7',  kap:'Brust'},
+  nackendruecken: {nr:'D-12', kap:'Schulter'},
+  seitheben:      {nr:'D-14', kap:'Schulter'},
+  trizepskabel:   {nr:'D-37', kap:'Trizeps'},
+  beinpresse:     {nr:'D-44', kap:'Quadrizeps'},
+  beinstrecken:   {nr:'D-46', kap:'Quadrizeps'},
+  latziehen:      {nr:'D-22', kap:'Rücken'},
+  ueberzuege:     {nr:'D-25', kap:'Rücken'},
+  kreuzheben:     {nr:'D-49', kap:'Ischiocrurale'},
+  wadenheben:     {nr:'D-53', kap:'Waden'},
+  klimmzuege:     {nr:'D-19', kap:'Rücken'},
+  rudern:         {nr:'D-21', kap:'Rücken'},
+  bizepcurlslh:   {nr:'D-30', kap:'Bizeps'},
+  bizepcurlskh:   {nr:'D-32', kap:'Bizeps'},
+  schulterheben:  {nr:'D-17', kap:'Trapez'},
+};
+
+function lastTrainedDays(exKey) {
+  const d = wlLoad();
+  const hist = d[exKey];
+  if (!hist || !hist.length) return null;
+  return daysSince(hist[hist.length-1].date);
 }
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -854,6 +934,23 @@ function renderHome() {
   // Rest indicator
   renderRestBar('home-rest');
 
+  // Lauf-Widget
+  const runs = loadRuns();
+  const hrEl = document.getElementById('home-run');
+  if (runs.length && hrEl) {
+    const lr = runs.sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const totalKm = runs.reduce((s,r)=>s+(r.dist||0),0);
+    hrEl.innerHTML = `<div class="card-body">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px">${fmtDate(lr.date)} · ${lr.type}</div>
+      <div class="chips">
+        ${lr.dist?`<span class="chip chip-g">${lr.dist.toFixed(1)} km</span>`:''}
+        ${lr.pace?`<span class="chip chip-b">⏱ ${fmtPace(lr.pace)} /km</span>`:''}
+        ${lr.speed?`<span class="chip chip-b">🏃 ${lr.speed} km/h</span>`:''}
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:6px">Gesamt: ${totalKm.toFixed(1)} km · ${runs.length} Läufe</div>
+    </div>`;
+  }
+
   // Badge
   const pIdx = loadLS('plan_index', 0) % PLAN.length;
   document.getElementById('home-badge').textContent = PLAN[pIdx].badge;
@@ -871,22 +968,30 @@ function renderRestBar(id) {
   el.style.display = 'flex';
   const last = history[history.length - 1];
   const days = daysSince(last.date);
-  let dot, bg, text, sub;
+  let dot, bg, border, text, sub;
   if (days === 0) {
-    dot='#c0193a'; bg='var(--red-l)';
-    text='Heute trainiert'; sub='Gießing empfiehlt 4–5 Ruhetage';
+    dot='#c0193a'; bg='var(--red-l)'; border='#f0c0c8';
+    text='⚠ Heute bereits trainiert';
+    sub='Gießing: 4–5 Ruhetage – morgen frühestens';
+  } else if (days === 1) {
+    dot='#c0193a'; bg='var(--red-l)'; border='#f0c0c8';
+    text=`1 Tag seit letzter Einheit`;
+    sub='Noch 3–4 Tage bis zum Optimum ('+last.plan+')';
   } else if (days < 4) {
-    dot='#a05800'; bg='var(--amb-l)';
-    text=`${days} Tag${days>1?'e':''} erholt`; sub=`Noch ${5-days} Tag${5-days>1?'e':''} bis Optimum`;
+    dot='#a05800'; bg='var(--amb-l)'; border='#f0d8a0';
+    text=`${days} Tage seit letzter Einheit`;
+    sub=`Noch ${5-days} Tage bis Gießing-Optimum`;
   } else if (days <= 6) {
-    dot='#007a55'; bg='var(--grn-l)';
-    text=`${days} Tage – optimaler Zeitpunkt`; sub=`Letztes Training: ${last.plan}`;
+    dot='#007a55'; bg='var(--grn-l)'; border='#b0ddd0';
+    text=`${days} Tage erholt – optimaler Zeitpunkt ✓`;
+    sub=last.plan + ' · ' + fmtDate(last.date);
   } else {
-    dot='#1a6fcc'; bg='var(--blu-l)';
-    text=`${days} Tage seit letzter Einheit`; sub='Lange Pause – konservativ starten';
+    dot='#1a6fcc'; bg='var(--blu-l)'; border='#c0d8f8';
+    text=`${days} Tage seit letzter Einheit`;
+    sub='Lange Pause – konservativ starten';
   }
   el.style.background = bg;
-  el.style.borderColor = dot + '44';
+  el.style.borderColor = border;
   el.innerHTML = `<div class="rest-dot" style="background:${dot}"></div><div><div class="rest-text">${text}</div><div class="rest-sub">${sub}</div></div>`;
 }
 
@@ -944,19 +1049,24 @@ function renderExercises(planIdx) {
     const done = !!state['ex_' + i];
     const hasLib = !!EXERCISES[origKey];
     const hasAlt = !!(ALTERNATIVES[origKey] && ALTERNATIVES[origKey].length);
+    const delNr = DELAVIER_NR[origKey];
+    const lastDays = lastTrainedDays(origKey);
+    const lastStr = lastDays===null?'Noch nie':lastDays===0?'Heute':lastDays===1?'Gestern':`vor ${lastDays} Tagen`;
     return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}">
       <div class="ex-check${done?' done':''}" onclick="toggleEx('${stateKey}',${i},this,${planIdx})">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="ex-info">
         <div class="ex-name">
-          <span onclick="${hasLib?`openEx('${origKey}')`:''}'" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
+          <span onclick="if(hasLib)openEx('${origKey}')" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
+          ${delNr?`<span style="font-family:'DM Mono',monospace;font-size:9px;background:var(--grn-l);color:var(--grn);padding:1px 6px;border-radius:4px;font-weight:700">${delNr.nr}</span>`:''}
           ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${origKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
           ${hasAlt?`<button class="swap-btn${swap?' active':''}" onclick="openAlt('${origKey}',event)">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:''}
         </div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px;margin-bottom:2px">${delNr?delNr.kap+' · ':''}Zuletzt: ${lastStr}</div>
         <div class="ex-detail">${dispEx.detail}</div>
         <div class="ex-note">${dispEx.note || ''}</div>
-        ${ex.supersetnext?`<div class="ex-supersetnext">⟶ SOFORT WEITER – Supersatz</div>
+        ${ex.supersetnext && !swap ?`<div class="ex-supersetnext">⟶ SOFORT WEITER – Supersatz</div>
           <div class="ss-cnt" id="sscnt-${wKey}">
             <div class="ss-num" id="ssnum-${wKey}">10</div>
             <div><div class="ss-lbl">Jetzt weiter!</div><div class="ss-sub">Nachermüdungs-Supersatz</div></div>
@@ -972,16 +1082,24 @@ function renderExercises(planIdx) {
 
 function renderActionBar(planIdx) {
   const bar = document.getElementById('action-bar');
-  if (PLAN[planIdx].type === 'rest') { bar.innerHTML = ''; return; }
+  const barTop = document.getElementById('action-bar-top');
+  if (PLAN[planIdx].type === 'rest') {
+    if(bar) bar.innerHTML = '';
+    if(barTop) barTop.innerHTML = '';
+    return;
+  }
   if (wkState === 'idle') {
-    bar.innerHTML = `<button class="btn btn-p" style="flex:1" onclick="startWorkout(${planIdx})">Training starten ⚡</button>`;
+    if(barTop) barTop.innerHTML = `<button class="btn btn-p" style="flex:1" onclick="startWorkout(${planIdx})">Training starten ⚡</button>`;
+    if(bar) bar.innerHTML = '';
   } else if (wkState === 'active') {
-    bar.innerHTML = `<button class="btn btn-p" style="flex:1" onclick="finishWorkout(${planIdx})">Einheit beenden ✓</button>
+    if(barTop) barTop.innerHTML = '';
+    if(bar) bar.innerHTML = `<button class="btn btn-p" style="flex:1" onclick="finishWorkout(${planIdx})">Einheit beenden ✓</button>
       <button class="btn btn-s" onclick="abortWorkout(${planIdx})">Abbrechen</button>`;
   }
 }
 
 function startWorkout(planIdx) {
+  if (!checkAlreadyTrainedToday(planIdx)) return;
   wkState = 'active';
   SND.start();
   renderActionBar(planIdx);
@@ -992,6 +1110,7 @@ function abortWorkout(planIdx) {
   if (!confirm('Training abbrechen?')) return;
   wkState = 'idle';
   stopAllTimers();
+  document.getElementById('action-bar').innerHTML = '';
   renderExercises(planIdx);
 }
 
@@ -1101,10 +1220,11 @@ function buildWW(key) {
   </div>
   <div class="reps-row">
     <span class="reps-label">Wdh. PmM:</span>
-    <input class="reps-inp inp" type="number" min="1" max="30" placeholder="—" value="${reps||''}"
-      onclick="event.stopPropagation()"
-      oninput="saveReps('${key}',this.value);refreshSug('${key}')"
-      onblur="refreshSug('${key}')">
+    <select class="reps-inp" onclick="event.stopPropagation()"
+      onchange="saveReps('${key}',this.value);refreshSug('${key}')">
+      <option value="">—</option>
+      ${Array.from({length:20},(_,i)=>`<option value="${i+1}"${reps===i+1?' selected':''}>${i+1}</option>`).join('')}
+    </select>
     <span id="sug-${key}">${sugHtml}</span>
   </div>
   <button class="kad-btn" id="kb-${key}" onclick="startKadenz('${key}');event.stopPropagation()">▶ Kadenz ${KADENZ.up}/${KADENZ.hold}/${KADENZ.down}</button>
@@ -1119,9 +1239,9 @@ function buildWW(key) {
 function buildSug(key, w, reps) {
   if (!reps) return `<span class="sug sug-ok">Wdh. eintragen</span>`;
   const r = parseInt(reps), step = getStep(key);
-  if (r > REPS_MAX) return `<span class="sug sug-up">↑ ${w+step} kg (${r} Wdh.)</span>`;
-  if (r < REPS_MIN) return `<span class="sug sug-dn">↓ ${Math.max(0,w-step)} kg (${r} Wdh.)</span>`;
-  return `<span class="sug sug-ok">✓ Halten (${r} Wdh.)</span>`;
+  if (r > REPS_MAX) return `<span class="sug sug-up" title="Über Korridor (8–12) – Gewicht erhöhen">↑ Nächste Einheit: ${w+step} kg</span>`;
+  if (r < REPS_MIN) return `<span class="sug sug-dn" title="Unter Korridor (8–12) – Gewicht zu hoch">↓ Gewicht reduzieren: ${Math.max(0,w-step)} kg</span>`;
+  return `<span class="sug sug-ok" title="Im Gießing-Korridor 8–12 Wdh.">✓ Gewicht passt</span>`;
 }
 
 function refreshSug(key) {
@@ -1171,6 +1291,86 @@ function wwCommit(key) {
 // SWAP / ALTERNATIVES
 // ═══════════════════════════════════════════
 
+// ── E: KF / Muskel Unit Toggle ────────────────
+let _fatUnit = 'pct';   // 'pct' | 'kg'
+let _muscleUnit = 'pct';
+
+function setFatUnit(unit) {
+  _fatUnit = unit;
+  document.getElementById('fat-label').textContent = unit === 'pct' ? 'KF%' : 'Körperfett kg';
+  document.getElementById('fat-btn-pct').style.background = unit==='pct' ? 'var(--grn)' : 'var(--surf2)';
+  document.getElementById('fat-btn-pct').style.color = unit==='pct' ? '#fff' : 'var(--t3)';
+  document.getElementById('fat-btn-kg').style.background = unit==='kg' ? 'var(--grn)' : 'var(--surf2)';
+  document.getElementById('fat-btn-kg').style.color = unit==='kg' ? '#fff' : 'var(--t3)';
+  document.getElementById('p-fat').placeholder = unit === 'pct' ? '33.1' : '32.5';
+  document.getElementById('p-fat').value = '';
+}
+
+function setMuscleUnit(unit) {
+  _muscleUnit = unit;
+  document.getElementById('muscle-label').textContent = unit === 'pct' ? 'Muskel%' : 'Muskelmasse kg';
+  document.getElementById('muscle-btn-pct').style.background = unit==='pct' ? 'var(--grn)' : 'var(--surf2)';
+  document.getElementById('muscle-btn-pct').style.color = unit==='pct' ? '#fff' : 'var(--t3)';
+  document.getElementById('muscle-btn-kg').style.background = unit==='kg' ? 'var(--grn)' : 'var(--surf2)';
+  document.getElementById('muscle-btn-kg').style.color = unit==='kg' ? '#fff' : 'var(--t3)';
+  document.getElementById('p-muscle').placeholder = unit === 'pct' ? '63.5' : '62.4';
+  document.getElementById('p-muscle').value = '';
+}
+
+// ── A: saveProgressForm (renamed to avoid collision) ──
+function saveProgressForm() {
+  const date = document.getElementById('p-date').value;
+  const weight = parseFloat(document.getElementById('p-weight').value)||null;
+  const fatRaw = parseFloat(document.getElementById('p-fat').value)||null;
+  const muscleRaw = parseFloat(document.getElementById('p-muscle').value)||null;
+  const waist = parseFloat(document.getElementById('p-waist').value)||null;
+  const src = document.getElementById('p-src').value;
+  if (!date) { toast('Datum fehlt'); return; }
+
+  // Konvertierung: wenn kg → Prozent berechnen (falls Gewicht bekannt)
+  let fat = fatRaw;
+  let muscle = muscleRaw;
+  if (_fatUnit === 'kg' && fatRaw && weight) {
+    fat = Math.round(fatRaw / weight * 1000) / 10; // kg → %
+  }
+  if (_muscleUnit === 'kg') {
+    muscle = muscleRaw; // kg bleibt kg
+  } else if (_muscleUnit === 'pct' && muscleRaw && weight) {
+    muscle = Math.round(muscleRaw / 100 * weight * 10) / 10; // % → kg
+  }
+
+  // Plausibilitätsprüfung
+  const prog = loadProgress();
+  const last = prog[prog.length-1];
+  if (last && weight && last.weight && (weight < last.weight*0.9 || weight > last.weight*1.1)) {
+    if (!confirm(`Gewicht ${weight}kg weicht stark von ${last.weight}kg ab. Trotzdem speichern?`)) return;
+  }
+  prog.push({date, weight, fat, fatKg: _fatUnit==='kg'?fatRaw:null, muscle, muscleUnit: _muscleUnit, waist, src});
+  if (prog.length > 365) prog.shift();
+  saveLS('progress_history', prog);
+  ['p-weight','p-fat','p-muscle','p-waist'].forEach(id => { document.getElementById(id).value=''; });
+  renderProgress();
+  toast('Körperwerte gespeichert ✓');
+}
+
+// ── G: Ruhetag-Warnung beim Trainingsstart ────
+function checkAlreadyTrainedToday(planIdx) {
+  const plan = PLAN[planIdx];
+  const stateKey = 'wk_' + localDate() + '_' + plan.id;
+  const state = loadLS(stateKey, {});
+  const doneCount = Object.values(state).filter(v => v === true).length;
+  if (doneCount > 0) {
+    return confirm(`Du hast heute bereits ${doneCount} Übung${doneCount>1?'en':''} dieser Einheit abgehakt. Trotzdem neu starten?`);
+  }
+  // Warnung wenn heute schon eine andere Einheit abgeschlossen wurde
+  const history = loadTrainingHistory();
+  const todayEntries = history.filter(t => t.date === localDate());
+  if (todayEntries.length > 0) {
+    return confirm(`Du hast heute bereits eine Trainingseinheit abgeschlossen (${todayEntries[0].plan}). Gießing empfiehlt 4–5 Ruhetage. Trotzdem trainieren?`);
+  }
+  return true;
+}
+
 function openAlt(origKey, event) {
   if (event) { event.stopPropagation(); event.preventDefault(); }
   _altOrigKey = origKey;
@@ -1182,12 +1382,17 @@ function openAlt(origKey, event) {
   const alts = ALTERNATIVES[origKey] || [];
   document.getElementById('alt-modal-orig').textContent = origEx.name;
   document.getElementById('alt-reset-btn').style.display = swap ? 'block' : 'none';
-  document.getElementById('alt-modal-opts').innerHTML = alts.map(a =>
-    `<div class="alt-option" onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
+  // Bild: Alt-Bild wenn vorhanden, sonst Bild der Originalübung
+  document.getElementById('alt-modal-opts').innerHTML = alts.map(a => {
+    const img = EXERCISE_IMAGES[a.exKey] || EXERCISE_IMAGES[origKey];
+    const imgLabel = EXERCISE_IMAGES[a.exKey] ? '' : EXERCISE_IMAGES[origKey] ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--t3);margin-bottom:4px">Bild: ${origEx.name}</div>` : '';
+    return `<div class="alt-option" onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
+      ${img ? `${imgLabel}<img src="${img}" alt="${a.name}" style="width:100%;height:110px;object-fit:cover;border-radius:var(--rs);margin-bottom:8px;display:block">` : ''}
       <div class="alt-name">${a.name}${swap&&swap.exKey===a.exKey?' ✓':''}</div>
       <div class="alt-detail">${a.detail}</div>
       <div class="alt-note">${a.note}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.getElementById('alt-overlay').classList.add('on');
 }
 
@@ -1416,19 +1621,39 @@ function renderRunHistory() {
   const runs = loadRuns();
   const el = document.getElementById('run-hist-list');
   if (!runs.length) { el.innerHTML = '<div style="padding:16px;color:var(--t3);font-size:13px">Noch keine Läufe.</div>'; return; }
-  el.innerHTML = runs.slice(0,30).map(r => {
+  // Chronologisch: älteste zuerst für Chart, neueste zuerst für Liste
+  const sorted = [...runs].sort((a,b) => b.date.localeCompare(a.date));
+  el.innerHTML = sorted.map(r => {
     const lastHIT = lastHITBefore(r.date);
+    const rpeLabels = {'1':'sehr leicht','2':'leicht','3':'mod. leicht','4':'moderat','5':'etwas hart','6':'hart','7':'sehr hart','8':'sehr sehr hart','9':'extrem','10':'maximal'};
     return `<div class="run-entry">
-      <button style="position:absolute;top:10px;right:12px;color:var(--t3);font-size:13px" onclick="deleteRun(${r.id})">✕</button>
-      <div class="log-date">${fmtDate(r.date)} · ${r.type}${lastHIT!==null?' · '+lastHIT+'d nach HIT':''}</div>
-      <div class="log-title">${r.dist?r.dist.toFixed(1)+' km':''} ${r.dur?r.dur+' min':''}</div>
-      <div class="chips">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="flex:1">
+          <div class="log-date">${fmtDate(r.date)} · ${r.type}${lastHIT!==null?' · '+lastHIT+'d nach HIT':''}</div>
+          <div class="log-title">${r.dist?r.dist.toFixed(1)+' km':''} ${r.dur?'· '+r.dur+' min':''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-s btn-sm" onclick="toggleRunEdit(${r.id})">✎</button>
+          <button class="btn btn-r btn-sm" onclick="deleteRun(${r.id})">✕</button>
+        </div>
+      </div>
+      <div class="chips" style="margin-top:6px">
         ${r.pace?`<span class="chip chip-b">⏱ ${fmtPace(r.pace)} /km</span>`:''}
+        ${r.speed?`<span class="chip chip-b">🏃 ${r.speed} km/h</span>`:''}
         ${r.hrAvg?`<span class="chip chip-r">♥ Ø${r.hrAvg}${r.hrMax?' Max'+r.hrMax:''}</span>`:''}
-        ${r.rpe?`<span class="chip chip-a">RPE ${r.rpe}</span>`:''}
-        ${r.cond?`<span class="chip">${r.cond}</span>`:''}
+        ${r.rpe?`<span class="chip chip-a">Anstrengung: ${r.rpe}/10 – ${rpeLabels[String(r.rpe)]||''}</span>`:''}
+        ${r.shoe&&r.shoe!=='Laufschuh'?`<span class="chip">${r.shoe}</span>`:''}
+        ${r.cond&&r.cond!=='Normal · Flach'?`<span class="chip">${r.cond}</span>`:''}
       </div>
       ${r.note?`<div style="font-size:11px;color:var(--t3);margin-top:5px">${r.note}</div>`:''}
+      <div class="log-edit" id="redit-${r.id}">
+        <div class="form-row form-2" style="margin-top:8px">
+          <div><div class="inp-label">Distanz (km)</div><input class="inp" type="number" step="0.1" id="redit-dist-${r.id}" value="${r.dist||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div><div class="inp-label">Dauer (min)</div><input class="inp" type="number" id="redit-dur-${r.id}" value="${r.dur||''}" style="font-size:14px;padding:6px 10px"></div>
+        </div>
+        <div style="margin-bottom:8px"><div class="inp-label">Notiz</div><input class="inp" type="text" id="redit-note-${r.id}" value="${r.note||''}" style="font-size:14px;padding:6px 10px"></div>
+        <button class="btn btn-p btn-full btn-sm" onclick="saveRunEdit(${r.id})">Speichern</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1464,6 +1689,23 @@ function renderRunStats() {
     </div>`;
 }
 
+function calcSpeed(dist, dur) {
+  if (!dist || !dur) return null;
+  return Math.round(dist / dur * 60 * 10) / 10; // km/h
+}
+
+function updatePacePreview() {
+  const dist = parseFloat(document.getElementById('r-dist').value);
+  const dur = parseFloat(document.getElementById('r-dur').value);
+  const el = document.getElementById('r-pace-preview');
+  if (dist > 0 && dur > 0) {
+    const p = calcPace(dist, dur);
+    const spd = calcSpeed(dist, dur);
+    el.style.display = 'block';
+    el.textContent = `→ ${p.str} · ${spd} km/h · ${dur} Min · ${dist.toFixed(1)} km`;
+  } else el.style.display = 'none';
+}
+
 function saveRun() {
   const date = document.getElementById('r-date').value;
   const type = document.getElementById('r-type').value;
@@ -1472,13 +1714,17 @@ function saveRun() {
   const hrAvg = parseInt(document.getElementById('r-hr-avg').value)||null;
   const hrMax = parseInt(document.getElementById('r-hr-max').value)||null;
   const rpe = parseInt(document.getElementById('r-rpe').value)||null;
+  const shoe = document.getElementById('r-shoe').value;
   const cond = document.getElementById('r-cond').value;
   const note = document.getElementById('r-note').value.trim();
   if (!date) { toast('Datum fehlt'); return; }
   if (!dist && !dur) { toast('Distanz oder Dauer fehlt'); return; }
   const pace = calcPace(dist, dur);
+  const speed = calcSpeed(dist, dur);
   const runs = loadRuns();
-  runs.unshift({id:Date.now(), date, type, dist, dur, pace:pace?pace.val:null, hrAvg, hrMax, rpe, cond, note, source:'manual'});
+  runs.unshift({id:Date.now(), date, type, dist, dur,
+    pace:pace?pace.val:null, speed,
+    hrAvg, hrMax, rpe, shoe, cond, note, source:'manual'});
   saveRuns(runs);
   ['r-dist','r-hr-avg','r-hr-max','r-note'].forEach(id => { document.getElementById(id).value=''; });
   document.getElementById('r-rpe').value = '';
@@ -1489,10 +1735,37 @@ function saveRun() {
 }
 
 function deleteRun(id) {
-  if (!confirm('Lauf löschen?')) return;
-  saveRuns(loadRuns().filter(r=>r.id!==id));
-  renderRunning(); renderRunHistory();
-  toast('Lauf gelöscht');
+  // confirm() kann in PWA/lokalen Dateien blockiert sein – eigener Dialog
+  const runs = loadRuns();
+  const r = runs.find(x=>x.id===id);
+  if (!r) return;
+  const msg = `Lauf vom ${fmtDate(r.date)} (${r.dist||'?'} km) löschen?`;
+  if (window.confirm ? window.confirm(msg) : true) {
+    saveRuns(runs.filter(x=>x.id!==id));
+    renderRunning(); renderRunHistory();
+    toast('Lauf gelöscht');
+  }
+}
+
+function toggleRunEdit(id) {
+  const el = document.getElementById('redit-'+id);
+  if (el) el.classList.toggle('on');
+}
+
+function saveRunEdit(id) {
+  const runs = loadRuns();
+  const idx = runs.findIndex(r=>r.id===id);
+  if (idx === -1) return;
+  const dist = parseFloat(document.getElementById(`redit-dist-${id}`).value)||runs[idx].dist;
+  const dur = parseFloat(document.getElementById(`redit-dur-${id}`).value)||runs[idx].dur;
+  const note = document.getElementById(`redit-note-${id}`).value;
+  const pace = calcPace(dist, dur);
+  const speed = calcSpeed(dist, dur);
+  runs[idx] = {...runs[idx], dist, dur, pace:pace?pace.val:null, speed, note};
+  saveRuns(runs);
+  toggleRunEdit(id);
+  renderRunHistory();
+  toast('Lauf aktualisiert ✓');
 }
 
 function showRunImport() { document.getElementById('run-import-box').style.display='block'; }
@@ -1549,7 +1822,7 @@ function drawChart(id, datasets, h=90) {
   canvas.width = W*dpr; canvas.height = h*dpr;
   canvas.style.width = W+'px'; canvas.style.height = h+'px';
   const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
-  const pad = {t:8,r:8,b:22,l:40};
+  const pad = {t:10,r:8,b:22,l:40};
   const w = W-pad.l-pad.r, hh = h-pad.t-pad.b;
   const allV = datasets.flatMap(d=>d.values.filter(v=>v!=null));
   if (!allV.length || datasets[0].values.length < 2) {
@@ -1558,60 +1831,113 @@ function drawChart(id, datasets, h=90) {
   }
   const n = datasets[0].values.length;
   const minV = Math.min(...allV)*0.96, maxV = Math.max(...allV)*1.04;
+  const range = maxV - minV || 1;
   const xP = i => pad.l + (n>1?i/(n-1)*w:w/2);
-  const yP = v => pad.t + hh - (v-minV)/(maxV-minV)*hh;
+  const yP = v => pad.t + hh - (v-minV)/range*hh;
+
+  // Grid
   ctx.strokeStyle='#e8e8f0'; ctx.lineWidth=1;
   [0,.5,1].forEach(f => {
-    const val = minV+(maxV-minV)*f, y = yP(val);
+    const val = minV+range*f, y = yP(val);
     ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+w,y); ctx.stroke();
     ctx.fillStyle='#9999b0'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='right';
     ctx.fillText(typeof datasets[0].fmt==='function'?datasets[0].fmt(val):Math.round(val), pad.l-3, y+3);
   });
+
+  // X labels
   const labels = datasets[0].labels||[];
   ctx.fillStyle='#9999b0'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
   const step = Math.max(1,Math.floor(n/5));
   for(let i=0;i<n;i+=step) if(labels[i]) ctx.fillText(labels[i],xP(i),h-4);
   if(labels[n-1]) ctx.fillText(labels[n-1],xP(n-1),h-4);
+
+  // Datasets with bezier curves
   datasets.forEach(ds => {
-    ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=2; ctx.setLineDash(ds.dashed?[4,4]:[]);
-    ds.values.forEach((v,i) => { if(v==null)return; if(i===0||ds.values[i-1]==null)ctx.moveTo(xP(i),yP(v)); else ctx.lineTo(xP(i),yP(v)); });
+    const pts = ds.values.map((v,i) => v!=null ? {x:xP(i),y:yP(v)} : null).filter(Boolean);
+    if (pts.length < 2) return;
+    ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=2.5; ctx.setLineDash(ds.dashed?[4,4]:[]);
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i=1; i<pts.length; i++) {
+      const cp1x = (pts[i-1].x + pts[i].x) / 2;
+      ctx.bezierCurveTo(cp1x, pts[i-1].y, cp1x, pts[i].y, pts[i].x, pts[i].y);
+    }
     ctx.stroke(); ctx.setLineDash([]);
-    ds.values.forEach((v,i) => { if(v==null)return; ctx.beginPath(); ctx.arc(xP(i),yP(v),3,0,Math.PI*2); ctx.fillStyle=ds.color; ctx.fill(); });
+    pts.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = ds.color; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+    });
   });
+
+  // Trend line (linear regression) for first dataset
+  if (!datasets[0].dashed && datasets[0].values.length >= 3) {
+    const vals = datasets[0].values.filter(v=>v!=null);
+    const ni = vals.length;
+    const xs = vals.map((_,i)=>i), ys = vals;
+    const mx = xs.reduce((a,b)=>a+b)/ni, my = ys.reduce((a,b)=>a+b)/ni;
+    const num = xs.reduce((s,x,i)=>s+(x-mx)*(ys[i]-my),0);
+    const den = xs.reduce((s,x)=>s+(x-mx)**2,0);
+    if (den !== 0) {
+      const slope = num/den, intercept = my - slope*mx;
+      const ty0 = yP(slope*0 + intercept);
+      const ty1 = yP(slope*(ni-1) + intercept);
+      ctx.beginPath(); ctx.strokeStyle='rgba(155,93,229,0.4)'; ctx.lineWidth=1.5;
+      ctx.setLineDash([6,4]);
+      ctx.moveTo(xP(0), ty0); ctx.lineTo(xP(ni-1), ty1);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
 }
 
-function drawBarChart(id, labels, values, color='var(--grn)', h=90) {
+function drawBarChart(id, labels, values, color='var(--grn)', h=100) {
   const canvas = document.getElementById(id); if (!canvas || !values.length) return;
+  // Ensure canvas is visible
+  canvas.style.display = 'block';
   const dpr = window.devicePixelRatio||1;
-  const W = canvas.parentElement.clientWidth - 8;
+  const W = Math.max(canvas.parentElement.clientWidth - 8, 100);
   canvas.width = W*dpr; canvas.height = h*dpr;
   canvas.style.width = W+'px'; canvas.style.height = h+'px';
   const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
-  const pad = {t:8,r:8,b:22,l:36};
+  const pad = {t:14,r:8,b:22,l:36};
   const w = W-pad.l-pad.r, hh = h-pad.t-pad.b;
-  const maxV = Math.max(...values)*1.1||10;
-  const n = values.length, bw = w/n*0.6;
+  const maxV = Math.max(...values)*1.15||10;
+  const n = values.length;
+  const bw = Math.min(w/n*0.55, 30);
+  // Grid
   ctx.strokeStyle='#e8e8f0'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+hh); ctx.stroke();
-  ctx.fillStyle='#9999b0'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='right';
-  ctx.fillText(maxV.toFixed(0),pad.l-3,pad.t+8);
+  [0,.5,1].forEach(f => {
+    const val = maxV*f, y = pad.t+hh-val/maxV*hh;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+w,y); ctx.stroke();
+    if(f>0){ctx.fillStyle='#9999b0';ctx.font='8px DM Mono,monospace';ctx.textAlign='right';ctx.fillText(val.toFixed(0),pad.l-3,y+3);}
+  });
   values.forEach((v,i) => {
-    const x = pad.l + i/n*w + w/n/2;
+    const x = pad.l + (i+0.5)/n*w;
     const bh = v/maxV*hh;
-    ctx.fillStyle = color+'55';
-    ctx.fillRect(x-bw/2, pad.t+hh-bh, bw, bh);
-    ctx.fillStyle='#9999b0'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
-    if(i===0||i===n-1||i===Math.floor(n/2)) ctx.fillText(labels[i]||'',x,h-4);
-    if(v>0){ctx.fillStyle=color;ctx.font='7px DM Mono,monospace';ctx.fillText(v.toFixed(1),x,pad.t+hh-bh-2);}
+    // Bar
+    ctx.fillStyle = 'rgba(0,121,85,0.25)';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x-bw/2, pad.t+hh-bh, bw, bh, 3) : ctx.rect(x-bw/2, pad.t+hh-bh, bw, bh);
+    ctx.fill();
+    // Value label
+    if(v>0){ctx.fillStyle='var(--grn)';ctx.font='bold 8px DM Mono,monospace';ctx.textAlign='center';ctx.fillText(v.toFixed(1),x,pad.t+hh-bh-3);}
+    // X label
+    ctx.fillStyle='#9999b0';ctx.font='8px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(labels[i]||'',x,h-4);
   });
 }
 
 function drawRunPaceChart() {
-  const runs = loadRuns().filter(r=>r.pace).reverse().slice(-15);
+  // Chronologisch: älteste links, neueste rechts
+  const runs = [...loadRuns()].filter(r=>r.pace)
+    .sort((a,b) => a.date.localeCompare(b.date))
+    .slice(-15);
   if (runs.length < 2) return;
   drawChart('run-pace-chart', [{
-    values: runs.map(r=>r.pace), labels: runs.map(r=>shortDate(r.date)),
-    color: 'var(--blu)', fmt: fmtPace,
+    values: runs.map(r=>r.pace),
+    labels: runs.map(r=>shortDate(r.date)),
+    color: '#1a6fcc',
+    fmt: fmtPace,
   }]);
 }
 
@@ -1621,12 +1947,18 @@ function drawRunWeeklyChart() {
     if (!r.dist) return;
     const d = new Date(r.date), day = d.getDay();
     const mon = new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1));
-    const k = shortDate(localDate(mon));
+    const k = localDate(mon);
     weeks[k] = (weeks[k]||0) + r.dist;
   });
-  const sorted = Object.entries(weeks).slice(-8);
-  if (sorted.length < 2) return;
-  drawBarChart('run-week-chart', sorted.map(s=>s[0]), sorted.map(s=>s[1]));
+  // Chronologisch sortieren
+  const sorted = Object.entries(weeks)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .slice(-8);
+  if (!sorted.length) return;
+  drawBarChart('run-week-chart',
+    sorted.map(s => shortDate(s[0])),
+    sorted.map(s => s[1])
+  );
 }
 
 // TVL
@@ -1643,28 +1975,6 @@ function fmtTVL(v) {
 // ═══════════════════════════════════════════
 // PROGRESS
 // ═══════════════════════════════════════════
-
-function saveProgress() {
-  const date = document.getElementById('p-date').value;
-  const weight = parseFloat(document.getElementById('p-weight').value)||null;
-  const fat = parseFloat(document.getElementById('p-fat').value)||null;
-  const muscle = parseFloat(document.getElementById('p-muscle').value)||null;
-  const waist = parseFloat(document.getElementById('p-waist').value)||null;
-  const src = document.getElementById('p-src').value;
-  if (!date) { toast('Datum fehlt'); return; }
-  // Plausibility check
-  const prog = loadProgress();
-  const last = prog[prog.length-1];
-  if (last && weight && last.weight && (weight < last.weight*0.9 || weight > last.weight*1.1)) {
-    if (!confirm(`Gewicht ${weight}kg weicht stark von ${last.weight}kg ab. Trotzdem?`)) return;
-  }
-  prog.push({date, weight, fat, muscle, waist, src});
-  if (prog.length > 365) prog.shift();
-  saveProgress(prog);
-  ['p-weight','p-fat','p-muscle','p-waist'].forEach(id => { document.getElementById(id).value=''; });
-  renderProgress();
-  toast('Gespeichert ✓');
-}
 
 function renderProgress() {
   renderProgressCurrent();
