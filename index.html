@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- HIT Coach PWA · Erstellt: 20.06.2026 15:23 -->
+<!-- HIT Coach PWA · Erstellt: 20.06.2026 15:23 · Update: 20.06.2026 15:31 -->
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -17,8 +17,8 @@
 <title>HIT Coach</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
-:root{--bg0:#0a0a0c;--bg1:#111114;--bg2:#18181d;--bg3:#222228;--border:#2a2a32;--text1:#f0f0f5;--text2:#9090a8;--text3:#55556a;--accent:#00e5a0;--accent-dim:#00e5a018;--accent2:#ff6b35;--blue:#4d9fff;--red:#ff4d6d;--amber:#ffb347;--purple:#a855f7;--radius:14px;--radius-sm:8px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
-body.light{--bg0:#f4f4f8;--bg1:#ffffff;--bg2:#f0f0f4;--bg3:#e4e4ec;--border:#d0d0dc;--text1:#141420;--text2:#505068;--text3:#9090a8;--accent:#009970;--accent-dim:#00997018;--blue:#2a7fd4;--red:#d42a4a;--amber:#c47d00;--purple:#7c3aed}
+:root{--bg0:#f4f4f8;--bg1:#ffffff;--bg2:#f0f0f4;--bg3:#e4e4ec;--border:#d0d0dc;--text1:#141420;--text2:#505068;--text3:#9090a8;--accent:#009970;--accent-dim:#00997018;--accent2:#ff6b35;--blue:#2a7fd4;--red:#d42a4a;--amber:#c47d00;--purple:#7c3aed;--radius:14px;--radius-sm:8px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+body.dark{--bg0:#0a0a0c;--bg1:#111114;--bg2:#18181d;--bg3:#222228;--border:#2a2a32;--text1:#f0f0f5;--text2:#9090a8;--text3:#55556a;--accent:#00e5a0;--accent-dim:#00e5a018;--blue:#4d9fff;--red:#ff4d6d;--amber:#ffb347;--purple:#a855f7}
 html.light-pre body{background:#f4f4f8}
 .theme-toggle{background:none;border:1px solid var(--border);border-radius:20px;color:var(--text2);font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;cursor:pointer;transition:all 0.2s}
 .theme-toggle:active{opacity:0.7}
@@ -297,7 +297,7 @@ html,body{height:100%;background:var(--bg0);color:var(--text1);font-family:'Syne
       <div class="page-sub" id="today-label">Lade...</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">☀ Light</button>
+      <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">☾ Dark</button>
       <div class="badge badge-green" id="day-type-badge">—</div>
     </div>
   </div>
@@ -2071,27 +2071,45 @@ function showRunTab(tab){
 
 // ===== THEME TOGGLE =====
 function initTheme(){
-  const saved=localStorage.getItem('hit_theme')||'dark';
+  const saved=localStorage.getItem('hit_theme')||'light';
   applyTheme(saved,false);
-  // documentElement pre-class aufräumen
   document.documentElement.classList.remove('light-pre');
 }
 
 function toggleTheme(){
-  const isLight=document.body.classList.contains('light');
-  applyTheme(isLight?'dark':'light',true);
+  const isDark=document.body.classList.contains('dark');
+  applyTheme(isDark?'light':'dark',true);
 }
 
-function applyTheme(mode, save){
-  const isLight=mode==='light';
-  document.body.classList.toggle('light',isLight);
+function applyTheme(mode,save){
+  const isDark=mode==='dark';
+  document.body.classList.toggle('dark',isDark);
   const btn=document.getElementById('theme-toggle-btn');
-  if(btn){
-    btn.textContent=isLight?'☾ Dark':'☀ Light';
-    btn.title=isLight?'Zu Dark wechseln':'Zu Light wechseln';
-  }
+  if(btn) btn.textContent=isDark?'☀ Light':'☾ Dark';
   if(save) localStorage.setItem('hit_theme',mode);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function openExModal(key){
   if(!key||!EXERCISES[key])return;
