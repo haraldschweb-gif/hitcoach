@@ -632,63 +632,157 @@ const PLAN = [
 
 // ── ALTERNATIVES ────────────────────────────
 const ALTERNATIVES = {
+  // ═══ BRUST ══════════════════════════════════════════════════════════════
   bankdruecken:[
-    {exKey:'brustpresse_m', name:'Brustpresse Maschine', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'Gelenkschonender, wenn Schulter empfindlich'},
-    {exKey:'kabel_brust', name:'Kabelziehen Brust', detail:'1 Satz × 10–12 WH bis PmM · konstante Spannung', note:'Am Kabelturm, stehend'},
+    {exKey:'E-B14', name:'Bankdrücken am Gerät (Esquerdo)', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:14 · Gleicher Bewegungsablauf, mehr Stabilität'},
+    {exKey:'E-B15', name:'Bankdrücken an der Multipresse', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:15 · Feste Führung, sicher bis PmM'},
+    {exKey:'D-B05', name:'Stemmen am Gerät (Brustpresse)', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'D:73 · Gelenkschonend, wenn Schulter empfindlich'},
+    {exKey:'E-B16', name:'Kabelzüge über Kreuz (Crossover)', detail:'1 Satz × 10–12 WH bis PmM · konstante Spannung', note:'E:16 · Kabelturm stehend, voller ROM'},
+    {exKey:'E-B17', name:'Fliegende Bewegungen am Seilzug von unten', detail:'1 Satz × 10–12 WH bis PmM', note:'E:17 · Unterer Kabel, Brustformung'},
+    {exKey:'D-B13', name:'Butterfly stehend / Kabelzug überkreuz', detail:'1 Satz × 10–12 WH bis PmM', note:'D:82 · Stehend, maximale Kontraktion'},
+    {exKey:'E-B19', name:'Überzüge am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM · Lat + Brust', note:'E:19 · Dehnung oben maximal'},
   ],
   butterfly:[
-    {exKey:'pec_deck', name:'Pec Deck Maschine', detail:'1 Satz × 10–12 WH bis PmM', note:'Wenn Butterfly-Maschine belegt'},
-    {exKey:'kabel_fly', name:'Kabel-Crossover', detail:'1 Satz × 10–12 WH bis PmM · voller ROM', note:'Am Kabelturm stehend'},
+    {exKey:'E-B18', name:'Butterfly / Pec Deck (Esquerdo)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:18 · Wenn eigene Maschine belegt'},
+    {exKey:'D-B12', name:'Butterfly – Pec Deck (Delavier)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:81 · Gleiche Isolation, andere Maschine'},
+    {exKey:'E-B16', name:'Kabelzüge über Kreuz', detail:'1 Satz × 10–12 WH bis PmM · voller ROM', note:'E:16 · Stehend, konstante Spannung'},
+    {exKey:'E-B17', name:'Fliegende Bewegungen am Seilzug von unten', detail:'1 Satz × 10–12 WH bis PmM', note:'E:17 · Untere Brust betont'},
+    {exKey:'D-B13', name:'Butterfly stehend / Kabelzug überkreuz', detail:'1 Satz × 10–12 WH bis PmM', note:'D:82 · Identisches Bewegungsmuster'},
   ],
+
+  // ═══ RÜCKEN ═════════════════════════════════════════════════════════════
   latziehen:[
-    {exKey:'latz_breit', name:'Latziehen breiter Griff', detail:'1 Satz × 8–10 WH bis PmM', note:'Gleiche Maschine, anderer Reiz'},
-    {exKey:'kabel_rudern', name:'Kabelrudern enger Griff', detail:'1 Satz × 8–10 WH bis PmM', note:'V-Griff am Kabelturm'},
+    {exKey:'E-R8', name:'Latziehen am Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'E:8 · Gleiche Maschine, breiter Griff'},
+    {exKey:'E-R9', name:'Latziehen zur Brust (Kabel)', detail:'1 Satz × 8–10 WH bis PmM', note:'E:9 · Kabelturm, variable Griffbreite'},
+    {exKey:'D-R03', name:'Lat-Ziehen zur Brust (Delavier)', detail:'1 Satz × 8–10 WH bis PmM', note:'D:90 · Schulterbreiter Griff, Brust heben'},
+    {exKey:'D-R05', name:'Brustziehen am Lat-Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'D:93 · Enge Griffvariante'},
+    {exKey:'E-R14', name:'Klimmzüge am Gerät mit Unterstützung', detail:'1 Satz × 8–10 WH bis PmM · Hilfsgewicht', note:'E:14 · Wenn echte Klimmzüge nicht bis PmM'},
+    {exKey:'E-R15', name:'Latziehen mit einer Hand', detail:'1 Satz je Seite × 8–10 WH bis PmM', note:'E:15 · Einseitig, bessere Isolation'},
+    {exKey:'E-R6', name:'Seitziehen mit einer Hand', detail:'1 Satz je Seite × 8–10 WH bis PmM', note:'E:6 · Kabel, Lat-Isolation'},
+    {exKey:'E-R17', name:'Adduktion der Oberarme am Gerät', detail:'1 Satz × 10–12 WH bis PmM', note:'E:17 · Tiefer Lat, Rücken-Isolation'},
   ],
   klimmzuege:[
-    {exKey:'latz_assist', name:'Latziehen (Untergriff)', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'Wenn Klimmzüge nicht bis PmM möglich'},
-    {exKey:'klimmzug_ass', name:'Klimmzug-Maschine assistiert', detail:'1 Satz × 8–10 WH bis PmM', note:'Negativgewicht hilft'},
+    {exKey:'E-R14', name:'Klimmzüge am Gerät mit Unterstützung', detail:'1 Satz × 8–10 WH bis PmM · Hilfsgewicht', note:'E:14 · Wenn freie Klimmzüge nicht bis PmM'},
+    {exKey:'D-R03', name:'Lat-Ziehen zur Brust', detail:'1 Satz × 8–10 WH bis PmM · Untergriff', note:'D:90 · Gleiche Muskelgruppe, Maschine'},
+    {exKey:'E-R9', name:'Latziehen zur Brust (Untergriff)', detail:'1 Satz × 8–10 WH bis PmM', note:'E:9 · Kabel statt Stange'},
+    {exKey:'E-R8', name:'Latziehen am Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'E:8 · Geführt, sicher bis PmM'},
+    {exKey:'E-R15', name:'Latziehen mit einer Hand', detail:'1 Satz je Seite × 8–10 WH bis PmM', note:'E:15 · Einseitig, Symmetrie-Korrektur'},
   ],
   rudern:[
-    {exKey:'rudern_breit', name:'Kabelrudern breiter Griff', detail:'1 Satz × 10–12 WH bis PmM', note:'Mehr Trapez-Beteiligung'},
-    {exKey:'schrägbank_rudern', name:'Schrägbankrudern', detail:'1 Satz × 10–12 WH bis PmM', note:'Wenn Rudermaschine belegt'},
-  ],
-  beinpresse:[
-    {exKey:'hack_squat', name:'Hack-Squat', detail:'1 Satz × 8–12 WH bis PmM · mehr Quad', note:'Wenn Beinpresse belegt'},
-    {exKey:'beinpresse_eng', name:'Beinpresse enger Fußstand', detail:'1 Satz × 8–12 WH bis PmM', note:'Gleiche Maschine, anderer Reiz'},
-  ],
-  beinstrecken:[
-    {exKey:'beinstr_einbein', name:'Beinstrecken einbeinig', detail:'1 Satz je Bein × 10–12 WH', note:'Behebt Seitenungleichgewichte'},
-  ],
-  nackendruecken:[
-    {exKey:'schulter_m', name:'Schulterdrücken Maschine', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'Gelenkschonender'},
-  ],
-  seitheben:[
-    {exKey:'seith_kabel', name:'Seitheben Kabel einarmig', detail:'1 Satz × 10–12 WH bis PmM', note:'Konstante Spannung – besser als KH'},
-    {exKey:'seith_m', name:'Seitheben Maschine', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'Wenn vorhanden'},
-  ],
-  bizepcurlslh:[
-    {exKey:'biz_kabel', name:'Bizeps-Curls Kabel', detail:'1 Satz × 8–10 WH bis PmM', note:'Keine tote Zone oben'},
-    {exKey:'biz_m', name:'Bizeps-Maschine', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'Kein Schwung möglich'},
-  ],
-  bizepcurlskh:[
-    {exKey:'hammer', name:'Hammer Curls', detail:'1 Satz × 10–12 WH bis PmM', note:'Neutralgriff = mehr Brachialis'},
-    {exKey:'konz', name:'Konzentrations-Curls', detail:'1 Satz × 10–12 WH bis PmM', note:'Maximale Isolation'},
-  ],
-  trizepskabel:[
-    {exKey:'triz_m', name:'Trizeps-Maschine', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'Wenn Kabelturm belegt'},
-  ],
-  kreuzheben:[
-    {exKey:'beinbeuger', name:'Beinbeuger liegend', detail:'1 Satz × 10–12 WH bis PmM', note:'Kein Rückenrisiko'},
+    {exKey:'E-R10', name:'Rudern am Seilzug', detail:'1 Satz × 8–10 WH bis PmM', note:'E:10 · Kabelturm, enger V-Griff'},
+    {exKey:'E-R11', name:'Rudern am Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'E:11 · Brustpolster, Schulterblätter aktiv'},
+    {exKey:'D-R06', name:'Rudern am tiefen Block (enger Griff)', detail:'1 Satz × 8–10 WH bis PmM', note:'D:94 · V-Griff, tiefe Rückenarbeit'},
+    {exKey:'D-R07', name:'Kabelrudern (proniert, breiter Griff)', detail:'1 Satz × 8–10 WH bis PmM', note:'D:95 · Mehr Trapez-Beteiligung'},
+    {exKey:'E-R12', name:'Rudern im Stehen am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:12 · Stehend, Rücken aktiv halten'},
+    {exKey:'E-R16', name:'Kabelzüge über Kreuz (Rücken)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:16 · Rückenfokus, Schulterblätter'},
+    {exKey:'E-R18', name:'Rudern an der Multipresse', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:18 · Feste Führung, sicher'},
+    {exKey:'E-R19', name:'Senkrechtes Rudern am Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'E:19 · Vertikale Rudermaschine'},
   ],
   ueberzuege:[
-    {exKey:'pullover_kabel', name:'Pullover Kabel stehend', detail:'1 Satz × 10–12 WH bis PmM', note:'Konstante Spannung'},
+    {exKey:'E-R13', name:'Überzüge am hohen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:13 · Konstante Spannung, Lat-Dehnung'},
+    {exKey:'D-R08', name:'Lat-Ziehen mit gestreckten Armen (Pullover Kabel)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:96 · Hoher Block, gestreckter Arm'},
+    {exKey:'E-B19', name:'Überzüge am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:19 · Tiefer Kabel, Brust + Lat'},
   ],
-  wadenheben:[
-    {exKey:'waden_steh', name:'Wadenheben stehend', detail:'1 Satz × 15–20 WH bis PmM', note:'Gastrocnemius-Fokus'},
-    {exKey:'waden_sitz', name:'Wadenheben sitzend', detail:'1 Satz × 15–20 WH bis PmM', note:'Soleus-Fokus'},
+
+  // ═══ SCHULTERN ══════════════════════════════════════════════════════════
+  nackendruecken:[
+    {exKey:'E-S21', name:'Schulterdrücken am Gerät', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:21 · Gelenkschonender als LH'},
+    {exKey:'E-S22', name:'Frontdrücken an der Multipresse', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:22 · Feste Führung, sicher'},
+    {exKey:'D-S18', name:'Seitwärtsheben am Gerät', detail:'1 Satz × 8–10 WH bis PmM', note:'D:57 · Wenn kein separates Drückgerät vorhanden'},
+  ],
+  seitheben:[
+    {exKey:'E-S23', name:'Seitheben am Gerät', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'E:23 · Maschine, wenn vorhanden'},
+    {exKey:'D-S18', name:'Seitwärtsheben am Gerät (Delavier)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:57 · Geführt, sicher bis PmM'},
+    {exKey:'E-S24', name:'Einhändiges Seitheben am tiefen Seilzug', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'E:24 · Konstante Spannung, besser als KH'},
+    {exKey:'D-S14', name:'Seitwärtsheben am tiefen Block einarmig', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'D:52 · Kabel, einseitig'},
+    {exKey:'D-S09', name:'Vorwärtsheben am tiefen Block (wechselseitig)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:46 · Vorderer Delta, Kabel'},
+    {exKey:'E-S25', name:'Frontheben am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:25 · Vorderer Deltamuskel'},
+    {exKey:'D-S19', name:'Zurückführen der Schultern am Gerät', detail:'1 Satz × 10–12 WH bis PmM', note:'D:58 · Hinterer Delta, Maschine'},
+    {exKey:'E-S27', name:'Schulterziehen im Sitzen am Gerät (waagerecht)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:27 · Hinterer Delta, waagerecht'},
+    {exKey:'E-S26', name:'Einhändiges Schulterziehen am Seilzug', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'E:26 · Hinterer Delta, Kabel'},
+    {exKey:'D-S11', name:'Zurückführen der Schultern an Blöcken', detail:'1 Satz × 10–12 WH bis PmM', note:'D:49 · Hinterer Delta, beide Seiten gleichzeitig'},
+    {exKey:'D-S12', name:'Außenrotation der Arme am Block', detail:'1 Satz × 12–15 WH bis PmM', note:'D:50 · Rotatorenmanschette, Prävention'},
+    {exKey:'E-S30', name:'Außenrotation am Seilzug', detail:'1 Satz × 12–15 WH bis PmM', note:'E:30 · Rotatorenmanschette, Kabel'},
+    {exKey:'E-S31', name:'Innenrotation am Seilzug', detail:'1 Satz × 12–15 WH bis PmM', note:'E:31 · Rotatorenmanschette, Kabel'},
+    {exKey:'E-S28', name:'Aufrechtes Rudern am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:28 · Gelenkschonender als LH-Variante'},
   ],
   schulterheben:[
-    {exKey:'schulterh_kabel', name:'Schulterheben Kabel', detail:'1 Satz × 12–15 WH bis PmM', note:'Konstante Spannung'},
+    {exKey:'E-S29', name:'Schulterheben am tiefen Seilzug', detail:'1 Satz × 12–15 WH bis PmM', note:'E:29 · Kabel, konstante Spannung'},
+    {exKey:'D-R24', name:'Schulterheben am Gerät / Cadre-Guide', detail:'1 Satz × 12–15 WH bis PmM', note:'D:119 · Maschine, Trapez-Isolation'},
+    {exKey:'E-S10', name:'Schulterheben mit Kurzhanteln', detail:'1 Satz × 12–15 WH bis PmM', note:'E:10 · Kurzhanteln, wenn Gerät belegt'},
+  ],
+
+  // ═══ BIZEPS ════════════════════════════════════════════════════════════
+  bizepcurlslh:[
+    {exKey:'E-BIZ9', name:'Curl am Gerät (Bizepsmaschine)', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:9 · Kein Schwung möglich, optimal'},
+    {exKey:'D-A08', name:'Armbeugen am Bizeps-Gerät Larry Scott', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'D:14 · Klassische Bizepsmaschine'},
+    {exKey:'E-BIZ10', name:'Curl am tiefen Seilzug', detail:'1 Satz × 8–10 WH bis PmM', note:'E:10 · Kabel, keine tote Zone oben'},
+    {exKey:'E-BIZ3', name:'Scott-Curl / Preacher Curl', detail:'1 Satz × 8–10 WH bis PmM', note:'E:3 · Ellenbogen fixiert, maximale Isolation'},
+    {exKey:'D-A09', name:'Armbeugen auf der Larry-Scott-Bank', detail:'1 Satz × 8–10 WH bis PmM', note:'D:15 · Ellenbogen gestützt'},
+    {exKey:'D-A05', name:'Armbeugen am tiefen Block (einarmig)', detail:'1 Satz je Seite × 8–10 WH bis PmM', note:'D:10 · Kabel, einseitig'},
+    {exKey:'D-A06', name:'Armbeugen am hohen Block', detail:'1 Satz × 8–10 WH bis PmM', note:'D:11 · Hoher Kabel, Spitzen-Kontraktion'},
+    {exKey:'E-BIZ11', name:'Einhändige Curls am hohen Seilzug', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'E:11 · Spitzen-Kontraktion maximieren'},
+  ],
+  bizepcurlskh:[
+    {exKey:'E-BIZ9', name:'Curl am Gerät', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'E:9 · Maschine, kein Ausweichen'},
+    {exKey:'E-BIZ10', name:'Curl am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'E:10 · Kabel, konstante Spannung'},
+    {exKey:'D-A05', name:'Armbeugen am tiefen Block (Hammercurl)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:10 · Neutralgriff = mehr Brachialis'},
+    {exKey:'E-BIZ3', name:'Scott-Curl / Preacher Curl', detail:'1 Satz × 10–12 WH bis PmM', note:'E:3 · Maximale Ellenbogen-Isolation'},
+    {exKey:'E-BIZ11', name:'Einhändige Curls am hohen Seilzug', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'E:11 · Hoher Kabel, Spitzen-Kontraktion'},
+    {exKey:'D-A06', name:'Armbeugen am hohen Block', detail:'1 Satz × 10–12 WH bis PmM', note:'D:11 · Hoher Kabel, konstante Spannung'},
+  ],
+
+  // ═══ TRIZEPS ═══════════════════════════════════════════════════════════
+  trizepskabel:[
+    {exKey:'E-T10', name:'Armstrecken am Gerät', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'E:10 · Wenn Kabelturm belegt'},
+    {exKey:'E-T12', name:'Trizepsdrücken an der Maschine', detail:'1 Satz × 10–12 WH bis PmM · geführt', note:'E:12 · Optimale Isolation, geführt'},
+    {exKey:'E-T11', name:'Enges Hanteldrücken an der Multipresse', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'E:11 · Compound-Trizeps, Multipresse'},
+    {exKey:'D-T01', name:'Trizeps Pushdown Stange (Kabel)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:20 · Klassischer Pushdown, Ellenbogen eng'},
+    {exKey:'D-T02', name:'Trizeps am hohen Block (Untergriff)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:21 · Langer Trizepskopf betont'},
+    {exKey:'D-T03', name:'Wechselseitiger Trizeps Kabel (supiniert)', detail:'1 Satz je Seite × 10–12 WH bis PmM', note:'D:22 · Einseitig, sicher bis PmM'},
+    {exKey:'D-T04', name:'Trizepsdehnen am Seilzug im Sitzen', detail:'1 Satz × 10–12 WH bis PmM', note:'D:23 · Überkopf-Kabel, langer Kopf'},
+    {exKey:'E-T8', name:'Armstrecken am Seilzug (Pushdown Stange)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:8 · Standard Pushdown'},
+    {exKey:'E-T9', name:'Rope Pushdown (Seil)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:9 · Seil = mehr Rotation am Ende'},
+    {exKey:'E-T14', name:'Armstrecken am Seilzug (Rücken zum Gerät)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:14 · Überkopf-Variante, langer Kopf'},
+    {exKey:'E-T15', name:'Armstrecken am Seilzug (weitere Variante)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:15 · Einarmig oder Seil-Variante'},
+    {exKey:'E-T13', name:'Oberkörperheben mit Unterstützung (Trizeps)', detail:'1 Satz × 8–10 WH bis PmM', note:'E:13 · Maschine, Dips geführt'},
+  ],
+
+  // ═══ BEINE / QUAD ══════════════════════════════════════════════════════
+  beinpresse:[
+    {exKey:'D-Q07', name:'Hack-Squat (Beinpresse im Stehen)', detail:'1 Satz × 8–12 WH bis PmM · mehr Quad', note:'D:136 · Wenn Schrägbeinpresse belegt'},
+    {exKey:'E-Q12', name:'Kniebeugen am Gerät / Sled Squat', detail:'1 Satz × 8–12 WH bis PmM', note:'E:12 · Geführte Kniebeuge, sicher'},
+    {exKey:'E-Q13', name:'Beinpresse (Esquerdo)', detail:'1 Satz × 8–12 WH bis PmM · breiter Fußstand', note:'E:13 · Breiter Stand = mehr Ischio/Gesäß'},
+    {exKey:'D-Q11', name:'Einbeinige Kniebeuge am Gerät', detail:'1 Satz je Bein × 10–12 WH bis PmM', note:'D:141 · Behebt Seitenungleichgewichte'},
+    {exKey:'E-Q23', name:'Ausfallschritt an der Multipresse', detail:'1 Satz × 10–12 WH je Bein bis PmM', note:'E:23 · Geführter Ausfallschritt'},
+    {exKey:'E-Q19', name:'Adduktion im Sitzen', detail:'1 Satz × 12–15 WH bis PmM', note:'E:19 · Adduktoren-Maschine, Ergänzung'},
+    {exKey:'E-Q20', name:'Abduktion im Sitzen', detail:'1 Satz × 12–15 WH bis PmM', note:'E:20 · Außenschenkel-Maschine, Ergänzung'},
+  ],
+  beinstrecken:[
+    {exKey:'D-Q09', name:'Beinstrecken am Gerät (Leg Extension)', detail:'1 Satz × 10–12 WH bis PmM · volle Streckung', note:'D:138 · Wenn eigene Maschine belegt'},
+    {exKey:'E-Q14', name:'Beinstrecken am Gerät (Esquerdo)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:14 · Einbeinig für Symmetrie-Korrektur'},
+    {exKey:'E-Q24', name:'Beinstrecken am tiefen Seilzug', detail:'1 Satz je Bein × 10–12 WH bis PmM', note:'E:24 · Kabel, einseitig, konstante Spannung'},
+  ],
+
+  // ═══ HAMSTRINGS ════════════════════════════════════════════════════════
+  kreuzheben:[
+    {exKey:'D-Q10', name:'Beinbeugen in Bauchlage (Lying Leg Curl)', detail:'1 Satz × 10–12 WH bis PmM', note:'D:140 · Kein Rückenrisiko, Ischio-Isolation'},
+    {exKey:'D-Q12', name:'Beinbeugen sitzend am Gerät', detail:'1 Satz × 10–12 WH bis PmM', note:'D:142 · Sitzend, anderer Winkel'},
+    {exKey:'E-Q15', name:'Beinbeugen in Bauchlage (Esquerdo)', detail:'1 Satz × 10–12 WH bis PmM', note:'E:15 · Liegend, Gastrocnemius mitbeteiligt'},
+    {exKey:'E-Q25', name:'Beinbeugen am tiefen Seilzug', detail:'1 Satz je Bein × 10–12 WH bis PmM', note:'E:25 · Kabel, stehend, einseitig'},
+    {exKey:'D-R18', name:'Hyperextension am Gerät', detail:'1 Satz × 10–12 WH bis PmM', note:'D:112 · Rückenstrecker + Ischio, geführt'},
+    {exKey:'D-R19', name:'Strecken des Oberkörpers am Gerät', detail:'1 Satz × 10–12 WH bis PmM', note:'D:113 · Rückenstrecker-Isolation'},
+  ],
+
+  // ═══ WADEN ══════════════════════════════════════════════════════════════
+  wadenheben:[
+    {exKey:'D-Q17', name:'Wadenheben am Gerät (Calf Raise stehend)', detail:'1 Satz × 15–20 WH bis PmM', note:'D:149 · Gastrocnemius-Fokus'},
+    {exKey:'D-Q20', name:'Wadenheben sitzend / Schollenmuskel', detail:'1 Satz × 15–20 WH bis PmM', note:'D:152 · Soleus-Fokus, gebeugtes Knie'},
+    {exKey:'D-Q19', name:'Donkey Calf Raise', detail:'1 Satz × 15–20 WH bis PmM', note:'D:151 · Maximale Dehnung, Gastrocnemius'},
+    {exKey:'E-Q16', name:'Fersenheben am Gerät', detail:'1 Satz × 15–20 WH bis PmM', note:'E:16 · Stehend, Gastrocnemius'},
+    {exKey:'E-Q17', name:'Presse für Zwillingswadenmuskeln (45°)', detail:'1 Satz × 15–20 WH bis PmM', note:'E:17 · Beinpresse-Variante für Waden'},
+    {exKey:'E-Q18', name:'Fersenheben im Sitzen (Seated Calf Raise)', detail:'1 Satz × 15–20 WH bis PmM', note:'E:18 · Soleus-Fokus'},
+    {exKey:'E-Q28', name:'Fersenheben am tiefen Seilzug', detail:'1 Satz × 15–20 WH bis PmM', note:'E:28 · Kabel, konstante Spannung'},
   ],
 };
 
