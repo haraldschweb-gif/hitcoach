@@ -371,7 +371,6 @@ canvas { display: block; width: 100% !important; }
     <div class="screen" id="running-screen">
       <div class="ph">
         <div><div class="ph-title">Laufen</div><div class="ph-sub" id="run-sub">—</div></div>
-        <button class="btn btn-s btn-sm" onclick="showRunImport()">↓ Import</button>
       </div>
       <div class="seg">
         <button class="seg-btn on" id="rseg-log" onclick="showRunTab('log')">Eintragen</button>
@@ -441,19 +440,6 @@ canvas { display: block; width: 100% !important; }
             </div>
             <div id="r-pace-preview" style="display:none;font-family:'DM Mono',monospace;font-size:12px;color:var(--grn);background:var(--grn-l);padding:8px 12px;border-radius:var(--rs);margin-bottom:10px"></div>
             <button class="btn btn-p btn-full" onclick="saveRun()">Lauf speichern</button>
-          </div>
-        </div>
-        <div id="run-import-box" style="display:none">
-          <div class="card" style="border-color:#b0ddd0">
-            <div class="card-head"><span class="card-label" style="color:var(--grn)">Apple Watch Import</span></div>
-            <div class="card-body">
-              <p style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.6">JSON aus Apple-Kurzbefehl. Format: {"runs":[{"date":"2026-06-20","dist":5.2,"dur":28,"hrAvg":142,"hrMax":168}]}</p>
-              <textarea id="run-import-json" rows="3" style="font-size:11px;font-family:'DM Mono',monospace;resize:none;margin-bottom:8px"></textarea>
-              <div class="form-row form-2">
-                <button class="btn btn-p" onclick="importRuns()">Importieren</button>
-                <button class="btn btn-s" onclick="hideRunImport()">Abbrechen</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -593,6 +579,16 @@ canvas { display: block; width: 100% !important; }
         <div class="card-body" id="data-stats"></div>
       </div>
       <div class="card">
+        <div class="card-head"><span class="card-label">App-Einstellungen</span></div>
+        <div class="card-body">
+          <div class="data-row">
+            <span>Geräusche</span>
+            <button class="btn btn-s btn-sm" id="sound-toggle" onclick="toggleSound()">—</button>
+          </div>
+          <button class="btn btn-s btn-full" style="margin-top:10px" onclick="testSound()">Testton</button>
+        </div>
+      </div>
+      <div class="card">
         <div class="card-head"><span class="card-label">Export / Import</span></div>
         <div class="card-body">
           <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Alle Daten als JSON sichern. Beim Löschen des Icons sind alle Daten weg!</p>
@@ -600,8 +596,13 @@ canvas { display: block; width: 100% !important; }
             <button class="btn btn-p" onclick="exportJSON()">↓ JSON</button>
             <button class="btn btn-s" onclick="exportCSV()">↓ CSV</button>
           </div>
-          <textarea id="import-json" rows="3" placeholder='{"training":[],"body":[],"runs":[]}' style="font-size:11px;font-family:'DM Mono',monospace;resize:none;margin-bottom:8px"></textarea>
-          <button class="btn btn-s btn-full" onclick="importJSON()">↑ JSON importieren</button>
+          <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importJSONFile(this)">
+          <button class="btn btn-s btn-full" onclick="document.getElementById('import-file').click()">↑ JSON-Datei importieren</button>
+          <details style="margin-top:10px">
+            <summary style="font-size:12px;color:var(--t3);cursor:pointer">Manueller Import</summary>
+            <textarea id="import-json" rows="3" placeholder='{"training":[],"body":[],"runs":[]}' style="font-size:11px;font-family:'DM Mono',monospace;resize:none;margin-top:8px;margin-bottom:8px"></textarea>
+            <button class="btn btn-s btn-full" onclick="importJSON()">Text importieren</button>
+          </details>
         </div>
       </div>
       <div class="card" style="border-color:#f0c0c8">
@@ -708,6 +709,7 @@ const REPS_KEY = 'hit_reps_v1';
 const RUN_KEY = 'hit_runs_v1';
 const FOCUS_KEY = 'hit_focus_v1';
 const STUDIO_KEY = 'hit_studios_v1';
+const SOUND_KEY = 'hit_sound_v1';
 
 const FOCUS_CONFIG = {
   none: {label:'Kein Fokus', primary:[], secondary:[], caution:'Normaler HIT-Rhythmus ohne Schwerpunkt.'},
@@ -1817,11 +1819,14 @@ function stopAllTimers() {
 // ═══════════════════════════════════════════
 
 let _audioCtx = null;
+function soundEnabled() { return loadLS(SOUND_KEY, true) !== false; }
+function saveSoundEnabled(v) { saveLS(SOUND_KEY, !!v); }
 function getAudio() {
   if (!_audioCtx) try { _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e) { return null; }
   return _audioCtx;
 }
 function beep(freq=440, dur=0.12, vol=0.4, type='sine', delay=0) {
+  if (!soundEnabled()) return;
   const ctx = getAudio(); if (!ctx) return;
   if (ctx.state === 'suspended') { ctx.resume().then(() => _beep(ctx,freq,dur,vol,type,delay)); return; }
   _beep(ctx,freq,dur,vol,type,delay);
@@ -1850,6 +1855,31 @@ const SND = {
   start:   () => { beep(440,0.1,0.4); beep(550,0.1,0.4,undefined,0.16); beep(660,0.16,0.45,undefined,0.34); },
   finish:  () => { beep(660,0.1,0.4); beep(784,0.1,0.4,undefined,0.18); beep(880,0.1,0.4,undefined,0.36); beep(1047,0.22,0.5,undefined,0.56); },
 };
+
+function unlockAudio() {
+  const ctx = getAudio();
+  if (ctx && ctx.state === 'suspended') ctx.resume();
+}
+function renderSoundSettings() {
+  const btn = document.getElementById('sound-toggle');
+  if (!btn) return;
+  const on = soundEnabled();
+  btn.textContent = on ? 'An' : 'Aus';
+  btn.className = 'btn btn-sm ' + (on ? 'btn-p' : 'btn-s');
+}
+function toggleSound() {
+  const next = !soundEnabled();
+  saveSoundEnabled(next);
+  unlockAudio();
+  renderSoundSettings();
+  if (next) testSound();
+  else toast('Geräusche aus');
+}
+function testSound() {
+  unlockAudio();
+  SND.start();
+  toast(soundEnabled() ? 'Testton abgespielt' : 'Geräusche sind aus');
+}
 
 // ═══════════════════════════════════════════
 // RUNNING
@@ -2032,31 +2062,6 @@ function saveRunEdit(id) {
   toggleRunEdit(id);
   renderRunHistory();
   toast('Lauf aktualisiert ✓');
-}
-
-function showRunImport() { document.getElementById('run-import-box').style.display='block'; }
-function hideRunImport() { document.getElementById('run-import-box').style.display='none'; document.getElementById('run-import-json').value=''; }
-
-function importRuns() {
-  const raw = document.getElementById('run-import-json').value.trim();
-  if (!raw) { toast('Kein JSON'); return; }
-  let parsed; try { parsed = JSON.parse(raw); } catch { toast('Ungültiges JSON'); return; }
-  const incoming = Array.isArray(parsed.runs) ? parsed.runs : Array.isArray(parsed) ? parsed : [];
-  const runs = loadRuns();
-  const existing = new Set(runs.filter(r=>r.source==='watch').map(r=>r.date));
-  let added = 0;
-  incoming.forEach(r => {
-    if (!r.date || existing.has(r.date)) return;
-    const dist = parseFloat(r.dist||r.distance||0)||null;
-    const dur = parseFloat(r.dur||r.duration||0)||null;
-    const pace = calcPace(dist, dur);
-    runs.unshift({id:Date.now()+added, date:r.date, type:r.type||'LISS – locker', dist, dur, pace:pace?pace.val:null,
-      hrAvg:parseInt(r.hrAvg||0)||null, hrMax:parseInt(r.hrMax||0)||null, rpe:parseInt(r.rpe||0)||null,
-      cond:r.cond||'Normal · Flach', note:r.note||'', source:'watch'});
-    added++;
-  });
-  saveRuns(runs); hideRunImport(); renderRunning();
-  toast(added + ' Läufe importiert ✓');
 }
 
 // Run pace preview
@@ -2251,6 +2256,7 @@ function fmtTVL(v) {
 function renderProgress() {
   renderFocusStatus();
   renderStudioSettings();
+  renderSoundSettings();
   renderProgressCurrent();
   renderBodyWeightTrend();
   renderTVLChart();
@@ -2702,19 +2708,66 @@ function renderProgressHistory() {
   if (!prog.length) { el.innerHTML='<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine Messungen.</div>'; return; }
   el.innerHTML = [...prog].reverse().slice(0,20).map((p,ri) => {
     const realIdx = prog.length-1-ri;
-    return `<div class="log-entry" style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div class="log-date">${fmtDate(p.date)} · ${p.src||''}</div>
-        <div class="chips" style="margin-top:4px">
-          ${p.weight?`<span class="chip">${p.weight} kg</span>`:''}
-          ${p.fat?`<span class="chip chip-r">${p.fat}% KF</span>`:''}
-          ${p.muscle?`<span class="chip chip-g">${p.muscle} kg M</span>`:''}
-          ${p.waist?`<span class="chip">${p.waist} cm</span>`:''}
+    return `<div class="log-entry">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div>
+          <div class="log-date">${fmtDate(p.date)} · ${p.src||''}</div>
+          <div class="chips" style="margin-top:4px">
+            ${p.weight?`<span class="chip">${p.weight} kg</span>`:''}
+            ${p.fat?`<span class="chip chip-r">${p.fat}% KF</span>`:''}
+            ${p.muscle?`<span class="chip chip-g">${p.muscle} kg M</span>`:''}
+            ${p.waist?`<span class="chip">${p.waist} cm</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-s btn-sm" onclick="toggleProgressEdit(${realIdx})">✎</button>
+          <button class="btn btn-r btn-sm" onclick="deleteProgress(${realIdx})">✕</button>
         </div>
       </div>
-      <button class="btn btn-r btn-sm" onclick="deleteProgress(${realIdx})">✕</button>
+      <div class="log-edit" id="pe-${realIdx}">
+        <div class="form-row form-2" style="margin-top:8px">
+          <div><div class="inp-label">Datum</div><input class="inp" type="date" id="pe-date-${realIdx}" value="${p.date||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div><div class="inp-label">Quelle</div><select class="inp" id="pe-src-${realIdx}" style="font-size:14px;padding:6px 10px">
+            ${['Withings','Apple Health','Manuell'].map(s=>`<option${(p.src||'')===s?' selected':''}>${s}</option>`).join('')}
+          </select></div>
+        </div>
+        <div class="form-row form-2">
+          <div><div class="inp-label">Gewicht kg</div><input class="inp" type="number" step="0.1" id="pe-weight-${realIdx}" value="${p.weight||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div><div class="inp-label">KF%</div><input class="inp" type="number" step="0.1" id="pe-fat-${realIdx}" value="${p.fat||''}" style="font-size:14px;padding:6px 10px"></div>
+        </div>
+        <div class="form-row form-2">
+          <div><div class="inp-label">Muskel kg</div><input class="inp" type="number" step="0.1" id="pe-muscle-${realIdx}" value="${p.muscle||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div><div class="inp-label">Taille cm</div><input class="inp" type="number" step="0.5" id="pe-waist-${realIdx}" value="${p.waist||''}" style="font-size:14px;padding:6px 10px"></div>
+        </div>
+        <button class="btn btn-p btn-full btn-sm" onclick="saveProgressEdit(${realIdx})">Speichern</button>
+      </div>
     </div>`;
   }).join('');
+}
+
+function toggleProgressEdit(idx) {
+  const el = document.getElementById('pe-'+idx);
+  if (el) el.classList.toggle('on');
+}
+
+function saveProgressEdit(idx) {
+  const p = loadProgress();
+  if (!p[idx]) return;
+  const date = document.getElementById(`pe-date-${idx}`).value;
+  if (!date) { toast('Datum fehlt'); return; }
+  p[idx] = {
+    ...p[idx],
+    date,
+    src: document.getElementById(`pe-src-${idx}`).value,
+    weight: parseFloat(document.getElementById(`pe-weight-${idx}`).value)||null,
+    fat: parseFloat(document.getElementById(`pe-fat-${idx}`).value)||null,
+    muscle: parseFloat(document.getElementById(`pe-muscle-${idx}`).value)||null,
+    waist: parseFloat(document.getElementById(`pe-waist-${idx}`).value)||null,
+  };
+  p.sort((a,b) => a.date.localeCompare(b.date));
+  saveProgress(p);
+  renderProgress();
+  toast('Körperwert aktualisiert ✓');
 }
 
 function deleteProgress(idx) {
@@ -2770,7 +2823,30 @@ function importJSON() {
   const raw = document.getElementById('import-json').value.trim();
   if (!raw) { toast('Kein JSON'); return; }
   let data; try { data = JSON.parse(raw); } catch { toast('Ungültiges JSON'); return; }
+  processImportData(data);
+  document.getElementById('import-json').value='';
+}
 
+function importJSONFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(String(reader.result || ''));
+      processImportData(data);
+      toast(file.name + ' importiert ✓');
+    } catch(e) {
+      toast('Datei ist kein gültiges JSON');
+    } finally {
+      input.value = '';
+    }
+  };
+  reader.onerror = () => { toast('Datei konnte nicht gelesen werden'); input.value = ''; };
+  reader.readAsText(file);
+}
+
+function processImportData(data) {
   // Handle FDDB format
   if (Array.isArray(data.fddb)) {
     let added=0;
@@ -2825,7 +2901,6 @@ function importJSON() {
   if (data.studios && Array.isArray(data.studios.studios)) {
     saveStudios(data.studios);
   }
-  document.getElementById('import-json').value='';
   renderProgress(); toast(merged+' Einträge importiert ✓');
 }
 
