@@ -133,6 +133,7 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 .unit-toggle { display: flex; justify-content: center; gap: 4px; margin-top: 7px; }
 .unit-btn { min-width: 30px; padding: 3px 6px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--surf2); color: var(--t3); font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 700; }
 .unit-btn.on { background: var(--grn); border-color: var(--grn); color: #fff; }
+.chart-switch { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 5px; margin: 0 0 10px; }
 
 @media (orientation: landscape) and (max-height: 520px) {
   #app { display: none; }
@@ -331,6 +332,17 @@ canvas { display: block; width: 100% !important; }
 .lib-section h3 { font-size: 14px; font-weight: 800; color: var(--grn); margin-bottom: 6px; }
 .lib-section p { font-size: 12px; line-height: 1.6; color: var(--t2); }
 .lib-highlight { background: var(--grn-l); border-left: 3px solid var(--grn); padding: 8px 12px; border-radius: 0 var(--rs) var(--rs) 0; font-size: 12px; margin-top: 8px; color: var(--t1); }
+.lib-tools { padding: 12px 16px; display: grid; gap: 8px; }
+.lib-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 16px 12px; }
+.lib-stat { background: var(--surf2); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 8px 6px; min-width: 0; }
+.lib-stat-val { font-size: 15px; font-weight: 800; color: var(--t1); line-height: 1; }
+.lib-stat-lbl { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--t3); margin-top: 3px; text-transform: uppercase; }
+.lib-list { border-top: 1.5px solid var(--line); }
+.lib-ex { padding: 12px 16px; border-bottom: 1.5px solid var(--line); }
+.lib-ex-title { font-size: 14px; font-weight: 800; color: var(--t1); line-height: 1.25; }
+.lib-ex-meta { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); margin-top: 4px; line-height: 1.45; }
+.lib-ex-reason { font-size: 11px; color: var(--t2); line-height: 1.45; margin-top: 7px; }
+.lib-empty { padding: 18px 16px; color: var(--t3); font-size: 12px; text-align: center; }
 
 /* ── DATA SCREEN ─────────────────────────── */
 .data-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1.5px solid var(--line); font-size: 13px; }
@@ -550,6 +562,7 @@ canvas { display: block; width: 100% !important; }
                 <option value="legs">Massive Beine</option>
                 <option value="shoulders">Breite Schultern</option>
                 <option value="chest">Brust stärker</option>
+                <option value="chest_abs">Brust/Bauch Fokus</option>
                 <option value="calves">Waden</option>
                 <option value="strength">Allgemeine Kraft</option>
               </select>
@@ -598,7 +611,17 @@ canvas { display: block; width: 100% !important; }
       <div class="stat-grid" id="p-current"></div>
 
       <div class="sec-label">Körpergewicht-Trend</div>
-      <div class="card"><div class="chart-wrap"><div class="chart-title">Wochenmittel kg · letzte 16 Wochen</div><canvas id="body-weight-chart" height="105"></canvas><div id="body-weight-summary" class="trend-sub"></div></div></div>
+      <div class="card"><div class="chart-wrap">
+        <div class="chart-title" id="body-trend-title">Wochenmittel kg · letzte 16 Wochen</div>
+        <div class="chart-switch">
+          <button class="unit-btn" id="body-trend-weight" onclick="setBodyTrendMode('weight')">kg</button>
+          <button class="unit-btn" id="body-trend-fat-pct" onclick="setBodyTrendMode('fatPct')">Fett %</button>
+          <button class="unit-btn" id="body-trend-fat-kg" onclick="setBodyTrendMode('fatKg')">Fett kg</button>
+          <button class="unit-btn" id="body-trend-muscle-pct" onclick="setBodyTrendMode('musclePct')">Muskel %</button>
+          <button class="unit-btn" id="body-trend-muscle-kg" onclick="setBodyTrendMode('muscleKg')">Muskel kg</button>
+        </div>
+        <canvas id="body-weight-chart" height="105"></canvas><div id="body-weight-summary" class="trend-sub"></div>
+      </div></div>
 
       <div class="sec-label">TVL-Verlauf</div>
       <div class="card"><div class="chart-wrap"><div class="chart-title">Temporal Volume Load kg·s</div><canvas id="tvl-chart" height="90"></canvas><div id="tvl-summary" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:4px"></div></div></div>
@@ -736,6 +759,7 @@ canvas { display: block; width: 100% !important; }
   </div>
 </div>
 
+<script src="hit_app_exercise_library_v1.js"></script>
 <script>
 'use strict';
 
@@ -752,6 +776,7 @@ const FOCUS_KEY = 'hit_focus_v1';
 const STUDIO_KEY = 'hit_studios_v1';
 const SOUND_KEY = 'hit_sound_v1';
 const HOME_UNITS_KEY = 'hit_home_units_v1';
+const BODY_TREND_KEY = 'hit_body_trend_v1';
 
 const FOCUS_CONFIG = {
   none: {label:'Kein Fokus', primary:[], secondary:[], caution:'Normaler HIT-Rhythmus ohne Schwerpunkt.'},
@@ -760,6 +785,7 @@ const FOCUS_CONFIG = {
   legs: {label:'Massive Beine', primary:['beinpresse','beinpresse_eng','hack_squat','beinstrecken','beinstr_einbein','kreuzheben','wadenheben','waden_steh','waden_sitz'], secondary:['beinbeuger'], caution:'Harte Läufe nach Beintag vorsichtig dosieren.'},
   shoulders: {label:'Breite Schultern', primary:['nackendruecken','schulter_m','seitheben','seith_kabel','seith_m'], secondary:['schulterheben','schulterh_kabel'], caution:'Schultergelenk sauber halten. Bei Nackendrücken Mobilität beachten.'},
   chest: {label:'Brust stärker', primary:['bankdruecken','brustpresse_m','butterfly','pec_deck','kabel_fly','kabel_brust'], secondary:['trizepskabel','triz_m'], caution:'Trizeps kann limitieren. Brustspannung und kontrollierte Exzentrik priorisieren.'},
+  chest_abs: {label:'Brust/Bauch Fokus', primary:['bankdruecken','schraegbankdruecken','brustpresse_m','bankdruecken_mp','butterfly','pec_deck','kabel_fly','kabel_brust','crunch_kabel','crunch_maschine','crunch_liegend','beinheben_liegend','beckenheben'], secondary:['pullover_tief_kabel','rueckenstrecken','trizepskabel','triz_m'], caution:'Brust sichtbar formen, Bauch messbar kräftigen. Fettverlust kommt über Gesamtdefizit; kein Bauchmuskeltraining ersetzt den Cut.'},
   calves: {label:'Waden', primary:['wadenheben','waden_steh','waden_sitz'], secondary:['beinpresse','beinpresse_eng'], caution:'Volle Amplitude zählt mehr als Last. Unten Dehnung halten.'},
   strength: {label:'Allgemeine Kraft', primary:['bankdruecken','beinpresse','klimmzuege','latziehen','rudern','kreuzheben','nackendruecken'], secondary:['wadenheben','schulterheben'], caution:'Konservativ steigern und Technik nicht für Gewicht opfern.'},
 };
@@ -786,6 +812,7 @@ const PLAN = [
     {name:'Nackendrücken (LH)', detail:'1 Satz × 6–8 WH bis PmM', note:'Dann sofort →', supersetnext:true, exKey:'nackendruecken'},
     {name:'Seitheben sitzend', detail:'1 Satz × 10–12 WH bis PmM', note:'→ Nachermüdung Schulter', exKey:'seitheben'},
     {name:'Trizepsdrücken Kabel', detail:'1 Satz × 8–10 WH bis PmM', note:'Strikter Ellenbogen', exKey:'trizepskabel'},
+    {name:'Kabel-Crunch', detail:'1 Satz × 10–15 WH bis PmM', note:'Bauch-Finisher · langsam einrollen', exKey:'crunch_kabel'},
   ]},
   {id:'legs', name:'Unterkörper', type:'legs', badge:'Quad · Ischio · Waden',
    note:'Beinpresse vor Beinstrecken – klassische Nachermüdung',
@@ -813,11 +840,19 @@ const PLAN = [
 const ALTERNATIVES = {
   bankdruecken:[
     {exKey:'brustpresse_m', name:'Brustpresse Maschine', detail:'1 Satz × 8–10 WH bis PmM · geführt', note:'Gelenkschonender, wenn Schulter empfindlich'},
+    {exKey:'schraegbankdruecken', name:'Schrägbankdrücken', detail:'1 Satz × 6–10 WH bis PmM · obere Brust', note:'Guter Fokus bei flacher Brustoptik'},
+    {exKey:'bankdruecken_mp', name:'Bankdrücken Multipresse', detail:'1 Satz × 6–10 WH bis PmM · geführt', note:'Stabiler bis ans Versagen als freie Langhantel'},
     {exKey:'kabel_brust', name:'Kabelziehen Brust', detail:'1 Satz × 10–12 WH bis PmM · konstante Spannung', note:'Am Kabelturm, stehend'},
   ],
   butterfly:[
     {exKey:'pec_deck', name:'Pec Deck Maschine', detail:'1 Satz × 10–12 WH bis PmM', note:'Wenn Butterfly-Maschine belegt'},
     {exKey:'kabel_fly', name:'Kabel-Crossover', detail:'1 Satz × 10–12 WH bis PmM · voller ROM', note:'Am Kabelturm stehend'},
+    {exKey:'pullover_tief_kabel', name:'Pullover am tiefen Seilzug', detail:'1 Satz × 10–12 WH bis PmM', note:'Brust/Lat-Dehnung, ruhig und kontrolliert'},
+  ],
+  crunch_kabel:[
+    {exKey:'crunch_maschine', name:'Crunch Maschine', detail:'1 Satz × 10–15 WH bis PmM · geführt', note:'Stabil und sehr gut progressierbar'},
+    {exKey:'crunch_liegend', name:'Crunch liegend', detail:'1 Satz × 12–20 WH bis PmM', note:'Wenn kein Bauchgerät frei ist'},
+    {exKey:'beinheben_liegend', name:'Beinheben liegend', detail:'1 Satz × 10–15 WH bis PmM', note:'Unterer Bauch, ohne Schwung'},
   ],
   latziehen:[
     {exKey:'latz_breit', name:'Latziehen breiter Griff', detail:'1 Satz × 8–10 WH bis PmM', note:'Gleiche Maschine, anderer Reiz'},
@@ -889,6 +924,21 @@ const EXERCISES = {
   bizepcurlslh:{title:'Bizep-Curls Langhantel',target:'Bizeps brachii · Brachialis',muscles:{primary:['Bizeps brachii'],secondary:['Brachialis','Brachioradialis']},execution:'Schulterbreiter Griff, Ellenbogen fest am Körper. 2s heben, Supination, 1s oben, 4s senken.',hitNote:'Kein Schwung. Wenn nötig Gewicht reduzieren.',source:'Gießing HIT · Armtraining'},
   bizepcurlskh:{title:'Bizep-Curls KH supiniert',target:'Bizeps brachii',muscles:{primary:['Bizeps brachii'],secondary:['Brachialis']},execution:'Alternierend oder gleichzeitig. Pronation unten → Supination oben (Daumen nach außen). 4s senken.',hitNote:'Zweite Bizeps-Übung für vollständige Erschöpfung beider Köpfe.',source:'Gießing HIT · Armtraining'},
   schulterheben:{title:'Schulterheben (Trapez)',target:'Trapezius',muscles:{primary:['Trapezius'],secondary:['Levator scapulae']},execution:'KH oder LH, Arme gestreckt. Schultern gerade hoch (2s), 1s halten, 4s senken. Kein Kreisen.',hitNote:'Letzter Satz – Trapez bis PmM erschöpfen.',source:'Gießing HIT · Schultertraining'},
+  schraegbankdruecken:{title:'Schrägbankdrücken',target:'Obere Brust · vordere Schulter · Trizeps',muscles:{primary:['Pectoralis major pars clavicularis'],secondary:['Deltoideus anterior','Trizeps']},execution:'Bank leicht schräg stellen. Stange oder Kurzhanteln kontrolliert zur oberen Brust senken, kurz halten, ohne Schwung hochdrücken.',hitNote:'Sehr guter Brust/Bauch-Fokusbaustein, wenn die obere Brust optisch hinterherhinkt. Bis PmM nur mit sicherer Ablage oder Partner.',source:'Enzyklopädie Muskeltraining · Brust'},
+  brustpresse_m:{title:'Brustpresse Maschine',target:'Brust · Schulter · Trizeps',muscles:{primary:['Pectoralis major'],secondary:['Deltoideus anterior','Trizeps']},execution:'Sitz so einstellen, dass die Griffe auf mittlerer Brusthöhe liegen. Schulterblätter hinten halten, 4s zurückführen, 2s drücken.',hitNote:'Für HIT besonders gut: geführt, stabil und sauber bis ans Versagen nutzbar.',source:'Enzyklopädie Muskeltraining · Brust'},
+  bankdruecken_mp:{title:'Bankdrücken Multipresse',target:'Brust · Trizeps',muscles:{primary:['Pectoralis major'],secondary:['Trizeps','Deltoideus anterior']},execution:'Bank unter der geführten Stange ausrichten. Stange kontrolliert absenken, nicht auf der Brust ablegen, gleichmäßig drücken.',hitNote:'Gute Alternative, wenn freies Bankdrücken bis PmM allein zu riskant ist.',source:'Enzyklopädie Muskeltraining · Brust'},
+  pec_deck:{title:'Pec Deck Maschine',target:'Brust isoliert',muscles:{primary:['Pectoralis major'],secondary:['Deltoideus anterior']},execution:'Unterarme/Griffe sauber anlegen. Arme vor dem Körper zusammenführen, 1s halten, langsam öffnen bis Dehnung spürbar ist.',hitNote:'Top-Isolation nach Drückübung. Für Brust-Fokus stärker als viele freie Fly-Varianten.',source:'Enzyklopädie Muskeltraining · Brust'},
+  kabel_fly:{title:'Kabel-Crossover',target:'Brust · konstante Spannung',muscles:{primary:['Pectoralis major'],secondary:['Deltoideus anterior','Serratus anterior']},execution:'Leicht nach vorn lehnen, Griffe in weitem Bogen vor dem Körper zusammenführen. Brust aktiv anspannen, Schultern unten lassen.',hitNote:'Sehr gut für kontrollierte Nachermüdung, wenn die Kabelführung frei ist.',source:'Enzyklopädie Muskeltraining · Brust'},
+  kabel_brust:{title:'Kabel-Fly von unten',target:'Obere Brust · Brustmitte',muscles:{primary:['Pectoralis major pars clavicularis'],secondary:['Deltoideus anterior']},execution:'Tiefer Seilzug, Griffe von unten-vorne nach oben-innen führen. Bewegung ruhig, ohne Schwung aus dem Rücken.',hitNote:'Guter Fokusreiz für obere Brust und Brustform, moderates Gewicht wählen.',source:'Enzyklopädie Muskeltraining · Brust'},
+  pullover_tief_kabel:{title:'Pullover am tiefen Seilzug',target:'Brustdehnung · Lat · Serratus',muscles:{primary:['Pectoralis major','Latissimus dorsi'],secondary:['Serratus anterior','Trizeps langer Kopf']},execution:'Am tiefen Seilzug mit fast gestreckten Armen arbeiten. Arme in weitem Bogen führen, Dehnung kontrollieren, Rippen unten halten.',hitNote:'Als Fokus-Alternative nutzen, nicht als schwere Hauptübung. Schulter sauber halten.',source:'Enzyklopädie Muskeltraining · Brust'},
+  crunch_kabel:{title:'Kabel-Crunch',target:'Gerader Bauchmuskel',muscles:{primary:['Rectus abdominis'],secondary:['Obliquus externus','Obliquus internus']},execution:'Am hohen Seilzug kniend oder stehend. Becken stabil, Rippen Richtung Becken einrollen. Nicht mit den Armen ziehen.',hitNote:'Für HIT sehr geeignet: gut progressierbar und nah am PmM kontrollierbar.',source:'Enzyklopädie Muskeltraining · Bauch'},
+  crunch_maschine:{title:'Crunch Maschine',target:'Gerader Bauchmuskel',muscles:{primary:['Rectus abdominis'],secondary:['Obliquus externus']},execution:'Gerät so einstellen, dass die Bewegung aus der Rumpfbeugung kommt. Langsam einrollen, unten kurz halten, kontrolliert zurück.',hitNote:'Beste Bauch-Alternative, wenn dein Studio ein gutes Gerät hat.',source:'Enzyklopädie Muskeltraining · Bauch'},
+  crunch_liegend:{title:'Crunch liegend',target:'Gerader Bauchmuskel',muscles:{primary:['Rectus abdominis'],secondary:['Obliquus externus']},execution:'Lendenwirbelsäule am Boden halten. Brustkorb Richtung Becken rollen, nicht am Kopf ziehen, oben kurz halten.',hitNote:'Solide Notlösung ohne Gerät. Für Progression später Zusatzgewicht oder Kabel wählen.',source:'Enzyklopädie Muskeltraining · Bauch'},
+  beinheben_liegend:{title:'Beinheben liegend',target:'Unterer Bauch · Hüftbeuger',muscles:{primary:['Rectus abdominis'],secondary:['Iliopsoas']},execution:'Beine kontrolliert heben und senken, Becken leicht einrollen. Wenn der Rücken abhebt, Bewegungsradius verkleinern.',hitNote:'Nur sauber bis PmM. Kein Schwung, sonst übernimmt der Hüftbeuger.',source:'Enzyklopädie Muskeltraining · Bauch'},
+  beckenheben:{title:'Beckenheben im Unterarmstütz',target:'Bauch · Beckenaufrichtung',muscles:{primary:['Rectus abdominis'],secondary:['Obliquus internus','Iliopsoas']},execution:'Unterarme stabil, Becken kontrolliert nach oben einrollen. Bewegung klein, aber bewusst aus dem Bauch.',hitNote:'Gute Ergänzung zum Kabel-Crunch, wenn du Bauchspannung besser spüren willst.',source:'Enzyklopädie Muskeltraining · Bauch'},
+  rueckenstrecken:{title:'Rückenstrecken / Back Extension',target:'Rückenstrecker · Gesäß · Ischiocrurale',muscles:{primary:['Erector spinae'],secondary:['Gluteus maximus','Ischiocrurale']},execution:'Hüfte am Polster, Rücken neutral. Oberkörper kontrolliert absenken und bis zur Körperlinie heben, nicht überstrecken.',hitNote:'Gegenspieler zum Bauchtraining. Nicht als Maximal-Kampfbewegung erzwingen.',source:'Enzyklopädie Muskeltraining · Bauch/Lenden'},
+  oberkoerperheben_tief_kabel:{title:'Oberkörperheben am tiefen Seilzug',target:'Lenden · Gesäß',muscles:{primary:['Erector spinae'],secondary:['Gluteus maximus','Ischiocrurale']},execution:'Tiefen Seilzug halten, Hüfte als Scharnier nutzen. Rücken neutral, kontrolliert aufrichten.',hitNote:'Nur mit sauberer Technik. Für Fokus eher Ergänzung als Pflichtübung.',source:'Enzyklopädie Muskeltraining · Bauch/Lenden'},
+  oberkoerperstrecken_tief_kabel:{title:'Oberkörperstrecken am tiefen Seilzug',target:'Rückenstrecker kontrolliert',muscles:{primary:['Erector spinae'],secondary:['Gluteus maximus']},execution:'Geringe Last, klare Hüftbewegung. Keine ruckartige Streckung, keine Überstreckung.',hitNote:'Als stabilisierender Gegenspieler zum Bauch-Fokus dosieren.',source:'Enzyklopädie Muskeltraining · Bauch/Lenden'},
 }
 
 const EXERCISE_IMAGES = {
@@ -931,23 +981,18 @@ const COACH_KB = [
   {k:['pmm','versagen','muskelversagen','momentan'],a:'PmM = punktuelles Muskelversagen. Du machst genau einen Satz bis der Muskel die nächste Wiederholung nicht mehr vollständig ausführen kann. Das ist Gießings Kernprinzip: Qualität vor Quantität.'},
   {k:['kadenz','tempo','geschwindigkeit','langsam'],a:'Gießing empfiehlt 2/1/4 Kadenz: 2s konzentrisch (heben), 1s halten, 4s exzentrisch (senken). Die exzentrische Phase ist besonders wichtig für Hypertrophie. App-Timer nutzen!'},
   {k:['supersatz','nachermüdung','sofort'],a:'Nachermüdungs-Supersatz: Erst Grundübung (erschöpft Synergisten), sofort danach (5-10 Sek) Isolationsübung. Beispiel: Bankdrücken → Butterfly. Der Zielmuskel wird so wirklich bis PmM trainiert.'},
-  {k:['ruhetag','pause','erholung','regeneration'],a:'Gießing: 4-5 Ruhetage zwischen Einheiten. Die App zeigt dir den Status. Schlaf und Ernährung sind Teil der Regeneration – ohne beides kein Muskelwachstum.'},
-  {k:['protein','eiweiß'],a:'Ziel: 155g Protein/Tag vegan. Beste Quellen: Tempeh (31g/150g), Seitan (25g/100g), Tofu (10g/100g), Sojaprotein (25g/30g), Edamame (17g/150g). Kombinationen verbessern das Aminosäureprofil.'},
-  {k:['kalorien','defizit','abnehmen','cut'],a:'Bei 98kg, BMR ~1885 kcal, TDEE ~2350 kcal. Moderates Defizit: 2000 kcal/Tag (Bass-Methode). Aggressiv: 1750 kcal. Defizit über 600 kcal/Tag erhöht Muskelabbaurisiko.'},
-  {k:['vegan','pflanzlich'],a:'Vollständige Aminosäureprofile durch Kombination: Hülsenfrüchte + Getreide (Linsen + Reis), Sojaprodukte (komplettes Profil). Kritisch: B12 supplementieren!'},
+  {k:['ruhetag','pause','erholung','regeneration'],a:'Gießing: 4-5 Ruhetage zwischen Einheiten. Die App zeigt dir den Status. Schlaf und saubere Regeneration sind Pflicht, sonst wird HIT schnell zu viel.'},
   {k:['tvl','temporal volume','volumen'],a:'TVL = Temporal Volume Load = kg × Wiederholungen × Sekunden/Wiederholung. Bei 2/1/4 Kadenz: 7 Sek/Wdh. Beispiel: 105kg × 10 × 7 = 7350 kg·s. Vergleichbar mit Volumentraining.'},
   {k:['fortschritt','progression','steigerung'],a:'Gießing: Wenn du am oberen Korridor (12 Wdh) bist → Gewicht erhöhen. Unter 8 Wdh → Gewicht leicht reduzieren. Wdh im PmM immer eintragen!'},
-  {k:['bass','clarence','lean'],a:'Clarence Bass "Living Lean": Moderates dauerhaftes Defizit statt aggressiver Cuts. 300-350 kcal Defizit, natürliche Lebensmittel, kein Cardio-Zwang. Nachhaltiger als Crash-Diäten.'},
   {k:['bfr','okklusionstraining'],a:'BFR = Blood Flow Restriction: 20-30% des Maximalgewichts mit Manschetten. Erzeugt vergleichbare Hypertrophie wie schweres Training. Gut wenn Geräte belegt oder nach Verletzung. 20-30-15-15 WH Protokoll.'},
   {k:['liss','cardio','laufen'],a:'LISS nach HIT: 15-20 Min lockeres Laufen (Zone 2) beschleunigt Laktatabbau. Intensives Cardio vor HIT ist kontraproduktiv. Puls unter 130 BPM.'},
   {k:['schlaf','tiefschlaf'],a:'Tiefschlaf ist die wichtigste Wachstumshormon-Phase. Ziel: ≥15% (≥70 Min bei 7h Schlaf). Unter 50 Min erhöht Muskelabbaurisiko im Defizit. Schlaf priorisieren!'},
   {k:['alternative','belegt','maschine'],a:'Gerät belegt? → Alt-Button neben der Übung tippen. Die App schlägt 1-2 Alternativen vor, die dieselbe Muskelgruppe ansprechen. Gewichtshistorie bleibt getrennt.'},
   {k:['körperfett','kf%','15%','umschalten'],a:'Optimaler Cut→Bulk-Wechsel bei ~15% KF. Dann steigt Insulinsensitivität, Testosteron und IGF-1 sind höher. Im Bulk bis ~19% aufbauen, dann Mini-Cut. Bei 33% KF jetzt wäre ein Bulk ineffizient.'},
   {k:['ffmi','natural','maximum','natürlich'],a:'Dein geschätzter natürlicher FFMI-Max bei ~25 → entspricht ~80 kg LBM. Aktuell ~62 kg LBM. Noch viel Potenzial für natürlichen Aufbau!'},
-  {k:['hallo','hi','hey','start','hilfe'],a:'Ich bin dein HIT Coach – offline, keine Cloud, alles auf deinem Gerät.\n\nIch basiere auf Gießing HIT + Clarence Bass Living Lean + veganer Ernährung.\n\nFrag mich zu: Training · Ernährung · Regeneration · Fortschritt · Methodik.'},
+  {k:['hallo','hi','hey','start','hilfe'],a:'Ich bin dein HIT Coach – offline, keine Cloud, alles auf deinem Gerät.\n\nIch fokussiere Training, Übungen, Regeneration, Fortschritt und Studioequipment.\n\nFrag mich zu: PmM · Kadenz · Supersatz · Alternativen · Ruhetage · TVL.'},
   {k:['plan','einheit','training heute'],a:'Dein Plan: Oberkörper A → Unterkörper → Oberkörper B → Ruhetag. Gießing empfiehlt 4-5 Ruhetage. Sieh im Training-Tab wann die nächste Einheit optimal ist.'},
   {k:['gewicht','kg','stagnation'],a:'Wenn das Gewicht auf der Waage stagniert: Erst KF% und Muskelmasse checken! Recomp-Effekt = Fett ab, Muskel zu. Das Gesamtgewicht kann gleich bleiben während die Komposition besser wird.'},
-  {k:['kobro','koro','protein pulver'],a:'KoRo Drogerie: Soja+Erbse+Reis-Blend für vollständiges Aminosäureprofil. Bio Erbsenprotein als soyfreie Alternative. Gute Wahl für vegane Proteinsupplementierung.'},
 ];
 
 // ═══════════════════════════════════════════
@@ -1063,13 +1108,31 @@ function daysSince(dateStr) {
 // Brust: D-1..8, Schulter: D-9..18, Rücken: D-19..28, Arme: D-29..40, Beine: D-41..55
 const DELAVIER_NR = {
   bankdruecken:   {nr:'D-4',  kap:'Brust'},
+  schraegbankdruecken:{nr:'D-2', kap:'Brust'},
+  brustpresse_m:  {nr:'D-14', kap:'Brust'},
+  bankdruecken_mp:{nr:'D-15', kap:'Brust'},
   butterfly:      {nr:'D-7',  kap:'Brust'},
+  pec_deck:       {nr:'D-18', kap:'Brust'},
+  kabel_fly:      {nr:'D-16', kap:'Brust'},
+  kabel_brust:    {nr:'D-17', kap:'Brust'},
+  pullover_tief_kabel:{nr:'D-19', kap:'Brust'},
   nackendruecken: {nr:'D-12', kap:'Schulter'},
   seitheben:      {nr:'D-14', kap:'Schulter'},
   trizepskabel:   {nr:'D-37', kap:'Trizeps'},
+  crunch_liegend: {nr:'D-1',  kap:'Bauch'},
+  beinheben_liegend:{nr:'D-3', kap:'Bauch'},
+  beckenheben:    {nr:'D-4',  kap:'Bauch'},
+  crunch_maschine:{nr:'D-13', kap:'Bauch'},
+  crunch_kabel:   {nr:'D-14', kap:'Bauch'},
+  rueckenstrecken:{nr:'D-10', kap:'Lenden'},
   beinpresse:     {nr:'D-44', kap:'Quadrizeps'},
   beinstrecken:   {nr:'D-46', kap:'Quadrizeps'},
   latziehen:      {nr:'D-22', kap:'Rücken'},
+  latz_assist:    {nr:'D-9',  kap:'Rücken'},
+  latz_breit:     {nr:'D-9',  kap:'Rücken'},
+  kabel_rudern:   {nr:'D-10', kap:'Rücken'},
+  rudern_breit:   {nr:'D-10', kap:'Rücken'},
+  klimmzug_ass:   {nr:'D-14', kap:'Rücken'},
   ueberzuege:     {nr:'D-25', kap:'Rücken'},
   kreuzheben:     {nr:'D-49', kap:'Ischiocrurale'},
   wadenheben:     {nr:'D-53', kap:'Waden'},
@@ -1365,13 +1428,14 @@ function renderExercises(planIdx) {
     const dispEx = swap ? {...ex, name: swap.name, detail: swap.detail, note: swap.note, exKey: swap.exKey} : ex;
     const wKey = dispEx.exKey;
     const done = !!state['ex_' + i];
-    const hasLib = !!EXERCISES[origKey];
+    const libKey = getExerciseInfo(wKey) ? wKey : origKey;
+    const hasLib = !!getExerciseInfo(libKey);
     const hasAlt = !!(ALTERNATIVES[origKey] && ALTERNATIVES[origKey].length);
-    const delNr = DELAVIER_NR[origKey];
+    const delNr = DELAVIER_NR[wKey] || DELAVIER_NR[origKey];
     const focusRole = getFocusRole(wKey) || getFocusRole(origKey);
     const eqs = equipmentForExercise(wKey);
     const primaryEq = eqs.find(e => e.role === 'primary') || eqs[0];
-    const lastDays = lastTrainedDays(origKey);
+    const lastDays = lastTrainedDays(wKey);
     const lastStr = lastDays===null?'Noch nie':lastDays===0?'Heute':lastDays===1?'Gestern':`vor ${lastDays} Tagen`;
     return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}">
       <div class="ex-check${done?' done':''}" onclick="toggleEx('${stateKey}',${i},this,${planIdx})">
@@ -1379,11 +1443,11 @@ function renderExercises(planIdx) {
       </div>
       <div class="ex-info">
         <div class="ex-name">
-          <span onclick="if(hasLib)openEx('${origKey}')" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
+          <span onclick="if(hasLib)openEx('${libKey}')" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
           ${focusRole?`<span class="focus-chip${focusRole==='secondary'?' sec':''}">${focusRole==='primary'?'FOKUS':'FOKUS+'}</span>`:''}
           ${eqs.length?`<span class="equip-chip">${eqs.length} Gerät${eqs.length>1?'e':''}</span>`:''}
           ${delNr?`<span style="font-family:'DM Mono',monospace;font-size:9px;background:var(--grn-l);color:var(--grn);padding:1px 6px;border-radius:4px;font-weight:700">${delNr.nr}</span>`:''}
-          ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${origKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
+          ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${libKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
           ${hasAlt?`<button class="swap-btn${swap?' active':''}" onclick="openAlt('${origKey}',event)">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:''}
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px;margin-bottom:2px">${delNr?delNr.kap+' · ':''}Zuletzt: ${lastStr}</div>
@@ -1724,13 +1788,14 @@ function openAlt(origKey, event) {
   const alts = ALTERNATIVES[origKey] || [];
   document.getElementById('alt-modal-orig').textContent = origEx.name;
   document.getElementById('alt-reset-btn').style.display = swap ? 'block' : 'none';
-  // Bild: Alt-Bild wenn vorhanden, sonst Bild der Originalübung
   document.getElementById('alt-modal-opts').innerHTML = alts.map(a => {
-    const img = EXERCISE_IMAGES[a.exKey] || EXERCISE_IMAGES[origKey];
-    const imgLabel = EXERCISE_IMAGES[a.exKey] ? '' : EXERCISE_IMAGES[origKey] ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--t3);margin-bottom:4px">Bild: ${origEx.name}</div>` : '';
+    const imageStatus = exerciseImageStatus(a.exKey);
+    const bookRef = bookImageReference(a.exKey);
+    const img = exerciseImage(a.exKey, a.name);
+    const imgLabel = imageStatus === 'verified' ? '' : `<div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--t3);margin-bottom:4px">${bookRef ? 'Buchbild nachgewiesen · '+bookRef.label+' · Studiofoto später' : imageStatus === 'fallback' ? 'Variantenbild · Studiofoto später möglich' : 'Platzhalter · Studiofoto später möglich'}</div>`;
     const eq = equipmentForExercise(a.exKey)[0];
     return `<div class="alt-option" onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
-      ${img ? `${imgLabel}<img src="${img}" alt="${a.name}" style="width:100%;height:110px;object-fit:cover;border-radius:var(--rs);margin-bottom:8px;display:block">` : ''}
+      ${imgLabel}<img src="${img}" alt="${a.name}" style="width:100%;height:110px;object-fit:cover;border-radius:var(--rs);margin-bottom:8px;display:block">
       <div class="alt-name">${a.name}${swap&&swap.exKey===a.exKey?' ✓':''}</div>
       ${eq?`<div class="equip-line" style="margin-top:6px;margin-bottom:6px">${fmtEquipment(eq)} · ${fmtEquipmentHistory(eq)}${eq.note?' · '+eq.note:''}</div>`:''}
       <div class="alt-detail">${a.detail}</div>
@@ -1776,13 +1841,72 @@ function resetSwap() {
 // EXERCISE MODAL
 // ═══════════════════════════════════════════
 
+function exercisePlaceholderImage(key, title) {
+  const cfg = getFocusRole(key) ? getFocusRole(key) : 'neutral';
+  const accent = cfg === 'primary' ? '#007955' : cfg === 'secondary' ? '#1a6fcc' : '#9b5de5';
+  const safeTitle = String(title || key || 'Übung').replace(/[<>&"]/g, '');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360">
+    <rect width="760" height="360" rx="24" fill="#f4f4f6"/>
+    <rect x="28" y="28" width="704" height="304" rx="20" fill="#ffffff" stroke="#e1e1e8" stroke-width="3"/>
+    <circle cx="188" cy="118" r="36" fill="${accent}" opacity=".9"/>
+    <path d="M188 158 L188 246 M128 196 L248 196 M146 282 L188 246 L230 282" fill="none" stroke="${accent}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M330 118 H610 M330 166 H650 M330 214 H560" stroke="#d8d8e0" stroke-width="16" stroke-linecap="round"/>
+    <text x="330" y="282" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#2f2f3a">${safeTitle}</text>
+    <text x="330" y="312" font-family="Arial, sans-serif" font-size="16" fill="#8b8ba0">Eigenes Platzhalterbild · später durch Studiofoto ersetzbar</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+}
+
+const UNVERIFIED_EXERCISE_IMAGES = new Set(['rudern']);
+const EXERCISE_IMAGE_FALLBACKS = {
+  latz_assist:'latziehen',
+  latz_breit:'latziehen',
+  klimmzug_ass:'klimmzuege',
+  pec_deck:'butterfly',
+  kabel_fly:'butterfly',
+  kabel_brust:'butterfly',
+  beinstr_einbein:'beinstrecken',
+  beinpresse_eng:'beinpresse',
+  seith_kabel:'seitheben',
+  seith_m:'seitheben',
+  hammer:'bizepcurlskh',
+  konz:'bizepcurlskh',
+  biz_kabel:'bizepcurlslh',
+  triz_m:'trizepskabel',
+  waden_steh:'wadenheben',
+  waden_sitz:'wadenheben',
+  schulterh_kabel:'schulterheben',
+  pullover_kabel:'ueberzuege',
+};
+const BOOK_IMAGE_REFERENCES = {
+  hack_squat:{label:'Neuer Muskel Guide S. 136', note:'Hack-Squat / Beinpresse im Stehen'},
+  waden_sitz:{label:'Neuer Muskel Guide S. 152 · Muskel Training S. 256', note:'Fersenheben im Sitzen / Soleus-Fokus'},
+};
+function exerciseImage(key, title) {
+  if (EXERCISE_IMAGES[key] && !UNVERIFIED_EXERCISE_IMAGES.has(key)) return EXERCISE_IMAGES[key];
+  const fallback = EXERCISE_IMAGE_FALLBACKS[key];
+  if (fallback && EXERCISE_IMAGES[fallback] && !UNVERIFIED_EXERCISE_IMAGES.has(fallback)) return EXERCISE_IMAGES[fallback];
+  return exercisePlaceholderImage(key, title);
+}
+function exerciseImageStatus(key) {
+  if (EXERCISE_IMAGES[key] && !UNVERIFIED_EXERCISE_IMAGES.has(key)) return 'verified';
+  const fallback = EXERCISE_IMAGE_FALLBACKS[key];
+  if (fallback && EXERCISE_IMAGES[fallback] && !UNVERIFIED_EXERCISE_IMAGES.has(fallback)) return 'fallback';
+  return 'placeholder';
+}
+function bookImageReference(key) {
+  return BOOK_IMAGE_REFERENCES[key] || null;
+}
+
 function openEx(key) {
-  const ex = EXERCISES[key];
+  const ex = getExerciseInfo(key);
   if (!ex) return;
   document.getElementById('ex-modal-name').textContent = ex.title;
-  const img = EXERCISE_IMAGES[key];
+  const img = exerciseImage(key, ex.title);
+  const bookRef = bookImageReference(key);
   document.getElementById('ex-modal-body').innerHTML = `
-    ${img ? `<img src="${img}" alt="${ex.title}" style="width:100%;border-radius:var(--rs);margin-bottom:12px;display:block">` : ''}
+    <img src="${img}" alt="${ex.title}" style="width:100%;border-radius:var(--rs);margin-bottom:12px;display:block">
+    ${bookRef?`<div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:8px">Buchbild nachgewiesen: ${bookRef.label} · ${bookRef.note}</div>`:''}
     <div style="font-size:12px;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:8px">${ex.target}</div>
     <div class="muscle-row">
       ${ex.muscles.primary.map(m=>`<span class="muscle-chip">${m}</span>`).join('')}
@@ -2439,6 +2563,9 @@ function getExerciseNameMap() {
   const nameMap = {};
   PLAN.forEach(p => p.exercises && p.exercises.forEach(e => { if(e.exKey) nameMap[e.exKey]=e.name; }));
   Object.keys(ALTERNATIVES).forEach(k => (ALTERNATIVES[k]||[]).forEach(a => { if(a.exKey) nameMap[a.exKey]=a.name; }));
+  Object.keys(EXERCISES).forEach(k => { if (!nameMap[k]) nameMap[k] = EXERCISES[k].title; });
+  const bookLib = typeof BOOK_EXERCISE_LIBRARY !== 'undefined' ? BOOK_EXERCISE_LIBRARY : [];
+  bookLib.forEach(e => { if (!nameMap[e.key]) nameMap[e.key] = e.title; });
   return nameMap;
 }
 
@@ -2463,6 +2590,42 @@ function fmtEquipmentHistory(eq) {
 function focusExerciseKeys() {
   const f = getFocusConfig();
   return [...new Set([...(f.primary||[]), ...(f.secondary||[])])];
+}
+
+function alternativeExerciseInfo(key) {
+  for (const [origKey, list] of Object.entries(ALTERNATIVES)) {
+    const alt = (list || []).find(a => a.exKey === key);
+    if (!alt) continue;
+    const base = EXERCISES[origKey] || {target:'Alternative Übung', muscles:{primary:['Zielmuskel'], secondary:[]}};
+    return {
+      title: alt.name,
+      target: base.target || 'Alternative Übung',
+      muscles: base.muscles || {primary:['Zielmuskel'], secondary:[]},
+      execution: `${alt.detail}. ${alt.note || ''}`,
+      hitNote: 'Als HIT-Alternative nutzen, wenn sie dieselbe Zielmuskulatur sauber und kontrolliert bis PmM belastet.',
+      source: 'App-Alternative · Buchabgleich vorgemerkt',
+    };
+  }
+  return null;
+}
+
+function getExerciseInfo(key) {
+  return EXERCISES[key] || alternativeExerciseInfo(key) || bookExerciseInfo(key);
+}
+
+function bookExerciseInfo(key) {
+  const bookLib = typeof BOOK_EXERCISE_LIBRARY !== 'undefined' ? BOOK_EXERCISE_LIBRARY : [];
+  const e = bookLib.find(x => x.key === key);
+  if (!e) return null;
+  const warning = e.warningText ? ` ${e.warningText}` : '';
+  return {
+    title: e.title,
+    target: `${e.group} · ${e.equipment}`,
+    muscles: {primary:[e.group], secondary:[]},
+    execution: `Buchübung aus der erweiterten Bibliothek. ${e.reason || ''}`,
+    hitNote: `${e.status}: kontrolliert bis PmM nur einsetzen, wenn die Ausführung zur Zielmuskulatur passt.${warning}`,
+    source: (e.sources || []).join(' · '),
+  };
 }
 
 function calcFocusStatus() {
@@ -2530,33 +2693,62 @@ function weekStart(dateStr) {
   return localDate(d);
 }
 
+const BODY_TREND_MODES = {
+  weight: {btn:'body-trend-weight', title:'Wochenmittel Körpergewicht · letzte 16 Wochen', label:'Gewicht', unit:' kg', color:'var(--blu)', value:p => p.weight || null},
+  fatPct: {btn:'body-trend-fat-pct', title:'Wochenmittel Körperfett % · letzte 16 Wochen', label:'Körperfett', unit:'%', color:'var(--red)', value:p => p.fat || null},
+  fatKg: {btn:'body-trend-fat-kg', title:'Wochenmittel Körperfett kg · letzte 16 Wochen', label:'Körperfett', unit:' kg', color:'var(--red)', value:p => p.fatKg || (p.weight && p.fat ? p.weight * p.fat / 100 : null)},
+  musclePct: {btn:'body-trend-muscle-pct', title:'Wochenmittel Muskelanteil % · letzte 16 Wochen', label:'Muskelanteil', unit:'%', color:'var(--grn)', value:p => p.weight && p.muscle ? p.muscle / p.weight * 100 : null},
+  muscleKg: {btn:'body-trend-muscle-kg', title:'Wochenmittel Muskelmasse kg · letzte 16 Wochen', label:'Muskelmasse', unit:' kg', color:'var(--grn)', value:p => p.muscle || null},
+};
+
+function bodyTrendMode() {
+  const mode = loadLS(BODY_TREND_KEY, 'weight');
+  return BODY_TREND_MODES[mode] ? mode : 'weight';
+}
+
+function setBodyTrendMode(mode) {
+  if (!BODY_TREND_MODES[mode]) return;
+  saveLS(BODY_TREND_KEY, mode);
+  renderBodyWeightTrend();
+}
+
 function renderBodyWeightTrend() {
-  const prog = sortedByDate(loadProgress()).filter(p => p.weight);
+  const modeKey = bodyTrendMode();
+  const mode = BODY_TREND_MODES[modeKey];
+  const titleEl = document.getElementById('body-trend-title');
   const sumEl = document.getElementById('body-weight-summary');
+  if (titleEl) titleEl.textContent = mode.title;
+  Object.entries(BODY_TREND_MODES).forEach(([key, cfg]) => {
+    document.getElementById(cfg.btn)?.classList.toggle('on', key === modeKey);
+  });
+
+  const prog = sortedByDate(loadProgress())
+    .map(p => ({...p, trendValue: mode.value(p)}))
+    .filter(p => p.trendValue !== null && p.trendValue !== undefined && Number.isFinite(p.trendValue));
   if (!prog.length) {
-    if (sumEl) sumEl.textContent = 'Noch keine Körpermessungen.';
-    drawChart('body-weight-chart', [{values: [], labels: [], color: 'var(--blu)', fmt: v => v.toFixed(1)+' kg'}], 105);
+    if (sumEl) sumEl.textContent = `Noch keine passenden Werte für ${mode.label}.`;
+    drawChart('body-weight-chart', [{values: [], labels: [], color: mode.color, fmt: v => v.toFixed(1)+mode.unit}], 105);
     return;
   }
   const weeks = {};
   prog.forEach(p => {
     const key = weekStart(p.date);
     if (!weeks[key]) weeks[key] = [];
-    weeks[key].push(p.weight);
+    weeks[key].push(p.trendValue);
   });
   const data = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0])).map(([date, vals]) => ({
     date,
-    weight: Math.round((vals.reduce((s,v)=>s+v,0) / vals.length) * 10) / 10,
+    value: Math.round((vals.reduce((s,v)=>s+v,0) / vals.length) * 10) / 10,
   })).slice(-16);
-  const first = data[0].weight;
-  const last = data[data.length-1].weight;
+  const first = data[0].value;
+  const last = data[data.length-1].value;
   const diff = Math.round((last - first) * 10) / 10;
-  if (sumEl) sumEl.textContent = `${data.length} Wochen · ${diff>0?'+':''}${diff.toFixed(1)} kg · letzte: ${last.toFixed(1)} kg`;
+  if (sumEl) sumEl.textContent = `${data.length} Wochen · ${diff>0?'+':''}${diff.toFixed(1)}${mode.unit} · letzte: ${last.toFixed(1)}${mode.unit}`;
   drawChart('body-weight-chart', [{
-    values: data.map(d=>d.weight),
+    values: data.map(d=>d.value),
     labels: data.map(d=>shortDate(d.date)),
-    color: 'var(--blu)',
-    fmt: v => v.toFixed(1)+' kg',
+    color: mode.color,
+    fmt: v => v.toFixed(1)+mode.unit,
   }], 105);
 }
 
@@ -3008,7 +3200,7 @@ function processImportData(data) {
 
 function clearAll() {
   if (!confirm('ALLE Daten löschen? Vorher exportieren!')) return;
-  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,STUDIO_KEY,HOME_UNITS_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
+  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,STUDIO_KEY,HOME_UNITS_KEY,BODY_TREND_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
   renderHome(); renderProgress(); renderRunning();
   toast('Alle Daten gelöscht');
 }
@@ -3021,7 +3213,7 @@ let coachInit = false;
 function initCoach() {
   if (coachInit) return;
   coachInit = true;
-  addMsg('bot', 'Hallo! Ich bin dein HIT Coach.\n\nIch basiere auf Gießing HIT + Clarence Bass Living Lean + veganer Ernährung.\n\nFrag mich zu Training, Ernährung, Regeneration oder Methodik.');
+  addMsg('bot', 'Hallo! Ich bin dein HIT Coach.\n\nIch fokussiere HIT-Training, Übungen, Regeneration, Fortschritt und Studioequipment.\n\nFrag mich zu PmM, Kadenz, Supersatz, Alternativen, Ruhetagen oder TVL.');
   const qq = ['Fokus-Status','PmM erklären','Kadenz 2/1/4','Supersatz','Ruhetage','TVL erklären'];
   document.getElementById('quick-q').innerHTML = qq.map(q =>
     `<button style="flex-shrink:0;padding:5px 10px;border-radius:20px;background:var(--surf2);border:1.5px solid var(--line);font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;white-space:nowrap" onclick="sendQ('${q}')">${q}</button>`
@@ -3060,7 +3252,7 @@ function getAnswer(text) {
     const s = e.k.filter(k => t.includes(k)).length;
     if (s > best) { best = s; ans = e.a; }
   }
-  return best > 0 ? ans : 'Dazu habe ich keine direkte Antwort. Frag mich zu: Training (PmM, Kadenz, Übungen, Ruhetage), Ernährung (Protein, Kalorien, vegane Quellen) oder HIT-Prinzipien (Nachermüdung, Supersatz, Regeneration).';
+  return best > 0 ? ans : 'Dazu habe ich keine direkte Antwort. Frag mich zu: Training (PmM, Kadenz, Übungen, Ruhetage), Übungsalternativen, Studioequipment oder HIT-Prinzipien (Nachermüdung, Supersatz, Regeneration).';
 }
 
 // ═══════════════════════════════════════════
@@ -3070,7 +3262,29 @@ function getAnswer(text) {
 function renderLibrary() {
   const el = document.getElementById('lib-content');
   if (el.innerHTML) return;
+  const bookLib = typeof BOOK_EXERCISE_LIBRARY !== 'undefined' ? BOOK_EXERCISE_LIBRARY : [];
   el.innerHTML = `
+    <div class="card">
+      <div class="card-head">
+        <span class="card-label" style="color:var(--pur)">Übungsbibliothek</span>
+        <span class="badge badge-b">${bookLib.length} Übungen</span>
+      </div>
+      <div class="lib-tools">
+        <input id="lib-search" placeholder="Übung suchen..." oninput="renderExerciseLibraryList()">
+        <div class="form-row form-2" style="margin-bottom:0">
+          <select id="lib-group" onchange="renderExerciseLibraryList()"></select>
+          <select id="lib-status" onchange="renderExerciseLibraryList()">
+            <option value="all">Alle</option>
+            <option value="Kernübung">Kernübungen</option>
+            <option value="Alternative">Alternativen</option>
+            <option value="Warnhinweis">Warnhinweis</option>
+            <option value="check">Noch prüfen</option>
+          </select>
+        </div>
+      </div>
+      <div class="lib-stats" id="lib-stats"></div>
+      <div class="lib-list" id="lib-ex-list"></div>
+    </div>
     <div class="card">
       <div class="card-head"><span class="card-label" style="color:var(--grn)">Gießing HIT – Grundprinzipien</span></div>
       <div class="lib-section">
@@ -3091,31 +3305,71 @@ function renderLibrary() {
         <h3>4–5 Ruhetage</h3>
         <p>HIT fordert das Nervensystem maximal. Vollständige Regeneration dauert 4–5 Tage. Zu früh trainieren = kein Fortschritt. Die App zeigt dir den optimalen Zeitpunkt.</p>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-label" style="color:var(--blu)">Clarence Bass – Living Lean</span></div>
-      <div class="lib-section">
-        <h3>Dauerhaftes moderates Defizit</h3>
-        <p>Statt aggressiver Crash-Diäten: 300–350 kcal Defizit täglich, dauerhaft. Ergebnis: nachhaltige Körperfettreduktion ohne Muskelabbau. Bei dir: Ziel 2000 kcal/Tag.</p>
-        <div class="lib-highlight">Bass trainierte bis ins hohe Alter mit 6–8% Körperfett – durch Konstanz, nicht durch Extreme.</div>
-      </div>
-      <div class="lib-section">
-        <h3>Natürliche Lebensmittel</h3>
-        <p>Keine verarbeiteten Produkte, keine Crash-Supplements. Vollwertige Nahrung die den Körper dauerhaft versorgt. Bei dir: vegane Vollwertkost mit Sojaprotein als Ergänzung.</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-label" style="color:var(--pur)">Ernährung – Vegan &amp; Sport</span></div>
-      <div class="lib-section">
-        <h3>Protein-Ziel: 155g/Tag</h3>
-        <p>1,6–2,0g pro kg Körpergewicht im Defizit schützt Muskelmasse. Pflanzliche Proteine sind vollwertig wenn Quellen kombiniert werden.</p>
-        <div class="lib-highlight">Top-Quellen für 155g/Tag: Tempeh · Tofu · Edamame · Seitan · Hülsenfrüchte · Sojaproteinpulver</div>
-      </div>
-      <div class="lib-section">
-        <h3>Aminosäureprofil</h3>
-        <p>Soja ist das einzige vollständige pflanzliche Protein. Kombination: Hülsenfrüchte + Getreide (z. B. Linsen + Reis) = vollständiges Aminosäureprofil.</p>
-      </div>
     </div>`;
+  initExerciseLibraryFilters();
+  renderExerciseLibraryList();
+}
+
+function initExerciseLibraryFilters() {
+  const sel = document.getElementById('lib-group');
+  if (!sel || sel.options.length) return;
+  const bookLib = typeof BOOK_EXERCISE_LIBRARY !== 'undefined' ? BOOK_EXERCISE_LIBRARY : [];
+  const groups = [...new Set(bookLib.map(e => e.group))].sort((a,b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="all">Alle Muskelgruppen</option>' + groups.map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+function libBadge(status) {
+  if (status === 'Kernübung') return 'badge-g';
+  if (status === 'Warnhinweis') return 'badge-r';
+  return 'badge-b';
+}
+
+function renderExerciseLibraryList() {
+  const q = (document.getElementById('lib-search')?.value || '').trim().toLowerCase();
+  const group = document.getElementById('lib-group')?.value || 'all';
+  const status = document.getElementById('lib-status')?.value || 'all';
+  const statsEl = document.getElementById('lib-stats');
+  const listEl = document.getElementById('lib-ex-list');
+  if (!statsEl || !listEl) return;
+  const all = typeof BOOK_EXERCISE_LIBRARY !== 'undefined' ? BOOK_EXERCISE_LIBRARY : [];
+  const stats = {
+    core: all.filter(e => e.status === 'Kernübung').length,
+    alt: all.filter(e => e.status === 'Alternative').length,
+    warn: all.filter(e => e.status === 'Warnhinweis').length,
+  };
+  statsEl.innerHTML = `
+    <div class="lib-stat"><div class="lib-stat-val">${stats.core}</div><div class="lib-stat-lbl">Kern</div></div>
+    <div class="lib-stat"><div class="lib-stat-val">${stats.alt}</div><div class="lib-stat-lbl">Alternativen</div></div>
+    <div class="lib-stat"><div class="lib-stat-val">${stats.warn}</div><div class="lib-stat-lbl">Warnung</div></div>`;
+  const filtered = all.filter(e => {
+    const text = [e.title, e.group, e.equipment, e.status, e.verification, ...(e.aliases||[]), ...(e.sources||[])].join(' ').toLowerCase();
+    if (q && !text.includes(q)) return false;
+    if (group !== 'all' && e.group !== group) return false;
+    if (status === 'check' && !String(e.verification).includes('prüfen')) return false;
+    if (status !== 'all' && status !== 'check' && e.status !== status) return false;
+    return true;
+  });
+  const shown = filtered.slice(0, 80);
+  if (!shown.length) {
+    listEl.innerHTML = '<div class="lib-empty">Keine Übung gefunden</div>';
+    return;
+  }
+  listEl.innerHTML = shown.map(e => `
+    <div class="lib-ex">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+        <div class="lib-ex-title">${e.title}</div>
+        <span class="badge ${libBadge(e.status)}">${e.status}</span>
+      </div>
+      <div class="chips">
+        <span class="chip chip-g">${e.group}</span>
+        <span class="chip">${e.equipment}</span>
+        <span class="chip ${String(e.verification).includes('prüfen') ? 'chip-a' : 'chip-b'}">${e.verification}</span>
+      </div>
+      ${e.warningText ? `<div class="lib-highlight" style="background:var(--red-l);border-left-color:var(--red);margin-top:8px">${e.warningText}</div>` : ''}
+      <div class="lib-ex-meta">${(e.sources || []).join(' · ')}</div>
+      ${e.aliases && e.aliases.length ? `<div class="lib-ex-meta">Auch: ${e.aliases.join(' · ')}</div>` : ''}
+      <div class="lib-ex-reason">${e.reason || ''}</div>
+    </div>`).join('') + (filtered.length > shown.length ? `<div class="lib-empty">${filtered.length - shown.length} weitere Treffer über Suche/Filter eingrenzen</div>` : '');
 }
 
 // ═══════════════════════════════════════════
