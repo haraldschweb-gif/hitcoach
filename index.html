@@ -278,6 +278,13 @@ canvas { display: block; width: 100% !important; }
 .focus-kpi { background: var(--surf2); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 7px 6px; min-width: 0; }
 .focus-kpi-val { font-size: 13px; font-weight: 800; }
 .focus-kpi-lbl { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--t3); margin-top: 1px; text-transform: uppercase; }
+.equip-chip { font-family: 'DM Mono', monospace; font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 700; background: var(--blu-l); color: var(--blu); border: 1.5px solid #c0d8f8; }
+.equip-line { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--blu); margin-top: 6px; padding: 5px 7px; border-radius: var(--rs); background: var(--blu-l); border: 1.5px solid #c0d8f8; }
+.equip-row { padding: 12px 14px; border-bottom: 1.5px solid var(--line); }
+.equip-row:last-child { border-bottom: none; }
+.equip-title { font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; gap: 8px; }
+.equip-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 4px; line-height: 1.4; }
+.equip-actions { display: flex; gap: 6px; margin-top: 8px; }
 
 /* ── RUNNING ─────────────────────────────── */
 .run-entry { padding: 12px 16px; border-bottom: 1.5px solid var(--line); position: relative; }
@@ -525,6 +532,41 @@ canvas { display: block; width: 100% !important; }
         </div>
       </div>
 
+      <div class="sec-label">Studio / Geräte</div>
+      <div class="card">
+        <div class="card-body">
+          <div class="form-row form-2">
+            <div><div class="inp-label">Aktives Studio</div><select id="studio-select" onchange="setActiveStudio(this.value)"></select></div>
+            <div><div class="inp-label">Neues Studio</div><input id="studio-name" placeholder="Studio Name"></div>
+          </div>
+          <button class="btn btn-s btn-full" onclick="addStudio()">Studio hinzufügen</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><span class="card-label">Gerät erfassen</span></div>
+        <div class="card-body">
+          <div class="form-row form-2">
+            <div><div class="inp-label">Hersteller</div><input id="eq-brand" value="gym80" placeholder="gym80"></div>
+            <div><div class="inp-label">Nummer</div><input id="eq-number" placeholder="z. B. 1234"></div>
+          </div>
+          <div class="form-row">
+            <div><div class="inp-label">Gerätename</div><input id="eq-name" placeholder="Lat Pulldown, Beinpresse..."></div>
+          </div>
+          <div class="form-row form-2">
+            <div><div class="inp-label">Übung</div><select id="eq-exercise"></select></div>
+            <div><div class="inp-label">Rolle</div><select id="eq-role"><option value="primary">Direkt passend</option><option value="alternative">Alternative</option></select></div>
+          </div>
+          <div class="form-row">
+            <div><div class="inp-label">Gewichtshistorie</div><select id="eq-history"><option value="exercise">Mit Übung zusammenführen</option><option value="equipment">Eigene Geräte-Historie vormerken</option></select></div>
+          </div>
+          <div class="form-row">
+            <div><div class="inp-label">Notiz</div><input id="eq-note" placeholder="Ort, Griff, Besonderheit..."></div>
+          </div>
+          <button class="btn btn-p btn-full" onclick="addEquipment()">Gerät speichern</button>
+        </div>
+      </div>
+      <div class="card" id="studio-equipment-list" style="overflow:hidden"></div>
+
       <div class="sec-label">Aktuell</div>
       <div class="stat-grid" id="p-current"></div>
 
@@ -665,6 +707,7 @@ const WL_KEY = 'hit_weights_v1';
 const REPS_KEY = 'hit_reps_v1';
 const RUN_KEY = 'hit_runs_v1';
 const FOCUS_KEY = 'hit_focus_v1';
+const STUDIO_KEY = 'hit_studios_v1';
 
 const FOCUS_CONFIG = {
   none: {label:'Kein Fokus', primary:[], secondary:[], caution:'Normaler HIT-Rhythmus ohne Schwerpunkt.'},
@@ -922,6 +965,24 @@ function saveReps(key, val) { const d = loadLS(REPS_KEY, {}); const n = parseInt
 // Runs
 function loadRuns() { return loadLS(RUN_KEY, []); }
 function saveRuns(d) { saveLS(RUN_KEY, d); }
+
+// Studios / equipment
+function defaultStudios() { return {activeId:'default', studios:[{id:'default', name:'Mein Studio', equipment:[]}]}; }
+function loadStudios() {
+  const data = loadLS(STUDIO_KEY, defaultStudios());
+  if (!data.studios || !data.studios.length) return defaultStudios();
+  if (!data.activeId || !data.studios.some(s => s.id === data.activeId)) data.activeId = data.studios[0].id;
+  data.studios.forEach(s => {
+    if (!s.equipment) s.equipment = [];
+    s.equipment.forEach(eq => { if (!eq.historyMode) eq.historyMode = 'exercise'; });
+  });
+  return data;
+}
+function saveStudios(data) { saveLS(STUDIO_KEY, data); }
+function activeStudio() {
+  const data = loadStudios();
+  return data.studios.find(s => s.id === data.activeId) || data.studios[0];
+}
 
 // Training history
 function loadTrainingHistory() { return loadLS('training_history', []); }
@@ -1229,6 +1290,8 @@ function renderExercises(planIdx) {
     const hasAlt = !!(ALTERNATIVES[origKey] && ALTERNATIVES[origKey].length);
     const delNr = DELAVIER_NR[origKey];
     const focusRole = getFocusRole(wKey) || getFocusRole(origKey);
+    const eqs = equipmentForExercise(wKey);
+    const primaryEq = eqs.find(e => e.role === 'primary') || eqs[0];
     const lastDays = lastTrainedDays(origKey);
     const lastStr = lastDays===null?'Noch nie':lastDays===0?'Heute':lastDays===1?'Gestern':`vor ${lastDays} Tagen`;
     return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}">
@@ -1239,11 +1302,13 @@ function renderExercises(planIdx) {
         <div class="ex-name">
           <span onclick="if(hasLib)openEx('${origKey}')" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
           ${focusRole?`<span class="focus-chip${focusRole==='secondary'?' sec':''}">${focusRole==='primary'?'FOKUS':'FOKUS+'}</span>`:''}
+          ${eqs.length?`<span class="equip-chip">${eqs.length} Gerät${eqs.length>1?'e':''}</span>`:''}
           ${delNr?`<span style="font-family:'DM Mono',monospace;font-size:9px;background:var(--grn-l);color:var(--grn);padding:1px 6px;border-radius:4px;font-weight:700">${delNr.nr}</span>`:''}
           ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${origKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
           ${hasAlt?`<button class="swap-btn${swap?' active':''}" onclick="openAlt('${origKey}',event)">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:''}
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px;margin-bottom:2px">${delNr?delNr.kap+' · ':''}Zuletzt: ${lastStr}</div>
+        ${primaryEq?`<div class="equip-line">${fmtEquipment(primaryEq)} · ${fmtEquipmentHistory(primaryEq)}${primaryEq.note?' · '+primaryEq.note:''}</div>`:''}
         <div class="ex-detail">${dispEx.detail}</div>
         <div class="ex-note">${dispEx.note || ''}</div>
         ${ex.supersetnext && !swap ?`<div class="ex-supersetnext">⟶ SOFORT WEITER – Supersatz</div>
@@ -1584,9 +1649,11 @@ function openAlt(origKey, event) {
   document.getElementById('alt-modal-opts').innerHTML = alts.map(a => {
     const img = EXERCISE_IMAGES[a.exKey] || EXERCISE_IMAGES[origKey];
     const imgLabel = EXERCISE_IMAGES[a.exKey] ? '' : EXERCISE_IMAGES[origKey] ? `<div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--t3);margin-bottom:4px">Bild: ${origEx.name}</div>` : '';
+    const eq = equipmentForExercise(a.exKey)[0];
     return `<div class="alt-option" onclick="applySwap('${origKey}','${a.exKey}','${a.name.replace(/'/g,"\\'")}','${a.detail.replace(/'/g,"\\'")}','${a.note.replace(/'/g,"\\'")}')">
       ${img ? `${imgLabel}<img src="${img}" alt="${a.name}" style="width:100%;height:110px;object-fit:cover;border-radius:var(--rs);margin-bottom:8px;display:block">` : ''}
       <div class="alt-name">${a.name}${swap&&swap.exKey===a.exKey?' ✓':''}</div>
+      ${eq?`<div class="equip-line" style="margin-top:6px;margin-bottom:6px">${fmtEquipment(eq)} · ${fmtEquipmentHistory(eq)}${eq.note?' · '+eq.note:''}</div>`:''}
       <div class="alt-detail">${a.detail}</div>
       <div class="alt-note">${a.note}</div>
     </div>`;
@@ -2183,6 +2250,7 @@ function fmtTVL(v) {
 
 function renderProgress() {
   renderFocusStatus();
+  renderStudioSettings();
   renderProgressCurrent();
   renderBodyWeightTrend();
   renderTVLChart();
@@ -2193,11 +2261,120 @@ function renderProgress() {
   renderDataStats();
 }
 
+function renderStudioSettings() {
+  const data = loadStudios();
+  const studioSel = document.getElementById('studio-select');
+  const exSel = document.getElementById('eq-exercise');
+  const list = document.getElementById('studio-equipment-list');
+  if (studioSel) {
+    studioSel.innerHTML = data.studios.map(s => `<option value="${s.id}"${s.id===data.activeId?' selected':''}>${s.name}</option>`).join('');
+  }
+  if (exSel) {
+    exSel.innerHTML = exerciseOptions().map(o => `<option value="${o.key}">${o.name}</option>`).join('');
+  }
+  if (!list) return;
+  const studio = activeStudio();
+  if (!studio.equipment.length) {
+    list.innerHTML = '<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine Geräte im aktiven Studio.</div>';
+    return;
+  }
+  const nameMap = getExerciseNameMap();
+  list.innerHTML = studio.equipment.map(eq => `
+    <div class="equip-row">
+      <div class="equip-title">
+        <span>${fmtEquipment(eq)}</span>
+        <span class="insight-chip ${eq.role === 'primary' ? 'up' : 'hold'}">${eq.role === 'primary' ? 'Direkt' : 'Alt.'}</span>
+      </div>
+      <div class="equip-meta">${nameMap[eq.exercise] || eq.exercise} · ${fmtEquipmentHistory(eq)}${eq.note ? ' · ' + eq.note : ''}</div>
+      <div class="equip-actions">
+        <button class="btn btn-r btn-sm" onclick="deleteEquipment('${eq.id}')">Löschen</button>
+      </div>
+    </div>`).join('');
+}
+
+function addStudio() {
+  const inp = document.getElementById('studio-name');
+  const name = (inp?.value || '').trim();
+  if (!name) { toast('Studio-Name fehlt'); return; }
+  const data = loadStudios();
+  const id = 'studio_' + Date.now();
+  data.studios.push({id, name, equipment:[]});
+  data.activeId = id;
+  saveStudios(data);
+  inp.value = '';
+  renderStudioSettings();
+  if (currentScreen === 'training') renderTraining();
+  toast('Studio angelegt ✓');
+}
+
+function setActiveStudio(id) {
+  const data = loadStudios();
+  if (!data.studios.some(s => s.id === id)) return;
+  data.activeId = id;
+  saveStudios(data);
+  renderStudioSettings();
+  if (currentScreen === 'training') renderTraining();
+  toast('Studio gewechselt');
+}
+
+function addEquipment() {
+  const studioData = loadStudios();
+  const studio = studioData.studios.find(s => s.id === studioData.activeId);
+  if (!studio) return;
+  const eq = {
+    id: 'eq_' + Date.now(),
+    brand: (document.getElementById('eq-brand')?.value || 'gym80').trim(),
+    number: (document.getElementById('eq-number')?.value || '').trim(),
+    name: (document.getElementById('eq-name')?.value || '').trim(),
+    exercise: document.getElementById('eq-exercise')?.value || '',
+    role: document.getElementById('eq-role')?.value || 'primary',
+    historyMode: document.getElementById('eq-history')?.value || 'exercise',
+    note: (document.getElementById('eq-note')?.value || '').trim(),
+  };
+  if (!eq.name && !eq.number) { toast('Name oder Nummer fehlt'); return; }
+  if (!eq.exercise) { toast('Übung fehlt'); return; }
+  studio.equipment.push(eq);
+  saveStudios(studioData);
+  ['eq-number','eq-name','eq-note'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderStudioSettings();
+  if (currentScreen === 'training') renderTraining();
+  toast('Gerät gespeichert ✓');
+}
+
+function deleteEquipment(id) {
+  const data = loadStudios();
+  const studio = data.studios.find(s => s.id === data.activeId);
+  if (!studio) return;
+  studio.equipment = studio.equipment.filter(eq => eq.id !== id);
+  saveStudios(data);
+  renderStudioSettings();
+  if (currentScreen === 'training') renderTraining();
+  toast('Gerät gelöscht');
+}
+
 function getExerciseNameMap() {
   const nameMap = {};
   PLAN.forEach(p => p.exercises && p.exercises.forEach(e => { if(e.exKey) nameMap[e.exKey]=e.name; }));
   Object.keys(ALTERNATIVES).forEach(k => (ALTERNATIVES[k]||[]).forEach(a => { if(a.exKey) nameMap[a.exKey]=a.name; }));
   return nameMap;
+}
+
+function exerciseOptions() {
+  const map = getExerciseNameMap();
+  return Object.keys(map).sort((a,b) => map[a].localeCompare(map[b])).map(key => ({key, name:map[key]}));
+}
+
+function equipmentForExercise(exKey) {
+  const studio = activeStudio();
+  return (studio.equipment || []).filter(eq => eq.exercise === exKey);
+}
+
+function fmtEquipment(eq) {
+  const no = eq.number ? ` #${eq.number}` : '';
+  return `${eq.brand || 'Gerät'}${no} · ${eq.name || 'ohne Name'}`;
+}
+function fmtEquipmentHistory(eq) {
+  return eq.historyMode === 'equipment' ? 'eigene Geräte-Historie' : 'Übungs-Historie';
 }
 
 function focusExerciseKeys() {
@@ -2549,11 +2726,14 @@ function renderDataStats() {
   const h = loadTrainingHistory();
   const p = loadProgress();
   const r = loadRuns();
+  const studios = loadStudios();
+  const eqCount = studios.studios.reduce((s,st) => s + (st.equipment||[]).length, 0);
   document.getElementById('data-stats').innerHTML = `
     <div class="data-row"><span>Trainingseinheiten</span><span style="color:var(--grn)">${h.length}</span></div>
     <div class="data-row"><span>Körpermessungen</span><span style="color:var(--blu)">${p.length}</span></div>
     <div class="data-row"><span>Läufe</span><span style="color:var(--grn)">${r.length} · ${r.reduce((s,x)=>s+(x.dist||0),0).toFixed(1)} km</span></div>
-    <div class="data-row"><span>Übungen (Gewichte)</span><span>${Object.keys(wlLoad()).length}</span></div>`;
+    <div class="data-row"><span>Übungen (Gewichte)</span><span>${Object.keys(wlLoad()).length}</span></div>
+    <div class="data-row"><span>Studios / Geräte</span><span>${studios.studios.length} · ${eqCount}</span></div>`;
 }
 
 // ── EXPORT / IMPORT ──────────────────────────
@@ -2562,7 +2742,7 @@ function exportJSON() {
   const data = {
     _app:'HIT Coach', _exported:new Date().toISOString(),
     training: loadTrainingHistory(), body: loadProgress(), runs: loadRuns(),
-    weights: wlLoad(), reps: loadLS(REPS_KEY,{}), focus: loadFocus(),
+    weights: wlLoad(), reps: loadLS(REPS_KEY,{}), focus: loadFocus(), studios: loadStudios(),
   };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -2642,13 +2822,16 @@ function importJSON() {
   if (data.focus && data.focus.id && FOCUS_CONFIG[data.focus.id]) {
     saveFocus({id:data.focus.id, startDate:data.focus.startDate||localDate(), weeks:data.focus.weeks||6});
   }
+  if (data.studios && Array.isArray(data.studios.studios)) {
+    saveStudios(data.studios);
+  }
   document.getElementById('import-json').value='';
   renderProgress(); toast(merged+' Einträge importiert ✓');
 }
 
 function clearAll() {
   if (!confirm('ALLE Daten löschen? Vorher exportieren!')) return;
-  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
+  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,STUDIO_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
   renderHome(); renderProgress(); renderRunning();
   toast('Alle Daten gelöscht');
 }
