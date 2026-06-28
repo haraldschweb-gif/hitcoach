@@ -48,6 +48,8 @@ button { font-family: 'Syne', sans-serif; cursor: pointer; border: none; backgro
 input, select, textarea { font-family: 'Syne', sans-serif; color: var(--t1); background: var(--surf); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 9px 12px; font-size: 16px; width: 100%; outline: none; -webkit-text-size-adjust: 100%; }
 input:focus, select:focus, textarea:focus { border-color: var(--grn); }
 select option { background: #fff; }
+input[type="date"], input[type="number"], select { min-width: 0; max-width: 100%; }
+input[type="date"] { -webkit-appearance: none; appearance: none; }
 
 /* ── LAYOUT ──────────────────────────────── */
 #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 430px; margin: 0 auto; background: var(--bg); }
@@ -85,6 +87,8 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 /* ── INPUTS ──────────────────────────────── */
 .inp-label { font-size: 11px; font-weight: 700; color: var(--t3); margin-bottom: 5px; }
 .form-row { display: grid; gap: 10px; margin-bottom: 12px; }
+.form-row > div { min-width: 0; }
+.form-row input, .form-row select, .form-row textarea { max-width: 100%; }
 .form-2 { grid-template-columns: 1fr 1fr; }
 .form-3 { grid-template-columns: 1fr 1fr 1fr; }
 
@@ -123,8 +127,30 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 /* ── HOME ────────────────────────────────── */
 .metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 0 16px 12px; }
 .metric-box { background: var(--surf); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 12px; text-align: center; }
+.metric-box.clickable { cursor: pointer; }
 .metric-val { font-size: 1.2rem; font-weight: 800; }
 .metric-lbl { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); margin-top: 2px; text-transform: uppercase; }
+.unit-toggle { display: flex; justify-content: center; gap: 4px; margin-top: 7px; }
+.unit-btn { min-width: 30px; padding: 3px 6px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--surf2); color: var(--t3); font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 700; }
+.unit-btn.on { background: var(--grn); border-color: var(--grn); color: #fff; }
+
+@media (orientation: landscape) and (max-height: 520px) {
+  #app { display: none; }
+  body::before {
+    content: "Bitte Hochformat verwenden";
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background: var(--bg);
+    color: var(--t1);
+    font-size: 18px;
+    font-weight: 800;
+  }
+}
 
 /* ── TRAINING ────────────────────────────── */
 .day-tabs { display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -228,6 +254,7 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 .log-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
 .log-edit { display: none; margin-top: 8px; }
 .log-edit.on { display: block; }
+.edit-inp { font-size: 14px !important; padding: 6px 10px !important; height: 34px; min-height: 34px; line-height: 1.2; }
 .log-ex-row { display: grid; grid-template-columns: 1fr 66px 52px; gap: 6px; align-items: center; margin-bottom: 6px; }
 .log-ex-row span { font-size: 12px; color: var(--t2); }
 
@@ -332,9 +359,23 @@ canvas { display: block; width: 100% !important; }
       </div>
 
       <div class="metric-row" id="home-metrics">
-        <div class="metric-box"><div class="metric-val" id="hm-weight">—</div><div class="metric-lbl">Gewicht</div></div>
-        <div class="metric-box"><div class="metric-val" id="hm-fat" style="color:var(--red)">—</div><div class="metric-lbl">KF%</div></div>
-        <div class="metric-box"><div class="metric-val" id="hm-muscle" style="color:var(--grn)">—</div><div class="metric-lbl">Muskel kg</div></div>
+        <div class="metric-box clickable" onclick="goToBodyProgress()"><div class="metric-val" id="hm-weight">—</div><div class="metric-lbl">Gewicht</div></div>
+        <div class="metric-box clickable" onclick="goToBodyProgress()">
+          <div class="metric-val" id="hm-fat" style="color:var(--red)">—</div>
+          <div class="metric-lbl" id="hm-fat-lbl">KF%</div>
+          <div class="unit-toggle">
+            <button class="unit-btn" id="hm-fat-pct" onclick="setHomeUnit(event,'fat','pct')">%</button>
+            <button class="unit-btn" id="hm-fat-kg" onclick="setHomeUnit(event,'fat','kg')">kg</button>
+          </div>
+        </div>
+        <div class="metric-box clickable" onclick="goToBodyProgress()">
+          <div class="metric-val" id="hm-muscle" style="color:var(--grn)">—</div>
+          <div class="metric-lbl" id="hm-muscle-lbl">Muskel kg</div>
+          <div class="unit-toggle">
+            <button class="unit-btn" id="hm-muscle-pct" onclick="setHomeUnit(event,'muscle','pct')">%</button>
+            <button class="unit-btn" id="hm-muscle-kg" onclick="setHomeUnit(event,'muscle','kg')">kg</button>
+          </div>
+        </div>
       </div>
 
       <div class="sec-label">Letztes Training</div>
@@ -710,6 +751,7 @@ const RUN_KEY = 'hit_runs_v1';
 const FOCUS_KEY = 'hit_focus_v1';
 const STUDIO_KEY = 'hit_studios_v1';
 const SOUND_KEY = 'hit_sound_v1';
+const HOME_UNITS_KEY = 'hit_home_units_v1';
 
 const FOCUS_CONFIG = {
   none: {label:'Kein Fokus', primary:[], secondary:[], caution:'Normaler HIT-Rhythmus ohne Schwerpunkt.'},
@@ -1147,6 +1189,28 @@ function goTo(name) {
 // HOME
 // ═══════════════════════════════════════════
 
+function homeUnits() {
+  return {...{fat:'pct', muscle:'kg'}, ...loadLS(HOME_UNITS_KEY, {})};
+}
+
+function setHomeUnit(ev, kind, unit) {
+  if (ev) ev.stopPropagation();
+  const units = homeUnits();
+  units[kind] = unit;
+  saveLS(HOME_UNITS_KEY, units);
+  renderHome();
+}
+
+function goToBodyProgress() {
+  goTo('progress');
+  setTimeout(() => document.getElementById('progress-history')?.scrollIntoView({behavior:'smooth', block:'start'}), 80);
+}
+
+function fmtHomeMetric(value, unit) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return `${Math.round(value * 10) / 10}${unit}`;
+}
+
 function renderHome() {
   document.getElementById('home-date').textContent =
     new Date().toLocaleDateString('de-DE', {weekday:'long', day:'2-digit', month:'long'});
@@ -1154,9 +1218,22 @@ function renderHome() {
   // Metrics from latest progress
   const prog = loadProgress();
   const last = latestByDate(prog);
-  document.getElementById('hm-weight').textContent = last?.weight ? last.weight + ' kg' : '—';
-  document.getElementById('hm-fat').textContent = last?.fat ? last.fat + '%' : '—';
-  document.getElementById('hm-muscle').textContent = last?.muscle ? last.muscle : '—';
+  const units = homeUnits();
+  const weight = last?.weight || null;
+  const fatPct = last?.fat || null;
+  const fatKg = last?.fatKg || (weight && fatPct ? (weight * fatPct / 100) : null);
+  const muscleKg = last?.muscle || null;
+  const musclePct = weight && muscleKg ? (muscleKg / weight * 100) : null;
+
+  document.getElementById('hm-weight').textContent = weight ? fmtHomeMetric(weight, ' kg') : '—';
+  document.getElementById('hm-fat').textContent = units.fat === 'kg' ? fmtHomeMetric(fatKg, ' kg') : fmtHomeMetric(fatPct, '%');
+  document.getElementById('hm-muscle').textContent = units.muscle === 'pct' ? fmtHomeMetric(musclePct, '%') : fmtHomeMetric(muscleKg, ' kg');
+  document.getElementById('hm-fat-lbl').textContent = units.fat === 'kg' ? 'KF kg' : 'KF%';
+  document.getElementById('hm-muscle-lbl').textContent = units.muscle === 'pct' ? 'Muskel%' : 'Muskel kg';
+  ['pct','kg'].forEach(unit => {
+    document.getElementById(`hm-fat-${unit}`)?.classList.toggle('on', units.fat === unit);
+    document.getElementById(`hm-muscle-${unit}`)?.classList.toggle('on', units.muscle === unit);
+  });
 
   // Last training
   const history = loadTrainingHistory();
@@ -2708,6 +2785,10 @@ function renderProgressHistory() {
   if (!prog.length) { el.innerHTML='<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine Messungen.</div>'; return; }
   el.innerHTML = [...prog].reverse().slice(0,20).map((p,ri) => {
     const realIdx = prog.length-1-ri;
+    const fatUnit = p.fatKg ? 'kg' : 'pct';
+    const fatVal = fatUnit === 'kg' ? p.fatKg : p.fat;
+    const muscleUnit = p.muscleUnit === 'pct' ? 'pct' : 'kg';
+    const muscleVal = muscleUnit === 'pct' && p.weight && p.muscle ? Math.round(p.muscle / p.weight * 1000) / 10 : p.muscle;
     return `<div class="log-entry">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <div>
@@ -2726,18 +2807,30 @@ function renderProgressHistory() {
       </div>
       <div class="log-edit" id="pe-${realIdx}">
         <div class="form-row form-2" style="margin-top:8px">
-          <div><div class="inp-label">Datum</div><input class="inp" type="date" id="pe-date-${realIdx}" value="${p.date||''}" style="font-size:14px;padding:6px 10px"></div>
-          <div><div class="inp-label">Quelle</div><select class="inp" id="pe-src-${realIdx}" style="font-size:14px;padding:6px 10px">
+          <div><div class="inp-label">Datum</div><input class="inp edit-inp" type="date" id="pe-date-${realIdx}" value="${p.date||''}"></div>
+          <div><div class="inp-label">Quelle</div><select class="inp edit-inp" id="pe-src-${realIdx}">
             ${['Withings','Apple Health','Manuell'].map(s=>`<option${(p.src||'')===s?' selected':''}>${s}</option>`).join('')}
           </select></div>
         </div>
         <div class="form-row form-2">
-          <div><div class="inp-label">Gewicht kg</div><input class="inp" type="number" step="0.1" id="pe-weight-${realIdx}" value="${p.weight||''}" style="font-size:14px;padding:6px 10px"></div>
-          <div><div class="inp-label">KF%</div><input class="inp" type="number" step="0.1" id="pe-fat-${realIdx}" value="${p.fat||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div><div class="inp-label">Gewicht kg</div><input class="inp edit-inp" type="number" step="0.1" id="pe-weight-${realIdx}" value="${p.weight||''}"></div>
+          <div>
+            <div class="inp-label">Körperfett</div>
+            <div style="display:grid;grid-template-columns:1fr 56px;gap:6px">
+              <input class="inp edit-inp" type="number" step="0.1" id="pe-fat-${realIdx}" value="${fatVal||''}">
+              <select class="inp edit-inp" id="pe-fat-unit-${realIdx}"><option value="pct"${fatUnit==='pct'?' selected':''}>%</option><option value="kg"${fatUnit==='kg'?' selected':''}>kg</option></select>
+            </div>
+          </div>
         </div>
         <div class="form-row form-2">
-          <div><div class="inp-label">Muskel kg</div><input class="inp" type="number" step="0.1" id="pe-muscle-${realIdx}" value="${p.muscle||''}" style="font-size:14px;padding:6px 10px"></div>
-          <div><div class="inp-label">Taille cm</div><input class="inp" type="number" step="0.5" id="pe-waist-${realIdx}" value="${p.waist||''}" style="font-size:14px;padding:6px 10px"></div>
+          <div>
+            <div class="inp-label">Muskel</div>
+            <div style="display:grid;grid-template-columns:1fr 56px;gap:6px">
+              <input class="inp edit-inp" type="number" step="0.1" id="pe-muscle-${realIdx}" value="${muscleVal||''}">
+              <select class="inp edit-inp" id="pe-muscle-unit-${realIdx}"><option value="kg"${muscleUnit==='kg'?' selected':''}>kg</option><option value="pct"${muscleUnit==='pct'?' selected':''}>%</option></select>
+            </div>
+          </div>
+          <div><div class="inp-label">Taille cm</div><input class="inp edit-inp" type="number" step="0.5" id="pe-waist-${realIdx}" value="${p.waist||''}"></div>
         </div>
         <button class="btn btn-p btn-full btn-sm" onclick="saveProgressEdit(${realIdx})">Speichern</button>
       </div>
@@ -2755,13 +2848,22 @@ function saveProgressEdit(idx) {
   if (!p[idx]) return;
   const date = document.getElementById(`pe-date-${idx}`).value;
   if (!date) { toast('Datum fehlt'); return; }
+  const weight = parseFloat(document.getElementById(`pe-weight-${idx}`).value)||null;
+  const fatRaw = parseFloat(document.getElementById(`pe-fat-${idx}`).value)||null;
+  const fatUnit = document.getElementById(`pe-fat-unit-${idx}`).value;
+  const muscleRaw = parseFloat(document.getElementById(`pe-muscle-${idx}`).value)||null;
+  const muscleUnit = document.getElementById(`pe-muscle-unit-${idx}`).value;
+  const fat = fatUnit === 'kg' && fatRaw && weight ? Math.round(fatRaw / weight * 1000) / 10 : fatRaw;
+  const muscle = muscleUnit === 'pct' && muscleRaw && weight ? Math.round(muscleRaw / 100 * weight * 10) / 10 : muscleRaw;
   p[idx] = {
     ...p[idx],
     date,
     src: document.getElementById(`pe-src-${idx}`).value,
-    weight: parseFloat(document.getElementById(`pe-weight-${idx}`).value)||null,
-    fat: parseFloat(document.getElementById(`pe-fat-${idx}`).value)||null,
-    muscle: parseFloat(document.getElementById(`pe-muscle-${idx}`).value)||null,
+    weight,
+    fat,
+    fatKg: fatUnit === 'kg' ? fatRaw : null,
+    muscle,
+    muscleUnit,
     waist: parseFloat(document.getElementById(`pe-waist-${idx}`).value)||null,
   };
   p.sort((a,b) => a.date.localeCompare(b.date));
@@ -2906,7 +3008,7 @@ function processImportData(data) {
 
 function clearAll() {
   if (!confirm('ALLE Daten löschen? Vorher exportieren!')) return;
-  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,STUDIO_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
+  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,STUDIO_KEY,HOME_UNITS_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
   renderHome(); renderProgress(); renderRunning();
   toast('Alle Daten gelöscht');
 }
@@ -3020,7 +3122,15 @@ function renderLibrary() {
 // INIT
 // ═══════════════════════════════════════════
 
+function lockPortrait() {
+  try {
+    if (screen.orientation?.lock) screen.orientation.lock('portrait').catch(() => {});
+  } catch (e) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  lockPortrait();
+
   // Set default dates
   const td = localDate();
   ['r-date','p-date'].forEach(id => { const el=document.getElementById(id); if(el) el.value=td; });
