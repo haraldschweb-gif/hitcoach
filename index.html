@@ -235,6 +235,49 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 .chart-wrap { padding: 10px 14px 12px; }
 .chart-title { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: 8px; }
 canvas { display: block; width: 100% !important; }
+.trend-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 6px; }
+.trend-card { padding: 12px 14px; border-bottom: 1.5px solid var(--line); cursor: pointer; }
+.trend-card:last-child { border-bottom: none; }
+.trend-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.trend-title { font-size: 13px; font-weight: 800; }
+.trend-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 2px; }
+.spark-bars { display: flex; align-items: flex-end; gap: 3px; height: 38px; margin-top: 10px; }
+.spark-bar { flex: 1; min-width: 5px; background: var(--grn-l); border-radius: 4px 4px 0 0; }
+.spark-bar.recent { background: var(--grn); }
+.spark-points { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.spark-point { background: var(--surf2); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 6px; min-width: 0; }
+.spark-date { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--t3); }
+.spark-val { font-size: 12px; font-weight: 800; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.detail-row { display: grid; grid-template-columns: 74px 1fr 1fr; gap: 8px; padding: 8px 0; border-bottom: 1.5px solid var(--line); align-items: center; }
+.detail-row:last-child { border-bottom: none; }
+.detail-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); }
+.detail-val { font-size: 13px; font-weight: 800; }
+.detail-note { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); text-align: right; }
+.insight-box { padding: 12px 14px; border-bottom: 1.5px solid var(--line); }
+.insight-box:last-child { border-bottom: none; }
+.insight-title { font-size: 13px; font-weight: 800; display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.insight-text { font-size: 12px; color: var(--t2); line-height: 1.45; margin-top: 5px; }
+.insight-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--t3); margin-top: 5px; }
+.insight-chip { font-family: 'DM Mono', monospace; font-size: 9px; padding: 3px 7px; border-radius: 20px; white-space: nowrap; border: 1.5px solid var(--line); background: var(--surf2); color: var(--t2); }
+.insight-chip.up { background: var(--grn-l); color: var(--grn); border-color: #b0ddd0; }
+.insight-chip.hold { background: var(--blu-l); color: var(--blu); border-color: #c0d8f8; }
+.insight-chip.warn { background: var(--amb-l); color: var(--amb); border-color: #f0d8a0; }
+.insight-chip.down { background: var(--red-l); color: var(--red); border-color: #f0c0c8; }
+.prog-hint { font-family: 'DM Mono', monospace; font-size: 10px; line-height: 1.35; margin-top: 7px; padding: 6px 8px; border-radius: var(--rs); background: var(--surf2); color: var(--t2); border: 1.5px solid var(--line); }
+.prog-hint.up { background: var(--grn-l); color: var(--grn); border-color: #b0ddd0; }
+.prog-hint.warn { background: var(--amb-l); color: var(--amb); border-color: #f0d8a0; }
+.prog-hint.down { background: var(--red-l); color: var(--red); border-color: #f0c0c8; }
+.focus-chip { font-family: 'DM Mono', monospace; font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: 700; background: var(--pur-l); color: var(--pur); border: 1.5px solid #c8b8f0; }
+.focus-chip.sec { background: var(--blu-l); color: var(--blu); border-color: #c0d8f8; }
+.focus-panel { padding: 14px 16px; }
+.focus-row { display: grid; grid-template-columns: 1fr 86px; gap: 8px; align-items: end; }
+.focus-score { font-size: 30px; font-weight: 800; color: var(--pur); line-height: 1; }
+.focus-bar { height: 6px; background: var(--surf2); border-radius: 999px; overflow: hidden; margin-top: 8px; border: 1px solid var(--line); }
+.focus-fill { height: 100%; background: var(--pur); border-radius: 999px; }
+.focus-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.focus-kpi { background: var(--surf2); border: 1.5px solid var(--line); border-radius: var(--rs); padding: 7px 6px; min-width: 0; }
+.focus-kpi-val { font-size: 13px; font-weight: 800; }
+.focus-kpi-lbl { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--t3); margin-top: 1px; text-transform: uppercase; }
 
 /* ── RUNNING ─────────────────────────────── */
 .run-entry { padding: 12px 16px; border-bottom: 1.5px solid var(--line); position: relative; }
@@ -461,11 +504,38 @@ canvas { display: block; width: 100% !important; }
         </div>
       </div>
 
+      <div class="sec-label">Fokus</div>
+      <div class="card">
+        <div class="focus-panel">
+          <div class="form-row" style="margin-bottom:10px">
+            <div><div class="inp-label">Ziel für 4–6 Wochen</div>
+              <select id="focus-select" onchange="setFocus(this.value)">
+                <option value="none">Kein Fokus</option>
+                <option value="biceps">Dicker Bizeps</option>
+                <option value="back">Riesiger Rücken</option>
+                <option value="legs">Massive Beine</option>
+                <option value="shoulders">Breite Schultern</option>
+                <option value="chest">Brust stärker</option>
+                <option value="calves">Waden</option>
+                <option value="strength">Allgemeine Kraft</option>
+              </select>
+            </div>
+          </div>
+          <div id="focus-status"></div>
+        </div>
+      </div>
+
       <div class="sec-label">Aktuell</div>
       <div class="stat-grid" id="p-current"></div>
 
+      <div class="sec-label">Körpergewicht-Trend</div>
+      <div class="card"><div class="chart-wrap"><div class="chart-title">Wochenmittel kg · letzte 16 Wochen</div><canvas id="body-weight-chart" height="105"></canvas><div id="body-weight-summary" class="trend-sub"></div></div></div>
+
       <div class="sec-label">TVL-Verlauf</div>
       <div class="card"><div class="chart-wrap"><div class="chart-title">Temporal Volume Load kg·s</div><canvas id="tvl-chart" height="90"></canvas><div id="tvl-summary" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:4px"></div></div></div>
+
+      <div class="sec-label">Trainingssteuerung</div>
+      <div class="card" id="training-insights" style="overflow:hidden"></div>
 
       <div class="sec-label">Trainingslog</div>
       <div class="card" id="training-log" style="overflow:hidden"></div>
@@ -572,6 +642,16 @@ canvas { display: block; width: 100% !important; }
   </div>
 </div>
 
+<!-- WEIGHT DETAIL MODAL -->
+<div class="overlay" id="weight-overlay" onclick="if(event.target===this)closeWeightDetail()">
+  <div class="modal">
+    <div class="modal-title">Gewicht-Verlauf</div>
+    <div class="modal-name" id="weight-modal-name"></div>
+    <div id="weight-modal-body"></div>
+    <button class="btn btn-s btn-full" style="margin-top:12px" onclick="closeWeightDetail()">Schließen</button>
+  </div>
+</div>
+
 <script>
 'use strict';
 
@@ -584,6 +664,18 @@ const REPS_MIN = 8, REPS_MAX = 12;
 const WL_KEY = 'hit_weights_v1';
 const REPS_KEY = 'hit_reps_v1';
 const RUN_KEY = 'hit_runs_v1';
+const FOCUS_KEY = 'hit_focus_v1';
+
+const FOCUS_CONFIG = {
+  none: {label:'Kein Fokus', primary:[], secondary:[], caution:'Normaler HIT-Rhythmus ohne Schwerpunkt.'},
+  biceps: {label:'Dicker Bizeps', primary:['bizepcurlslh','bizepcurlskh','biz_kabel','biz_m','hammer','konz'], secondary:['klimmzuege','latziehen','latz_assist','latz_breit','rudern','kabel_rudern'], caution:'Rückenübungen belasten den Bizeps indirekt. Zusatzreiz nur bei guter Erholung.'},
+  back: {label:'Riesiger Rücken', primary:['klimmzuege','latziehen','latz_assist','latz_breit','rudern','rudern_breit','kabel_rudern','ueberzuege','pullover_kabel'], secondary:['schulterheben','schulterh_kabel','kreuzheben'], caution:'Wenn Bizeps oder Griff limitiert, Alternative oder Griffhilfe prüfen.'},
+  legs: {label:'Massive Beine', primary:['beinpresse','beinpresse_eng','hack_squat','beinstrecken','beinstr_einbein','kreuzheben','wadenheben','waden_steh','waden_sitz'], secondary:['beinbeuger'], caution:'Harte Läufe nach Beintag vorsichtig dosieren.'},
+  shoulders: {label:'Breite Schultern', primary:['nackendruecken','schulter_m','seitheben','seith_kabel','seith_m'], secondary:['schulterheben','schulterh_kabel'], caution:'Schultergelenk sauber halten. Bei Nackendrücken Mobilität beachten.'},
+  chest: {label:'Brust stärker', primary:['bankdruecken','brustpresse_m','butterfly','pec_deck','kabel_fly','kabel_brust'], secondary:['trizepskabel','triz_m'], caution:'Trizeps kann limitieren. Brustspannung und kontrollierte Exzentrik priorisieren.'},
+  calves: {label:'Waden', primary:['wadenheben','waden_steh','waden_sitz'], secondary:['beinpresse','beinpresse_eng'], caution:'Volle Amplitude zählt mehr als Last. Unten Dehnung halten.'},
+  strength: {label:'Allgemeine Kraft', primary:['bankdruecken','beinpresse','klimmzuege','latziehen','rudern','kreuzheben','nackendruecken'], secondary:['wadenheben','schulterheben'], caution:'Konservativ steigern und Technik nicht für Gewicht opfern.'},
+};
 
 // Kadenz settings
 let KADENZ = loadLS('hit_kadenz', {up:2,hold:1,down:4});
@@ -783,20 +875,46 @@ function saveSession(key, val) { try { sessionStorage.setItem(key, JSON.stringif
 // Weight logger
 function wlLoad() { return loadLS(WL_KEY, {}); }
 function wlSave(d) { saveLS(WL_KEY, d); }
-function getCurrentW(key) { const d = wlLoad(); const h = d[key]; return h && h.length ? h[h.length-1].w : 0; }
-function saveW(key, w) {
+function sortedByDate(items) {
+  return [...(items || [])].filter(x => x && x.date).sort((a,b) => a.date.localeCompare(b.date));
+}
+function latestByDate(items) {
+  const sorted = sortedByDate(items);
+  if (!sorted.length) return null;
+  const today = localDate();
+  return sorted.filter(x => x.date <= today).pop() || sorted[sorted.length - 1];
+}
+function getCurrentW(key) { const d = wlLoad(); const h = sortedByDate(d[key]); return h.length ? h[h.length-1].w : 0; }
+function saveWAtDate(key, w, date) {
   const d = wlLoad();
   if (!d[key]) d[key] = [];
-  const today = localDate();
-  // Nur einmal pro Tag speichern – letzten Eintrag desselben Tages ersetzen
-  const lastIdx = d[key].length - 1;
-  if (lastIdx >= 0 && d[key][lastIdx].date === today) {
-    d[key][lastIdx].w = w; // Überschreiben statt Anhängen
+  const entryDate = date || localDate();
+  const idx = d[key].findIndex(e => e.date === entryDate);
+  if (idx >= 0) {
+    d[key][idx].w = w;
   } else {
-    d[key].push({date: today, w});
+    d[key].push({date: entryDate, w});
   }
+  d[key].sort((a,b) => a.date.localeCompare(b.date));
   if (d[key].length > 60) d[key].shift();
   wlSave(d);
+}
+function saveW(key, w) { saveWAtDate(key, w, localDate()); }
+function deleteWAtDate(key, date) {
+  const d = wlLoad();
+  if (!d[key]) return;
+  d[key] = d[key].filter(e => e.date !== date);
+  if (!d[key].length) delete d[key];
+  wlSave(d);
+}
+function moveWorkoutWeightToDate(key, w, date) {
+  const d = wlLoad();
+  const today = localDate();
+  if (date !== today && d[key]) {
+    d[key] = d[key].filter(e => !(e.date === today && e.w === w));
+  }
+  wlSave(d);
+  saveWAtDate(key, w, date);
 }
 function getReps(key) { const d = loadLS(REPS_KEY, {}); return d[key] || null; }
 function saveReps(key, val) { const d = loadLS(REPS_KEY, {}); const n = parseInt(val); if (!isNaN(n) && n > 0) d[key] = n; else delete d[key]; saveLS(REPS_KEY, d); }
@@ -873,6 +991,66 @@ function toast(msg) {
 function getStep(key) {
   return ['beinpresse','beinpresse_eng','hack_squat','wadenheben','waden_steh','waden_sitz'].includes(key) ? 5 : 2.5;
 }
+function loadFocus() {
+  const f = loadLS(FOCUS_KEY, {id:'none', startDate:localDate(), weeks:6});
+  if (!FOCUS_CONFIG[f.id]) f.id = 'none';
+  if (!f.startDate) f.startDate = localDate();
+  if (!f.weeks) f.weeks = 6;
+  return f;
+}
+function saveFocus(f) { saveLS(FOCUS_KEY, f); }
+function setFocus(id) {
+  const cur = loadFocus();
+  saveFocus({id, startDate:id === cur.id ? cur.startDate : localDate(), weeks:6});
+  renderFocusStatus();
+  renderTrainingInsights();
+  renderWeightHistory();
+  if (currentScreen === 'training') renderTraining();
+  toast(id === 'none' ? 'Fokus entfernt' : 'Fokus gesetzt ✓');
+}
+function getFocusConfig() { return FOCUS_CONFIG[loadFocus().id] || FOCUS_CONFIG.none; }
+function getFocusRole(key) {
+  const f = getFocusConfig();
+  if (f.primary.includes(key)) return 'primary';
+  if (f.secondary.includes(key)) return 'secondary';
+  return null;
+}
+function isFocusExercise(key) { return !!getFocusRole(key); }
+function focusWeek(focus) {
+  if (focus.id === 'none') return 0;
+  return Math.min(focus.weeks || 6, Math.max(1, Math.floor(daysSince(focus.startDate) / 7) + 1));
+}
+function getExerciseLog(key) {
+  const rows = [];
+  sortedByDate(loadTrainingHistory()).forEach(t => {
+    (t.exercises || []).forEach(e => {
+      if (e.exKey === key && e.done && (e.weight || e.repsAtFailure)) {
+        rows.push({date:t.date, weight:e.weight||null, reps:e.repsAtFailure||null, tvl:exerciseTVL(e,t.kadenz)});
+      }
+    });
+  });
+  return rows;
+}
+function analyzeExerciseProgress(key) {
+  const rows = getExerciseLog(key);
+  const last = rows[rows.length - 1];
+  const role = getFocusRole(key);
+  const focusText = role === 'primary' ? ' Fokusübung.' : role === 'secondary' ? ' Unterstützt den Fokus.' : '';
+  if (!last) return {status:'hold', label:'Noch keine Daten', text:'Nach der ersten abgeschlossenen Einheit entsteht hier ein Vorschlag.' + focusText, meta:'Gewicht + Wdh. eintragen', next:null, rows, focusRole:role};
+  const step = getStep(key);
+  const reps = last.reps;
+  const weight = last.weight;
+  const recent = rows.slice(-4);
+  const sameWeight = recent.length >= 3 && recent.every(r => r.weight === recent[0].weight);
+  const repsFlat = recent.length >= 3 && recent.every(r => r.reps != null) && (Math.max(...recent.map(r=>r.reps)) - Math.min(...recent.map(r=>r.reps)) <= 1);
+  const tvlFlat = recent.length >= 3 && recent.every(r => r.tvl) && recent[recent.length-1].tvl <= Math.max(...recent.slice(0,-1).map(r=>r.tvl)) * 1.03;
+  const plateau = sameWeight && (repsFlat || tvlFlat);
+  if (!weight || !reps) return {status:'hold', label:'Daten fehlen', text:'Für einen Vorschlag braucht die App Gewicht und Wdh. bis PmM.' + focusText, meta:`Letzter Eintrag ${fmtDate(last.date)}`, next:weight, rows, focusRole:role};
+  if (reps > REPS_MAX) return {status:'up', label:role?'Fokus steigern':'Steigern', text:`Oberhalb des Korridors. Nächste Einheit konservativ auf ${weight + step} kg erhöhen.` + (role ? ' Fokusfortschritt mit sauberer Kadenz priorisieren.' : ''), meta:`${weight} kg × ${reps} Wdh. · ${fmtDate(last.date)}`, next:weight+step, rows, focusRole:role};
+  if (reps < REPS_MIN) return {status:'down', label:'Reduzieren', text:`Unterhalb des Korridors. Nächste Einheit auf ${Math.max(0, weight - step)} kg reduzieren oder Technik/Kadenz prüfen.` + (role ? ' Fokus bleibt Qualität vor Last.' : ''), meta:`${weight} kg × ${reps} Wdh. · ${fmtDate(last.date)}`, next:Math.max(0, weight-step), rows, focusRole:role};
+  if (plateau) return {status:'warn', label:role?'Fokus-Plateau':'Plateau möglich', text:'3-4 Einträge ohne klare Verbesserung. Gewicht halten, Kadenz streng prüfen; wenn es erneut stagniert, leicht reduzieren.' + (role ? ' Alternative für denselben Zielmuskel prüfen.' : ''), meta:`Zuletzt ${weight} kg × ${reps} Wdh.`, next:weight, rows, focusRole:role};
+  return {status:'hold', label:role?'Fokus halten':'Halten', text:'Im Zielkorridor. Gewicht halten und versuchen, eine saubere Wiederholung mehr zu erreichen.' + (role ? ' Das ist ein guter Fokusreiz.' : ''), meta:`${weight} kg × ${reps} Wdh. · TVL ${last.tvl?fmtTVL(last.tvl):'—'}`, next:weight, rows, focusRole:role};
+}
 
 // ═══════════════════════════════════════════
 // NAVIGATION
@@ -912,14 +1090,14 @@ function renderHome() {
 
   // Metrics from latest progress
   const prog = loadProgress();
-  const last = prog[prog.length - 1];
+  const last = latestByDate(prog);
   document.getElementById('hm-weight').textContent = last?.weight ? last.weight + ' kg' : '—';
   document.getElementById('hm-fat').textContent = last?.fat ? last.fat + '%' : '—';
   document.getElementById('hm-muscle').textContent = last?.muscle ? last.muscle : '—';
 
   // Last training
   const history = loadTrainingHistory();
-  const lt = history[history.length - 1];
+  const lt = latestByDate(history);
   const htEl = document.getElementById('home-training');
   if (lt) {
     const exDone = lt.exercises.filter(e => e.done);
@@ -1050,6 +1228,7 @@ function renderExercises(planIdx) {
     const hasLib = !!EXERCISES[origKey];
     const hasAlt = !!(ALTERNATIVES[origKey] && ALTERNATIVES[origKey].length);
     const delNr = DELAVIER_NR[origKey];
+    const focusRole = getFocusRole(wKey) || getFocusRole(origKey);
     const lastDays = lastTrainedDays(origKey);
     const lastStr = lastDays===null?'Noch nie':lastDays===0?'Heute':lastDays===1?'Gestern':`vor ${lastDays} Tagen`;
     return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}">
@@ -1059,6 +1238,7 @@ function renderExercises(planIdx) {
       <div class="ex-info">
         <div class="ex-name">
           <span onclick="if(hasLib)openEx('${origKey}')" style="${done?'text-decoration:line-through;color:var(--t3)':''}${hasLib?';cursor:pointer':''}">${dispEx.name}</span>
+          ${focusRole?`<span class="focus-chip${focusRole==='secondary'?' sec':''}">${focusRole==='primary'?'FOKUS':'FOKUS+'}</span>`:''}
           ${delNr?`<span style="font-family:'DM Mono',monospace;font-size:9px;background:var(--grn-l);color:var(--grn);padding:1px 6px;border-radius:4px;font-weight:700">${delNr.nr}</span>`:''}
           ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${origKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
           ${hasAlt?`<button class="swap-btn${swap?' active':''}" onclick="openAlt('${origKey}',event)">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:''}
@@ -1125,21 +1305,27 @@ function finishWorkout(planIdx) {
   const plan = PLAN[planIdx];
   const stateKey = 'wk_' + localDate() + '_' + plan.id;
   const state = loadLS(stateKey, {});
+  const workoutDate = (document.getElementById('wk-date-inp')||{}).value || localDate();
   const exLog = plan.exercises.map((ex, i) => {
     const origKey = ex.exKey;
     const swap = activeSwaps[origKey];
     const wKey = swap ? swap.exKey : origKey;
+    const done = !!state['ex_' + i];
+    const weight = done ? getCurrentW(wKey) : null;
+    const reps = done ? (getReps(wKey) || null) : null;
+    if (done && weight) moveWorkoutWeightToDate(wKey, weight, workoutDate);
     return {
       name: swap ? swap.name : ex.name,
       exKey: wKey,
       wasSwapped: !!swap,
-      weight: getCurrentW(wKey),
-      repsAtFailure: getReps(wKey) || null,
-      done: !!state['ex_' + i],
+      weight,
+      repsAtFailure: reps,
+      done,
     };
   });
   const history = loadTrainingHistory();
-  history.push({date: (document.getElementById('wk-date-inp')||{}).value || localDate(), plan: plan.name, id: plan.id, exercises: exLog, kadenz: {...KADENZ}});
+  history.push({date: workoutDate, plan: plan.name, id: plan.id, exercises: exLog, kadenz: {...KADENZ}});
+  history.sort((a,b) => a.date.localeCompare(b.date));
   if (history.length > 200) history.shift();
   saveTrainingHistory(history);
   const newIdx = (planIdx + 1) % PLAN.length;
@@ -1206,7 +1392,7 @@ function highlightNext(planIdx) {
 
 function buildWW(key) {
   const d = wlLoad();
-  const hist = d[key] || [];
+  const hist = sortedByDate(d[key]);
   const cur = hist.length ? hist[hist.length-1].w : 0;
   const prev = hist.length > 1 ? hist[hist.length-2].w : null;
   const isPR = hist.length >= 2 && cur >= Math.max(...hist.map(h=>h.w));
@@ -1220,6 +1406,8 @@ function buildWW(key) {
   const prHtml = isPR && hist.length > 1 ? '<span class="ww-pr">PR</span>' : '';
   const reps = getReps(key);
   const sugHtml = buildSug(key, cur, reps);
+  const insight = analyzeExerciseProgress(key);
+  const insightHtml = `<div class="prog-hint ${insight.status}">${insight.label}: ${insight.text}</div>`;
   return `<div class="ww" id="ww-${key}">
     <button class="ww-btn" onclick="wwChange('${key}',-${step});event.stopPropagation()">−</button>
     <div class="ww-val" id="wv-${key}" onclick="wwEdit('${key}');event.stopPropagation()">${cur}<span style="font-size:11px;font-weight:400"> kg</span></div>
@@ -1242,7 +1430,8 @@ function buildWW(key) {
     <div class="kad-count" id="kc-${key}">—</div>
     <div class="kad-bar-wrap"><div class="kad-bar" id="kbar-${key}" style="width:0%;background:var(--blu)"></div></div>
     <span class="kad-stop" onclick="stopKadenz('${key}');event.stopPropagation()">✕</span>
-  </div>`;
+  </div>
+  ${insightHtml}`;
 }
 
 function buildSug(key, w, reps) {
@@ -1256,9 +1445,8 @@ function buildSug(key, w, reps) {
 function refreshSug(key) {
   const el = document.getElementById('sug-' + key);
   if (!el) return;
-  const rEl = document.querySelector(`input.reps-inp[oninput*="'${key}'"]`);
+  const rEl = document.querySelector(`#ww-${key} + .reps-row select.reps-inp`);
   const reps = rEl ? parseInt(rEl.value) || null : null;
-  if (reps) saveReps(key, reps);
   el.innerHTML = buildSug(key, getCurrentW(key), reps);
 }
 
@@ -1355,6 +1543,7 @@ function saveProgressForm() {
     if (!confirm(`Gewicht ${weight}kg weicht stark von ${last.weight}kg ab. Trotzdem speichern?`)) return;
   }
   prog.push({date, weight, fat, fatKg: _fatUnit==='kg'?fatRaw:null, muscle, muscleUnit: _muscleUnit, waist, src});
+  prog.sort((a,b) => a.date.localeCompare(b.date));
   if (prog.length > 365) prog.shift();
   saveLS('progress_history', prog);
   ['p-weight','p-fat','p-muscle','p-waist'].forEach(id => { document.getElementById(id).value=''; });
@@ -1671,7 +1860,8 @@ function lastHITBefore(dateStr) {
   const h = loadTrainingHistory();
   const dates = h.map(t => t.date).filter(d => d < dateStr).sort();
   if (!dates.length) return null;
-  return daysSince(dates[dates.length-1]);
+  const last = dates[dates.length - 1];
+  return Math.floor((new Date(dateStr) - new Date(last)) / 86400000);
 }
 
 function renderRunStats() {
@@ -1735,7 +1925,7 @@ function saveRun() {
     pace:pace?pace.val:null, speed,
     hrAvg, hrMax, rpe, shoe, cond, note, source:'manual'});
   saveRuns(runs);
-  ['r-dist','r-hr-avg','r-hr-max','r-note'].forEach(id => { document.getElementById(id).value=''; });
+  ['r-dist','r-dur','r-hr-avg','r-hr-max','r-note'].forEach(id => { document.getElementById(id).value=''; });
   document.getElementById('r-rpe').value = '';
   document.getElementById('r-pace-preview').style.display = 'none';
   renderRunning();
@@ -1809,20 +1999,16 @@ function importRuns() {
     if (el) el.addEventListener('input', updatePacePreview);
   });
 });
-function updatePacePreview() {
-  const dist = parseFloat(document.getElementById('r-dist').value);
-  const dur = parseFloat(document.getElementById('r-dur').value);
-  const el = document.getElementById('r-pace-preview');
-  if (dist > 0 && dur > 0) {
-    const p = calcPace(dist, dur);
-    el.style.display = 'block';
-    el.textContent = '→ ' + p.str + ' · ' + dur + ' Min · ' + dist.toFixed(1) + ' km';
-  } else el.style.display = 'none';
-}
 
 // ═══════════════════════════════════════════
 // CHARTS
 // ═══════════════════════════════════════════
+
+function resolveColor(color) {
+  if (!color || !color.startsWith('var(')) return color;
+  const name = color.slice(4, -1).trim();
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || color;
+}
 
 function drawChart(id, datasets, h=90) {
   const canvas = document.getElementById(id); if (!canvas) return;
@@ -1834,7 +2020,7 @@ function drawChart(id, datasets, h=90) {
   const pad = {t:10,r:8,b:22,l:40};
   const w = W-pad.l-pad.r, hh = h-pad.t-pad.b;
   const allV = datasets.flatMap(d=>d.values.filter(v=>v!=null));
-  if (!allV.length || datasets[0].values.length < 2) {
+  if (!allV.length) {
     ctx.fillStyle='#9999b0'; ctx.font='11px Syne,sans-serif'; ctx.textAlign='center';
     ctx.fillText('Noch keine Daten', W/2, h/2); return;
   }
@@ -1863,17 +2049,19 @@ function drawChart(id, datasets, h=90) {
   // Datasets with bezier curves
   datasets.forEach(ds => {
     const pts = ds.values.map((v,i) => v!=null ? {x:xP(i),y:yP(v)} : null).filter(Boolean);
-    if (pts.length < 2) return;
-    ctx.beginPath(); ctx.strokeStyle=ds.color; ctx.lineWidth=2.5; ctx.setLineDash(ds.dashed?[4,4]:[]);
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i=1; i<pts.length; i++) {
-      const cp1x = (pts[i-1].x + pts[i].x) / 2;
-      ctx.bezierCurveTo(cp1x, pts[i-1].y, cp1x, pts[i].y, pts[i].x, pts[i].y);
+    const color = resolveColor(ds.color);
+    if (pts.length >= 2) {
+      ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.setLineDash(ds.dashed?[4,4]:[]);
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i=1; i<pts.length; i++) {
+        const cp1x = (pts[i-1].x + pts[i].x) / 2;
+        ctx.bezierCurveTo(cp1x, pts[i-1].y, cp1x, pts[i].y, pts[i].x, pts[i].y);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
     }
-    ctx.stroke(); ctx.setLineDash([]);
     pts.forEach(p => {
       ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
-      ctx.fillStyle = ds.color; ctx.fill();
+      ctx.fillStyle = color; ctx.fill();
       ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
       ctx.fillStyle = '#fff'; ctx.fill();
     });
@@ -1976,6 +2164,14 @@ function calcTVL(weight, reps, kadenz) {
   const k = kadenz || KADENZ;
   return Math.round(weight * reps * ((k.up||2)+(k.hold||1)+(k.down||4)));
 }
+function exerciseTVL(ex, kadenz) {
+  if (!ex || !ex.done) return 0;
+  return calcTVL(ex.weight, ex.repsAtFailure, kadenz) || 0;
+}
+function workoutTVL(entry) {
+  if (!entry || !entry.exercises) return 0;
+  return entry.exercises.reduce((sum, ex) => sum + exerciseTVL(ex, entry.kadenz), 0);
+}
 function fmtTVL(v) {
   if (!v) return '—';
   return v>=1000 ? (Math.round(v/100)/10)+'k kg·s' : v+' kg·s';
@@ -1986,17 +2182,127 @@ function fmtTVL(v) {
 // ═══════════════════════════════════════════
 
 function renderProgress() {
+  renderFocusStatus();
   renderProgressCurrent();
+  renderBodyWeightTrend();
   renderTVLChart();
+  renderTrainingInsights();
   renderTrainingLog();
   renderWeightHistory();
   renderProgressHistory();
   renderDataStats();
 }
 
+function getExerciseNameMap() {
+  const nameMap = {};
+  PLAN.forEach(p => p.exercises && p.exercises.forEach(e => { if(e.exKey) nameMap[e.exKey]=e.name; }));
+  Object.keys(ALTERNATIVES).forEach(k => (ALTERNATIVES[k]||[]).forEach(a => { if(a.exKey) nameMap[a.exKey]=a.name; }));
+  return nameMap;
+}
+
+function focusExerciseKeys() {
+  const f = getFocusConfig();
+  return [...new Set([...(f.primary||[]), ...(f.secondary||[])])];
+}
+
+function calcFocusStatus() {
+  const focus = loadFocus();
+  const cfg = getFocusConfig();
+  if (focus.id === 'none') return {focus, cfg, score:null, done:0, improved:0, plateau:0, dataOk:0, weeks:0, caution:cfg.caution};
+  const keys = focusExerciseKeys();
+  const analyses = keys.map(key => ({key, role:getFocusRole(key), a:analyzeExerciseProgress(key)})).filter(x => x.a.rows.length);
+  const done = analyses.length;
+  const improved = analyses.filter(x => {
+    const r = x.a.rows;
+    if (r.length < 2) return false;
+    const first = r[0], last = r[r.length-1];
+    return (last.weight || 0) > (first.weight || 0) || (last.reps || 0) > (first.reps || 0) || (last.tvl || 0) > (first.tvl || 0);
+  }).length;
+  const plateau = analyses.filter(x => x.a.status === 'warn').length;
+  const complete = analyses.filter(x => {
+    const last = x.a.rows[x.a.rows.length - 1];
+    return last && last.weight && last.reps;
+  }).length;
+  const hist = loadTrainingHistory();
+  const lastT = latestByDate(hist);
+  const restDays = lastT ? daysSince(lastT.date) : 6;
+  const doneScore = keys.length ? Math.min(30, Math.round(done / Math.min(keys.length, 4) * 30)) : 0;
+  const progressScore = done ? Math.round(improved / done * 25) : 0;
+  const plateauScore = done ? Math.max(0, 20 - plateau * 8) : 10;
+  const restScore = restDays >= 4 ? 15 : restDays >= 2 ? 8 : 3;
+  const dataScore = done ? Math.round(complete / done * 10) : 0;
+  const score = Math.max(0, Math.min(100, doneScore + progressScore + plateauScore + restScore + dataScore));
+  return {focus, cfg, score, done, improved, plateau, dataOk:complete, weeks:focusWeek(focus), caution:cfg.caution, analyses};
+}
+
+function renderFocusStatus() {
+  const sel = document.getElementById('focus-select');
+  const box = document.getElementById('focus-status');
+  if (!box) return;
+  const status = calcFocusStatus();
+  if (sel) sel.value = status.focus.id;
+  if (status.focus.id === 'none') {
+    box.innerHTML = '<div class="trend-sub">Kein Schwerpunkt aktiv. Der Plan wird neutral bewertet.</div>';
+    return;
+  }
+  const pct = status.score || 0;
+  box.innerHTML = `
+    <div class="focus-row">
+      <div>
+        <div class="trend-title">${status.cfg.label}</div>
+        <div class="trend-meta">Woche ${status.weeks} von ${status.focus.weeks || 6} · Start ${fmtDate(status.focus.startDate)}</div>
+      </div>
+      <div style="text-align:right"><div class="focus-score">${pct}</div><div class="trend-meta">Score</div></div>
+    </div>
+    <div class="focus-bar"><div class="focus-fill" style="width:${pct}%"></div></div>
+    <div class="focus-kpis">
+      <div class="focus-kpi"><div class="focus-kpi-val">${status.done}</div><div class="focus-kpi-lbl">Übungen</div></div>
+      <div class="focus-kpi"><div class="focus-kpi-val">${status.improved}</div><div class="focus-kpi-lbl">besser</div></div>
+      <div class="focus-kpi"><div class="focus-kpi-val">${status.plateau}</div><div class="focus-kpi-lbl">Plateau</div></div>
+    </div>
+    <div class="trend-sub">${status.caution}</div>`;
+}
+
+function weekStart(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const day = d.getDay();
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return localDate(d);
+}
+
+function renderBodyWeightTrend() {
+  const prog = sortedByDate(loadProgress()).filter(p => p.weight);
+  const sumEl = document.getElementById('body-weight-summary');
+  if (!prog.length) {
+    if (sumEl) sumEl.textContent = 'Noch keine Körpermessungen.';
+    drawChart('body-weight-chart', [{values: [], labels: [], color: 'var(--blu)', fmt: v => v.toFixed(1)+' kg'}], 105);
+    return;
+  }
+  const weeks = {};
+  prog.forEach(p => {
+    const key = weekStart(p.date);
+    if (!weeks[key]) weeks[key] = [];
+    weeks[key].push(p.weight);
+  });
+  const data = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0])).map(([date, vals]) => ({
+    date,
+    weight: Math.round((vals.reduce((s,v)=>s+v,0) / vals.length) * 10) / 10,
+  })).slice(-16);
+  const first = data[0].weight;
+  const last = data[data.length-1].weight;
+  const diff = Math.round((last - first) * 10) / 10;
+  if (sumEl) sumEl.textContent = `${data.length} Wochen · ${diff>0?'+':''}${diff.toFixed(1)} kg · letzte: ${last.toFixed(1)} kg`;
+  drawChart('body-weight-chart', [{
+    values: data.map(d=>d.weight),
+    labels: data.map(d=>shortDate(d.date)),
+    color: 'var(--blu)',
+    fmt: v => v.toFixed(1)+' kg',
+  }], 105);
+}
+
 function renderProgressCurrent() {
   const prog = loadProgress();
-  const last = prog[prog.length-1];
+  const last = latestByDate(prog);
   const el = document.getElementById('p-current');
   function delta(cur, start, unit) {
     if (!cur || !start) return '';
@@ -2005,8 +2311,8 @@ function renderProgressCurrent() {
   }
   // Letztes Training mit TVL
   const history = loadTrainingHistory();
-  const lastT = history[history.length-1];
-  const lastTVL = lastT ? lastT.exercises.filter(e=>e.done).reduce((s,e)=>s+(calcTVL(e.weight,e.repsAtFailure,lastT.kadenz)||0),0) : 0;
+  const lastT = latestByDate(history);
+  const lastTVL = workoutTVL(lastT);
   el.innerHTML = `
     <div class="stat-box"><div class="stat-val">${last?.weight||'—'}</div><div class="stat-lbl">Gewicht kg</div>${delta(last?.weight,USER.weight,' kg')}</div>
     <div class="stat-box"><div class="stat-val" style="color:var(--red)">${last?.fat||'—'}${last?.fat?'%':''}</div><div class="stat-lbl">KF%</div>${delta(last?.fat,USER.fat,'%')}</div>
@@ -2016,12 +2322,16 @@ function renderProgressCurrent() {
 
 function renderTVLChart() {
   const history = loadTrainingHistory();
-  const data = history.map(t => ({
+  const data = sortedByDate(history).map(t => ({
     date: t.date,
-    tvl: t.exercises.filter(e=>e.done).reduce((s,e)=>s+(calcTVL(e.weight,e.repsAtFailure,t.kadenz)||0),0)
+    tvl: workoutTVL(t)
   })).filter(d=>d.tvl>0);
   const sumEl = document.getElementById('tvl-summary');
-  if (!data.length) { if(sumEl) sumEl.textContent='Wdh. PmM eintragen → TVL wird berechnet.'; return; }
+  if (!data.length) {
+    if(sumEl) sumEl.textContent='Wdh. PmM eintragen → TVL wird berechnet.';
+    drawChart('tvl-chart', [{values: [], labels: [], color: 'var(--pur)', fmt: fmtTVL}]);
+    return;
+  }
   const last = data[data.length-1].tvl;
   const avg = Math.round(data.reduce((s,d)=>s+d.tvl,0)/data.length);
   if (sumEl) sumEl.textContent = `Ø ${fmtTVL(avg)} · Letzte: ${fmtTVL(last)}`;
@@ -2031,12 +2341,44 @@ function renderTVLChart() {
   }]);
 }
 
+function renderTrainingInsights() {
+  const el = document.getElementById('training-insights');
+  if (!el) return;
+  const nameMap = getExerciseNameMap();
+  const keys = Array.from(new Set([
+    ...Object.keys(wlLoad()),
+    ...loadTrainingHistory().flatMap(t => (t.exercises || []).map(e => e.exKey).filter(Boolean))
+  ]));
+  const analyses = keys.map(key => ({key, name:nameMap[key]||key, a:analyzeExerciseProgress(key)}))
+    .filter(x => x.a.rows.length || x.a.status !== 'hold');
+  if (!analyses.length) {
+    el.innerHTML = '<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine abgeschlossenen Übungsdaten für Vorschläge.</div>';
+    return;
+  }
+  const rank = {warn:0, down:1, up:2, hold:3};
+  analyses.sort((a,b) => {
+    const fa = getFocusRole(a.key) ? -1 : 0;
+    const fb = getFocusRole(b.key) ? -1 : 0;
+    return fa - fb || (rank[a.a.status]??9) - (rank[b.a.status]??9) || a.name.localeCompare(b.name);
+  });
+  el.innerHTML = analyses.slice(0,8).map(x => `
+    <div class="insight-box">
+      <div class="insight-title">
+        <span>${x.name} ${getFocusRole(x.key)?`<span class="focus-chip${getFocusRole(x.key)==='secondary'?' sec':''}">${getFocusRole(x.key)==='primary'?'FOKUS':'FOKUS+'}</span>`:''}</span>
+        <span class="insight-chip ${x.a.status}">${x.a.label}</span>
+      </div>
+      <div class="insight-text">${x.a.text}</div>
+      <div class="insight-meta">${x.a.meta}</div>
+    </div>`).join('');
+}
+
 function renderTrainingLog() {
   const el = document.getElementById('training-log');
   const history = loadTrainingHistory();
   if (!history.length) { el.innerHTML='<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine Einheiten.</div>'; return; }
-  el.innerHTML = history.map((t,logIdx) => {
-    const unitTVL = t.exercises.filter(e=>e.done).reduce((s,e)=>s+(calcTVL(e.weight,e.repsAtFailure,t.kadenz)||0),0);
+  const entries = history.map((t,logIdx) => ({t, logIdx})).sort((a,b) => b.t.date.localeCompare(a.t.date));
+  el.innerHTML = entries.map(({t,logIdx}) => {
+    const unitTVL = workoutTVL(t);
     return `<div class="log-entry">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
@@ -2059,7 +2401,7 @@ function renderTrainingLog() {
             <input class="inp" type="number" step="2.5" min="0" placeholder="kg" value="${e.weight||''}" style="font-size:12px;padding:5px 8px;text-align:center" onchange="editLog(${logIdx},${ei},'weight',this.value)">
             <input class="inp" type="number" min="1" max="30" placeholder="Wdh" value="${e.repsAtFailure||''}" style="font-size:12px;padding:5px 8px;text-align:center" onchange="editLog(${logIdx},${ei},'reps',this.value)">
           </div>`).join('')}
-        <button class="btn btn-s btn-full btn-sm" onclick="toggleLogEdit(${logIdx})">Fertig</button>
+        <button class="btn btn-s btn-full btn-sm" onclick="finishLogEdit(${logIdx})">Fertig</button>
       </div>
     </div>`;
   }).join('');
@@ -2073,9 +2415,36 @@ function toggleLogEdit(idx) {
 function editLog(logIdx, exIdx, field, val) {
   const h = loadTrainingHistory();
   if (!h[logIdx]||!h[logIdx].exercises[exIdx]) return;
-  if (field==='weight') h[logIdx].exercises[exIdx].weight = parseFloat(val)||null;
-  if (field==='reps') h[logIdx].exercises[exIdx].repsAtFailure = parseInt(val)||null;
+  const entry = h[logIdx];
+  const ex = entry.exercises[exIdx];
+  if (field==='weight') {
+    const weight = parseFloat(val)||null;
+    ex.weight = weight;
+    if (weight) ex.done = true;
+    if (ex.exKey && entry.date) {
+      if (weight) saveWAtDate(ex.exKey, weight, entry.date);
+      else deleteWAtDate(ex.exKey, entry.date);
+    }
+  }
+  if (field==='reps') {
+    const reps = parseInt(val)||null;
+    ex.repsAtFailure = reps;
+    if (reps) ex.done = true;
+  }
+  if (!ex.weight && !ex.repsAtFailure) ex.done = false;
   saveTrainingHistory(h);
+  renderProgressCurrent();
+  renderTVLChart();
+  renderTrainingInsights();
+  renderWeightHistory();
+}
+
+function finishLogEdit(idx) {
+  renderTrainingLog();
+  renderProgressCurrent();
+  renderTVLChart();
+  renderTrainingInsights();
+  renderWeightHistory();
 }
 
 function deleteLog(idx) {
@@ -2090,19 +2459,64 @@ function renderWeightHistory() {
   const d = wlLoad();
   const keys = Object.keys(d).filter(k=>d[k]&&d[k].length>0);
   if (!keys.length) { el.innerHTML='<div style="padding:14px 16px;color:var(--t3);font-size:13px">Noch keine Gewichtsdaten.</div>'; return; }
-  const nameMap = {};
-  PLAN.forEach(p => p.exercises && p.exercises.forEach(e => { if(e.exKey) nameMap[e.exKey]=e.name; }));
-  el.innerHTML = keys.map(k => {
-    const hist = d[k];
+  const nameMap = getExerciseNameMap();
+  const sortedKeys = keys.sort((a,b) => {
+    const ra = getFocusRole(a) === 'primary' ? 0 : getFocusRole(a) === 'secondary' ? 1 : 2;
+    const rb = getFocusRole(b) === 'primary' ? 0 : getFocusRole(b) === 'secondary' ? 1 : 2;
+    return ra - rb || (nameMap[a]||a).localeCompare(nameMap[b]||b);
+  });
+  el.innerHTML = sortedKeys.map(k => {
+    const hist = sortedByDate(d[k]);
     const cur = hist[hist.length-1].w, first = hist[0].w;
     const diff = cur - first;
-    // Alt → Neu (links → rechts): slice(-8) gibt älteste zuerst, natürliche Reihenfolge
-    const recent = hist.slice(-8).map(h=>`${shortDate(h.date)}: ${h.w}`).join(' → ');
-    return `<div class="log-entry">
-      <div class="log-title">${nameMap[k]||k} <span style="color:var(--grn);font-weight:800">${cur} kg</span> <span style="font-family:'DM Mono',monospace;font-size:11px;color:${diff>=0?'var(--grn)':'var(--red)'}">${diff>0?'+':''}${diff.toFixed(1)} kg gesamt</span></div>
-      <div class="log-date" style="margin-top:4px;word-break:break-word">${recent}</div>
+    const shown = hist.slice(-12);
+    const min = Math.min(...shown.map(h=>h.w));
+    const max = Math.max(...shown.map(h=>h.w));
+    const bars = shown.map((h,i) => {
+      const height = 12 + ((h.w - min) / (max - min || 1)) * 28;
+      return `<div class="spark-bar${i >= shown.length - 3 ? ' recent' : ''}" style="height:${height}px"></div>`;
+    }).join('');
+    const recent = hist.slice(-4);
+    return `<div class="trend-card" onclick="openWeightDetail('${k}')">
+      <div class="trend-head">
+        <div>
+          <div class="trend-title">${nameMap[k]||k} ${getFocusRole(k)?`<span class="focus-chip${getFocusRole(k)==='secondary'?' sec':''}">${getFocusRole(k)==='primary'?'FOKUS':'FOKUS+'}</span>`:''}</div>
+          <div class="trend-meta">${fmtDate(hist[0].date)} – ${fmtDate(hist[hist.length-1].date)} · ${hist.length} Einträge</div>
+        </div>
+        <span class="chip chip-g">${diff>0?'+':''}${diff.toFixed(1)} kg</span>
+      </div>
+      <div class="spark-bars">${bars}</div>
+      <div class="spark-points">
+        ${recent.map(h=>`<div class="spark-point"><div class="spark-date">${shortDate(h.date)}</div><div class="spark-val">${h.w} kg</div></div>`).join('')}
+      </div>
     </div>`;
   }).join('');
+}
+
+function openWeightDetail(key) {
+  const d = wlLoad();
+  const hist = sortedByDate(d[key]);
+  if (!hist.length) return;
+  const nameMap = getExerciseNameMap();
+  const first = hist[0].w;
+  document.getElementById('weight-modal-name').textContent = nameMap[key] || key;
+  document.getElementById('weight-modal-body').innerHTML = `
+    <div class="trend-sub" style="margin-bottom:10px">${fmtDate(hist[0].date)} – ${fmtDate(hist[hist.length-1].date)} · ${hist.length} Einträge</div>
+    ${hist.map((h,i) => {
+      const prev = i > 0 ? hist[i-1].w : h.w;
+      const step = h.w - prev;
+      const total = h.w - first;
+      return `<div class="detail-row">
+        <div class="detail-date">${fmtDate(h.date)}</div>
+        <div class="detail-val">${h.w} kg</div>
+        <div class="detail-note">${i===0?'Start':`${step>0?'+':''}${step.toFixed(1)} · ${total>0?'+':''}${total.toFixed(1)} ges.`}</div>
+      </div>`;
+    }).join('')}`;
+  document.getElementById('weight-overlay').classList.add('on');
+}
+
+function closeWeightDetail() {
+  document.getElementById('weight-overlay').classList.remove('on');
 }
 
 function renderProgressHistory() {
@@ -2148,7 +2562,7 @@ function exportJSON() {
   const data = {
     _app:'HIT Coach', _exported:new Date().toISOString(),
     training: loadTrainingHistory(), body: loadProgress(), runs: loadRuns(),
-    weights: wlLoad(), reps: loadLS(REPS_KEY,{}),
+    weights: wlLoad(), reps: loadLS(REPS_KEY,{}), focus: loadFocus(),
   };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -2160,7 +2574,7 @@ function exportJSON() {
 function exportCSV() {
   let csv = 'Typ,Datum,Detail,Gewicht,Wdh,TVL\n';
   loadTrainingHistory().forEach(t => t.exercises.forEach(e => {
-    const tvl = calcTVL(e.weight,e.repsAtFailure,t.kadenz);
+    const tvl = exerciseTVL(e,t.kadenz);
     csv += `Training,${t.date},"${e.name}",${e.weight||''},${e.repsAtFailure||''},${tvl||''}\n`;
   }));
   loadProgress().forEach(p => csv += `Körper,${p.date},,${p.weight||''},${p.fat||''}%,\n`);
@@ -2203,8 +2617,16 @@ function importJSON() {
     p.sort((a,b)=>a.date.localeCompare(b.date)); saveProgress(p);
   }
   if (Array.isArray(data.runs)) {
-    const r = loadRuns(); const dates = new Set(r.filter(x=>x.source==='watch').map(x=>x.date));
-    data.runs.forEach(e => { if(!dates.has(e.date)||e.source!=='watch'){r.push(e);merged++;} });
+    const r = loadRuns();
+    const sig = new Set(r.map(x => `${x.date}|${x.type}|${x.dist}|${x.dur}`));
+    data.runs.forEach(e => {
+      const key = `${e.date}|${e.type}|${e.dist}|${e.dur}`;
+      if (!sig.has(key)) {
+        r.push(e);
+        sig.add(key);
+        merged++;
+      }
+    });
     saveRuns(r);
   }
   if (data.weights) {
@@ -2217,13 +2639,16 @@ function importJSON() {
     });
     wlSave(cur);
   }
+  if (data.focus && data.focus.id && FOCUS_CONFIG[data.focus.id]) {
+    saveFocus({id:data.focus.id, startDate:data.focus.startDate||localDate(), weeks:data.focus.weeks||6});
+  }
   document.getElementById('import-json').value='';
   renderProgress(); toast(merged+' Einträge importiert ✓');
 }
 
 function clearAll() {
   if (!confirm('ALLE Daten löschen? Vorher exportieren!')) return;
-  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
+  ['training_history','progress_history',WL_KEY,REPS_KEY,RUN_KEY,FOCUS_KEY,'plan_index','hit_kadenz'].forEach(k => localStorage.removeItem(k));
   renderHome(); renderProgress(); renderRunning();
   toast('Alle Daten gelöscht');
 }
@@ -2237,7 +2662,7 @@ function initCoach() {
   if (coachInit) return;
   coachInit = true;
   addMsg('bot', 'Hallo! Ich bin dein HIT Coach.\n\nIch basiere auf Gießing HIT + Clarence Bass Living Lean + veganer Ernährung.\n\nFrag mich zu Training, Ernährung, Regeneration oder Methodik.');
-  const qq = ['PmM erklären','Kadenz 2/1/4','Supersatz','Protein vegan','Ruhetage','Cut→Bulk 15%','TVL erklären'];
+  const qq = ['Fokus-Status','PmM erklären','Kadenz 2/1/4','Supersatz','Ruhetage','TVL erklären'];
   document.getElementById('quick-q').innerHTML = qq.map(q =>
     `<button style="flex-shrink:0;padding:5px 10px;border-radius:20px;background:var(--surf2);border:1.5px solid var(--line);font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;white-space:nowrap" onclick="sendQ('${q}')">${q}</button>`
   ).join('');
@@ -2265,6 +2690,11 @@ function addMsg(type, text) {
 
 function getAnswer(text) {
   const t = text.toLowerCase();
+  if (t.includes('fokus') || t.includes('schwerpunkt')) {
+    const status = calcFocusStatus();
+    if (status.focus.id === 'none') return 'Aktuell ist kein Fokus gesetzt. Im Daten-Reiter kannst du einen 4–6 Wochen Fokus wählen, z. B. Dicker Bizeps, Riesiger Rücken oder Massive Beine.';
+    return `Aktiver Fokus: ${status.cfg.label}\nWoche ${status.weeks} von ${status.focus.weeks || 6}\nScore: ${status.score}/100\n\nFokusübungen erledigt: ${status.done}\nVerbessert: ${status.improved}\nPlateau-Risiken: ${status.plateau}\n\nHinweis: ${status.caution}`;
+  }
   let best = 0, ans = null;
   for (const e of COACH_KB) {
     const s = e.k.filter(k => t.includes(k)).length;
