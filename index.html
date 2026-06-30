@@ -160,7 +160,7 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 .day-tab.on { background: var(--grn); border-color: var(--grn); color: #fff; }
 .day-tab.rest { background: var(--surf2); color: var(--t3); }
 
-.ex-item { padding: 14px 16px; border-bottom: 1.5px solid var(--line); display: flex; align-items: flex-start; gap: 12px; transition: background .15s; }
+.ex-item { padding: 14px 16px; border-bottom: 1.5px solid var(--line); display: flex; align-items: flex-start; gap: 12px; transition: background .15s; touch-action: pan-y; }
 .ex-item.active-ex { background: var(--grn-l); border-left: 3px solid var(--grn); }
 .ex-check { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--line); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
 .ex-check.done { background: var(--grn); border-color: var(--grn); }
@@ -174,6 +174,10 @@ nav { display: flex; background: var(--surf); border-top: 1.5px solid var(--line
 .ex-info-icon { width: 14px; height: 14px; stroke: var(--t3); flex-shrink: 0; }
 .swap-btn { font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 4px; background: var(--surf2); color: var(--t3); border: 1.5px solid var(--line); cursor: pointer; white-space: nowrap; }
 .swap-btn.active { background: var(--amb-l); color: var(--amb); border-color: #f0d8a0; }
+.swipe-hint { display: inline-flex; align-items: center; gap: 4px; font-family: 'DM Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 4px; background: var(--surf2); color: var(--t3); border: 1.5px solid var(--line); white-space: nowrap; }
+.ex-item.swiping { transform: translateX(var(--swipe-x, 0)); transition: transform .08s; }
+.ex-item.swipe-flash { animation: swipeFlash .28s ease-out; }
+@keyframes swipeFlash { 0% { background: var(--grn-l); } 100% { background: var(--surf); } }
 
 /* WEIGHT WIDGET */
 .ww { display: flex; align-items: center; gap: 6px; margin-top: 8px; padding: 8px 10px; background: var(--surf2); border: 1.5px solid var(--line); border-radius: var(--rs); }
@@ -1039,6 +1043,29 @@ function deleteWAtDate(key, date) {
   if (!d[key].length) delete d[key];
   wlSave(d);
 }
+function syncWeightAfterLogRemoval(key, date, remainingHistory) {
+  if (!key || !date) return;
+  const same = [];
+  (remainingHistory || []).forEach(t => {
+    if (t.date !== date) return;
+    (t.exercises || []).forEach(e => {
+      if (e.exKey === key && e.done && e.weight) same.push(e.weight);
+    });
+  });
+  if (same.length) saveWAtDate(key, same[same.length - 1], date);
+  else deleteWAtDate(key, date);
+}
+function syncWeightsAfterDeletedLog(deletedEntry, remainingHistory) {
+  if (!deletedEntry || !deletedEntry.date) return;
+  const touched = new Set();
+  (deletedEntry.exercises || []).forEach(e => {
+    if (!e.exKey || !e.weight) return;
+    const sig = `${e.exKey}|${deletedEntry.date}`;
+    if (touched.has(sig)) return;
+    touched.add(sig);
+    syncWeightAfterLogRemoval(e.exKey, deletedEntry.date, remainingHistory);
+  });
+}
 function moveWorkoutWeightToDate(key, w, date) {
   const d = wlLoad();
   const today = localDate();
@@ -1437,7 +1464,9 @@ function renderExercises(planIdx) {
     const primaryEq = eqs.find(e => e.role === 'primary') || eqs[0];
     const lastDays = lastTrainedDays(wKey);
     const lastStr = lastDays===null?'Noch nie':lastDays===0?'Heute':lastDays===1?'Gestern':`vor ${lastDays} Tagen`;
-    return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}">
+    const family = exerciseFamily(origKey, ex);
+    const familyIdx = Math.max(0, family.findIndex(a => a.exKey === wKey));
+    return `<div class="ex-item${done?' ':''}${wkState==='active'&&!done?' active-ex':''}" id="exi-${i}" data-orig-key="${origKey}" data-plan-idx="${planIdx}" data-family-count="${family.length}">
       <div class="ex-check${done?' done':''}" onclick="toggleEx('${stateKey}',${i},this,${planIdx})">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
@@ -1448,6 +1477,7 @@ function renderExercises(planIdx) {
           ${eqs.length?`<span class="equip-chip">${eqs.length} Gerät${eqs.length>1?'e':''}</span>`:''}
           ${delNr?`<span style="font-family:'DM Mono',monospace;font-size:9px;background:var(--grn-l);color:var(--grn);padding:1px 6px;border-radius:4px;font-weight:700">${delNr.nr}</span>`:''}
           ${hasLib?`<svg class="ex-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="openEx('${libKey}')"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`:''}
+          ${family.length>1?`<span class="swipe-hint">⇆ ${familyIdx+1}/${family.length}</span>`:''}
           ${hasAlt?`<button class="swap-btn${swap?' active':''}" onclick="openAlt('${origKey}',event)">${swap?'⇄ '+swap.name.split(' ')[0]:'⇄ Alt.'}</button>`:''}
         </div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-top:2px;margin-bottom:2px">${delNr?delNr.kap+' · ':''}Zuletzt: ${lastStr}</div>
@@ -1465,6 +1495,7 @@ function renderExercises(planIdx) {
     </div>`;
   }).join('');
 
+  attachExerciseSwipe(planIdx);
   renderActionBar(planIdx);
 }
 
@@ -1696,6 +1727,89 @@ function wwCommit(key) {
 // SWAP / ALTERNATIVES
 // ═══════════════════════════════════════════
 
+function exerciseFamily(origKey, ex) {
+  const base = {
+    exKey: origKey,
+    name: ex?.name || origKey,
+    detail: ex?.detail || '',
+    note: ex?.note || '',
+    original: true,
+  };
+  return [base, ...(ALTERNATIVES[origKey] || [])];
+}
+
+function activeFamilyIndex(origKey, ex) {
+  const family = exerciseFamily(origKey, ex);
+  const activeKey = (activeSwaps[origKey] || {}).exKey || origKey;
+  const idx = family.findIndex(item => item.exKey === activeKey);
+  return idx >= 0 ? idx : 0;
+}
+
+function cycleExerciseAlternative(origKey, dir, planIdx) {
+  const plan = PLAN[planIdx];
+  const ex = plan?.exercises?.find(item => item.exKey === origKey);
+  const family = exerciseFamily(origKey, ex);
+  if (family.length < 2) return;
+  const cur = activeFamilyIndex(origKey, ex);
+  const nextIdx = (cur + dir + family.length) % family.length;
+  const next = family[nextIdx];
+  if (next.original) {
+    delete activeSwaps[origKey];
+  } else {
+    activeSwaps[origKey] = {exKey: next.exKey, name: next.name, detail: next.detail, note: next.note};
+  }
+  saveSession('hit_swaps', activeSwaps);
+  renderExercises(planIdx);
+  const row = document.querySelector(`#ex-list .ex-item[data-orig-key="${origKey}"]`);
+  if (row) {
+    row.classList.add('swipe-flash');
+    setTimeout(() => row.classList.remove('swipe-flash'), 320);
+  }
+  toast(next.original ? 'Originalübung wiederhergestellt' : '⇄ ' + next.name.split(' ').slice(0,3).join(' '));
+}
+
+function attachExerciseSwipe(planIdx) {
+  document.querySelectorAll('#ex-list .ex-item[data-orig-key]').forEach(row => {
+    const count = parseInt(row.dataset.familyCount || '0', 10);
+    if (count < 2) return;
+    let startX = 0, startY = 0, pointerId = null, moved = false;
+    row.addEventListener('pointerdown', e => {
+      if (e.target.closest('button,input,select,.ex-check,.ww,.reps-row,.kad-btn,.ex-info-icon')) return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      moved = false;
+      row.setPointerCapture?.(pointerId);
+    });
+    row.addEventListener('pointermove', e => {
+      if (pointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        moved = true;
+        row.classList.add('swiping');
+        row.style.setProperty('--swipe-x', `${Math.max(-36, Math.min(36, dx / 3))}px`);
+      }
+    });
+    row.addEventListener('pointerup', e => {
+      if (pointerId !== e.pointerId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      row.classList.remove('swiping');
+      row.style.removeProperty('--swipe-x');
+      pointerId = null;
+      if (moved && Math.abs(dx) > 54 && Math.abs(dy) < 70) {
+        cycleExerciseAlternative(row.dataset.origKey, dx < 0 ? 1 : -1, planIdx);
+      }
+    });
+    row.addEventListener('pointercancel', () => {
+      pointerId = null;
+      row.classList.remove('swiping');
+      row.style.removeProperty('--swipe-x');
+    });
+  });
+}
+
 // ── E: KF / Muskel Unit Toggle ────────────────
 let _fatUnit = 'pct';   // 'pct' | 'kg'
 let _muscleUnit = 'pct';
@@ -1750,10 +1864,9 @@ function saveProgressForm() {
   if (last && weight && last.weight && (weight < last.weight*0.9 || weight > last.weight*1.1)) {
     if (!confirm(`Gewicht ${weight}kg weicht stark von ${last.weight}kg ab. Trotzdem speichern?`)) return;
   }
-  prog.push({date, weight, fat, fatKg: _fatUnit==='kg'?fatRaw:null, muscle, muscleUnit: _muscleUnit, waist, src});
-  prog.sort((a,b) => a.date.localeCompare(b.date));
-  if (prog.length > 365) prog.shift();
-  saveLS('progress_history', prog);
+  const normalized = normalizeProgressEntries([...prog, {date, weight, fat, fatKg: _fatUnit==='kg'?fatRaw:null, muscle, muscleUnit: _muscleUnit, waist, src}]);
+  while (normalized.length > 365) normalized.shift();
+  saveProgress(normalized);
   ['p-weight','p-fat','p-muscle','p-waist'].forEach(id => { document.getElementById(id).value=''; });
   renderProgress();
   toast('Körperwerte gespeichert ✓');
@@ -2649,6 +2762,9 @@ function calcFocusStatus() {
   const hist = loadTrainingHistory();
   const lastT = latestByDate(hist);
   const restDays = lastT ? daysSince(lastT.date) : 6;
+  if (!done) {
+    return {focus, cfg, score:0, done:0, improved:0, plateau:0, dataOk:0, weeks:focusWeek(focus), caution:cfg.caution, analyses};
+  }
   const doneScore = keys.length ? Math.min(30, Math.round(done / Math.min(keys.length, 4) * 30)) : 0;
   const progressScore = done ? Math.round(improved / done * 25) : 0;
   const plateauScore = done ? Math.max(0, 20 - plateau * 8) : 10;
@@ -2875,7 +2991,7 @@ function editLog(logIdx, exIdx, field, val) {
     if (weight) ex.done = true;
     if (ex.exKey && entry.date) {
       if (weight) saveWAtDate(ex.exKey, weight, entry.date);
-      else deleteWAtDate(ex.exKey, entry.date);
+      else syncWeightAfterLogRemoval(ex.exKey, entry.date, h);
     }
   }
   if (field==='reps') {
@@ -2889,6 +3005,7 @@ function editLog(logIdx, exIdx, field, val) {
   renderTVLChart();
   renderTrainingInsights();
   renderWeightHistory();
+  renderFocusStatus();
 }
 
 function finishLogEdit(idx) {
@@ -2897,12 +3014,21 @@ function finishLogEdit(idx) {
   renderTVLChart();
   renderTrainingInsights();
   renderWeightHistory();
+  renderFocusStatus();
 }
 
 function deleteLog(idx) {
   if (!confirm('Trainingseintrag löschen?')) return;
-  const h = loadTrainingHistory(); h.splice(idx,1); saveTrainingHistory(h);
-  renderTrainingLog(); renderTVLChart();
+  const h = loadTrainingHistory();
+  const deleted = h.splice(idx,1)[0];
+  saveTrainingHistory(h);
+  syncWeightsAfterDeletedLog(deleted, h);
+  renderTrainingLog();
+  renderTVLChart();
+  renderTrainingInsights();
+  renderWeightHistory();
+  renderFocusStatus();
+  renderProgressCurrent();
   toast('Eintrag gelöscht');
 }
 
@@ -3083,6 +3209,28 @@ function renderDataStats() {
     <div class="data-row"><span>Studios / Geräte</span><span>${studios.studios.length} · ${eqCount}</span></div>`;
 }
 
+function progressEntryCompleteness(p) {
+  return ['weight','fat','fatKg','muscle','muscleUnit','waist','src'].reduce((n,k) => n + (p && p[k] != null && p[k] !== '' ? 1 : 0), 0);
+}
+function normalizeProgressEntries(entries) {
+  const byDate = new Map();
+  (entries || []).forEach(raw => {
+    if (!raw || !raw.date) return;
+    const e = {...raw};
+    const prev = byDate.get(e.date);
+    if (!prev) {
+      byDate.set(e.date, e);
+      return;
+    }
+    const merged = {...prev};
+    ['weight','fat','fatKg','muscle','muscleUnit','waist','src'].forEach(k => {
+      if ((merged[k] == null || merged[k] === '') && e[k] != null && e[k] !== '') merged[k] = e[k];
+    });
+    byDate.set(e.date, progressEntryCompleteness(e) > progressEntryCompleteness(merged) ? {...merged, ...e} : merged);
+  });
+  return Array.from(byDate.values()).sort((a,b) => a.date.localeCompare(b.date));
+}
+
 // ── EXPORT / IMPORT ──────────────────────────
 
 function exportJSON() {
@@ -3161,10 +3309,17 @@ function processImportData(data) {
     h.sort((a,b)=>a.date.localeCompare(b.date)); saveTrainingHistory(h);
   }
   if (Array.isArray(data.body)) {
-    const p = loadProgress();
-    const sig = new Set(p.map(e=>JSON.stringify(e)));
-    data.body.forEach(e => { if(!sig.has(JSON.stringify(e))){p.push(e);merged++;} });
-    p.sort((a,b)=>a.date.localeCompare(b.date)); saveProgress(p);
+    const before = loadProgress();
+    const beforeNorm = normalizeProgressEntries(before);
+    const normalized = normalizeProgressEntries([...before, ...data.body]);
+    const beforeSig = JSON.stringify(beforeNorm);
+    const afterSig = JSON.stringify(normalized);
+    if (beforeSig !== afterSig) {
+      merged += Math.max(1, normalized.length - beforeNorm.length);
+      saveProgress(normalized);
+    } else {
+      saveProgress(normalized);
+    }
   }
   if (Array.isArray(data.runs)) {
     const r = loadRuns();
